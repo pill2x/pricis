@@ -1,175 +1,593 @@
-import { Ruler, FileText, Send, MessageSquare } from "lucide-react";
+"use client";
+
 import Link from "next/link";
+import { FileText, MessageSquare, ArrowRight } from "lucide-react";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[#0B1D35] text-white">
-      {/* Navbar */}
-      <nav className="px-6 py-6">
-        <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <Link href="/" className="text-xl font-bold text-[#B8860B]">
-            Pricis
-          </Link>
-          <div className="flex items-center gap-6">
-            <Link
-              href="/negotiate"
-              className="text-sm text-white/80 hover:text-white transition-colors"
+    <>
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+      `}</style>
+      
+      <div className="min-h-screen" style={{ fontFamily: 'Inter, sans-serif', backgroundColor: '#FFFFFF', color: '#0A0F1E' }}>
+        
+        {/* Navbar */}
+        <nav 
+          className="sticky top-0 z-50 bg-white border-b border-[#E8EAED]"
+          style={{ height: '60px' }}
+        >
+          <div className="max-w-6xl mx-auto px-6 h-full flex items-center justify-between">
+            <Link 
+              href="/" 
+              className="font-bold text-xl"
+              style={{ color: '#0A0F1E' }}
             >
-              Negotiate
+              Pricis
             </Link>
-            <Link
-              href="/login"
-              className="text-sm text-white/80 hover:text-white transition-colors"
+            <div className="flex items-center gap-6">
+              <Link
+                href="/login"
+                className="text-sm hover:text-[#0A0F1E] transition-colors"
+                style={{ color: '#4B5563' }}
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/signup"
+                className="text-sm font-semibold px-4 py-2 rounded-lg hover:bg-[#1D4ED8] transition-colors"
+                style={{ 
+                  backgroundColor: '#2563EB',
+                  color: 'white'
+                }}
+              >
+                Get Started
+              </Link>
+            </div>
+          </div>
+        </nav>
+
+        {/* Hero Section */}
+        <section 
+          className="text-center"
+          style={{ paddingTop: '96px', paddingBottom: '64px', backgroundColor: '#FFFFFF' }}
+        >
+          <div className="max-w-4xl mx-auto px-6">
+            {/* Eyebrow badge */}
+            <div 
+              className="inline-block mb-8"
+              style={{ 
+                backgroundColor: '#FBF6E9',
+                color: '#B8860B',
+                border: '1px solid #E8D5A3',
+                fontSize: '12px',
+                fontWeight: '500',
+                letterSpacing: '0.05em',
+                textTransform: 'uppercase',
+                padding: '6px 12px',
+                borderRadius: '9999px'
+              }}
             >
-              Sign In
-            </Link>
+              For Freelancers & Service Providers
+            </div>
+
+            {/* Headline */}
+            <h1 
+              className="font-black mb-6"
+              style={{ 
+                fontSize: 'clamp(48px, 8vw, 80px)',
+                letterSpacing: '-0.03em',
+                lineHeight: '0.92',
+                color: '#0A0F1E'
+              }}
+            >
+              Know exactly
+              <br />
+              <span style={{ color: '#2563EB' }}>what to charge.</span>
+            </h1>
+
+            {/* Subtext */}
+            <p 
+              className="mb-10 leading-relaxed"
+              style={{ 
+                fontSize: 'clamp(18px, 2vw, 20px)',
+                color: '#4B5563',
+                maxWidth: '640px',
+                margin: '0 auto 40px'
+              }}
+            >
+              Pricis generates professional pricing and scope documents in seconds — so you stop undercharging and start getting paid what your work is worth. Then when the client pushes back? We&apos;ve got that covered too.
+            </p>
+
+            {/* CTA buttons */}
+            <div className="flex justify-center gap-3 mb-4">
+              <Link
+                href="/generate"
+                className="font-bold rounded-xl transition-colors"
+                style={{ 
+                  backgroundColor: '#2563EB',
+                  color: '#white',
+                  fontSize: '16px',
+                  padding: '14px 28px',
+                  boxShadow: '0 4px 14px rgba(37,99,235,0.25)'
+                }}
+              >
+                Generate Your Free Scope →
+              </Link>
+              <Link
+                href="/signup"
+                className="font-medium rounded-xl transition-all"
+                style={{ 
+                  border: '1px solid #E8EAED',
+                  color: '#4B5563',
+                  fontSize: '16px',
+                  padding: '14px 24px'
+                }}
+              >
+                Try Negotiation Assistant →
+              </Link>
+            </div>
+
+            <p 
+              className="text-sm"
+              style={{ color: '#9CA3AF' }}
+            >
+              No sign-up required · Free forever
+            </p>
+          </div>
+        </section>
+
+        {/* Product Mockup Card */}
+        <section 
+          className="mt-16"
+          style={{ maxWidth: '672px', margin: '0 auto', padding: '0 24px' }}
+        >
+          <div 
+            className="rounded-2xl overflow-hidden"
+            style={{ 
+              border: '1px solid #E8EAED',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04)',
+              backgroundColor: '#FFFFFF'
+            }}
+          >
+            {/* Browser bar */}
+            <div 
+              className="flex items-center gap-2"
+              style={{ 
+                backgroundColor: '#F7F8FA',
+                borderBottom: '1px solid #E8EAED',
+                padding: '12px 16px'
+              }}
+            >
+              <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#E8545A' }} />
+              <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#F5BE4F' }} />
+              <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#56C15E' }} />
+              <span 
+                className="ml-4 text-xs"
+                style={{ color: '#9CA3AF' }}
+              >
+                pricis.co/scope/mj8k2
+              </span>
+            </div>
+
+            {/* Content */}
+            <div style={{ padding: '24px' }}>
+              {/* Tag */}
+              <div 
+                className="inline-block mb-3"
+                style={{ 
+                  backgroundColor: '#FBF6E9',
+                  color: '#B8860B',
+                  border: '1px solid #E8D5A3',
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  padding: '4px 10px',
+                  borderRadius: '9999px'
+                }}
+              >
+                UI/UX Design · Senior
+              </div>
+
+              {/* Title */}
+              <h3 
+                className="font-bold mb-4"
+                style={{ 
+                  fontSize: '20px',
+                  color: '#0A0F1E'
+                }}
+              >
+                Mobile App Redesign — Fintech
+              </h3>
+
+              {/* Divider */}
+              <div style={{ borderTop: '1px solid #E8EAED', marginBottom: '20px' }} />
+
+              {/* Pricing */}
+              <div className="grid grid-cols-3 gap-4 mb-5">
+                <div>
+                  <p 
+                    className="text-xs uppercase tracking-wide mb-1"
+                    style={{ color: '#9CA3AF' }}
+                  >
+                    Conservative
+                  </p>
+                  <p 
+                    className="text-lg font-bold"
+                    style={{ color: '#0A0F1E' }}
+                  >
+                    ₦120,000
+                  </p>
+                </div>
+                <div style={{ position: 'relative' }}>
+                  <div style={{ 
+                    position: 'absolute',
+                    top: '-8px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: '6px',
+                    height: '6px',
+                    borderRadius: '50%',
+                    backgroundColor: '#2563EB'
+                  }} />
+                  <p 
+                    className="text-xs uppercase tracking-wide mb-1"
+                    style={{ color: '#9CA3AF' }}
+                  >
+                    Standard
+                  </p>
+                  <p 
+                    className="text-lg font-bold"
+                    style={{ color: '#2563EB' }}
+                  >
+                    ₦200,000
+                  </p>
+                </div>
+                <div>
+                  <p 
+                    className="text-xs uppercase tracking-wide mb-1"
+                    style={{ color: '#9CA3AF' }}
+                  >
+                    Premium
+                  </p>
+                  <p 
+                    className="text-lg font-bold"
+                    style={{ color: '#0A0F1E' }}
+                  >
+                    ₦320,000
+                  </p>
+                </div>
+              </div>
+
+              {/* Tags */}
+              <div className="flex gap-2">
+                <div 
+                  className="rounded-lg"
+                  style={{ 
+                    backgroundColor: '#F7F8FA',
+                    border: '1px solid #E8EAED',
+                    fontSize: '12px',
+                    color: '#4B5563',
+                    padding: '6px 12px'
+                  }}
+                >
+                  12 Deliverables
+                </div>
+                <div 
+                  className="rounded-lg"
+                  style={{ 
+                    backgroundColor: '#F7F8FA',
+                    border: '1px solid #E8EAED',
+                    fontSize: '12px',
+                    color: '#4B5563',
+                    padding: '6px 12px'
+                  }}
+                >
+                  3 Revision rounds
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Industries Strip */}
+        <section 
+          className="mt-20 py-12"
+          style={{ 
+            borderTop: '1px solid #E8EAED',
+            borderBottom: '1px solid #E8EAED',
+            backgroundColor: '#F7F8FA'
+          }}
+        >
+          <p 
+            className="text-center mb-7"
+            style={{ 
+              fontSize: '12px',
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: '#9CA3AF'
+            }}
+          >
+            Built for every type of freelancer
+          </p>
+          
+          <div className="flex flex-wrap justify-center gap-3 px-6">
+            {[
+              "UI/UX Design", "Web Development", "Copywriting", "Video Editing",
+              "Photography", "Social Media", "Graphic Design", "Brand Strategy"
+            ].map((industry) => (
+              <div
+                key={industry}
+                className="rounded-full transition-colors cursor-default"
+                style={{ 
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #E8EAED',
+                  fontSize: '14px',
+                  color: '#4B5563',
+                  padding: '8px 16px'
+                }}
+              >
+                {industry}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* How It Works */}
+        <section 
+          className="py-28 px-6"
+          style={{ backgroundColor: '#FFFFFF' }}
+        >
+          <div className="max-w-5xl mx-auto">
+            {/* Header */}
+            <div className="text-center mb-16">
+              <p 
+                className="mb-4"
+                style={{ 
+                  fontSize: '12px',
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                  color: '#2563EB',
+                  fontWeight: '500'
+                }}
+              >
+                How it works
+              </p>
+              
+              <h2 
+                className="font-black"
+                style={{ 
+                  fontSize: 'clamp(36px, 5vw, 48px)',
+                  letterSpacing: '-0.02em',
+                  lineHeight: '1.2',
+                  color: '#0A0F1E'
+                }}
+              >
+                From first quote to<br />
+                final agreement.
+              </h2>
+              
+              <p 
+                className="mt-4 text-lg"
+                style={{ color: '#4B5563' }}
+              >
+                Two tools. One workflow.
+              </p>
+            </div>
+
+            {/* Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {/* Card 1 */}
+              <div 
+                className="group rounded-2xl p-8 transition-all"
+                style={{ 
+                  backgroundColor: '#F7F8FA',
+                  border: '1px solid #E8EAED'
+                }}
+              >
+                <p 
+                  className="mb-5"
+                  style={{ 
+                    fontSize: '12px',
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
+                    color: '#2563EB',
+                    fontWeight: '500'
+                  }}
+                >
+                  STEP 01
+                </p>
+                
+                <div 
+                  className="flex items-center justify-center mb-5 rounded-xl"
+                  style={{ 
+                    width: '44px',
+                    height: '44px',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #E8EAED',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+                  }}
+                >
+                  <FileText size={20} color="#2563EB" />
+                </div>
+                
+                <h3 
+                  className="text-xl font-bold mb-3"
+                  style={{ color: '#0A0F1E' }}
+                >
+                  Know what to charge
+                </h3>
+                
+                <p 
+                  className="text-sm leading-relaxed mb-6"
+                  style={{ color: '#4B5563' }}
+                >
+                  Generate a professional scope and accurate pricing in seconds. Export a PDF your client can accept digitally.
+                </p>
+                
+                <Link
+                  href="/generate"
+                  className="inline-flex items-center gap-1.5 font-semibold transition-all group-hover:gap-2.5"
+                  style={{ 
+                    fontSize: '14px',
+                    color: '#2563EB'
+                  }}
+                >
+                  Generate Scope
+                  <ArrowRight size={16} />
+                </Link>
+              </div>
+
+              {/* Card 2 */}
+              <div 
+                className="group rounded-2xl p-8 transition-all"
+                style={{ 
+                  backgroundColor: '#F7F8FA',
+                  border: '1px solid #E8EAED'
+                }}
+              >
+                <p 
+                  className="mb-5"
+                  style={{ 
+                    fontSize: '12px',
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
+                    color: '#2563EB',
+                    fontWeight: '500'
+                  }}
+                >
+                  STEP 02
+                </p>
+                
+                <div 
+                  className="flex items-center justify-center mb-5 rounded-xl"
+                  style={{ 
+                    width: '44px',
+                    height: '44px',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #E8EAED',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+                  }}
+                >
+                  <MessageSquare size={20} color="#2563EB" />
+                </div>
+                
+                <h3 
+                  className="text-xl font-bold mb-3"
+                  style={{ color: '#0A0F1E' }}
+                >
+                  Hold your ground
+                </h3>
+                
+                <p 
+                  className="text-sm leading-relaxed mb-6"
+                  style={{ color: '#4B5563' }}
+                >
+                  When the client negotiates, you&apos;re ready. Get strategy, draft responses, and practice the conversation before it happens.
+                </p>
+                
+                <Link
+                  href="/signup"
+                  className="inline-flex items-center gap-1.5 font-semibold transition-all group-hover:gap-2.5"
+                  style={{ 
+                    fontSize: '14px',
+                    color: '#2563EB'
+                  }}
+                >
+                  Try Negotiation Assistant
+                  <ArrowRight size={16} />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Final CTA */}
+        <section 
+          className="py-28 px-6 text-center"
+          style={{ backgroundColor: '#0A0F1E' }}
+        >
+          <div className="max-w-4xl mx-auto">
+            <h2 
+              className="font-black"
+              style={{ 
+                fontSize: 'clamp(36px, 6vw, 60px)',
+                letterSpacing: '-0.03em',
+                lineHeight: '1.2',
+                color: '#FFFFFF'
+              }}
+            >
+              Stop guessing.
+              <br />
+              <span style={{ color: 'rgba(255,255,255,0.4)' }}>
+                Start charging with confidence.
+              </span>
+            </h2>
+            
+            <p 
+              className="mt-6 text-lg"
+              style={{ 
+                color: 'rgba(255,255,255,0.5)',
+                maxWidth: '512px',
+                margin: '24px auto 0'
+              }}
+            >
+              Join freelancers who know their worth — and charge accordingly.
+            </p>
+            
             <Link
               href="/signup"
-              className="inline-flex items-center px-4 py-2 bg-[#B8860B] text-[#0B1D35] font-medium rounded-lg hover:bg-[#c99414] transition-colors text-sm"
+              className="inline-block mt-10 font-bold rounded-xl transition-colors"
+              style={{ 
+                backgroundColor: '#2563EB',
+                color: '#FFFFFF',
+                fontSize: '16px',
+                padding: '16px 32px'
+              }}
             >
-              Get Started
+              Get Started Free →
             </Link>
-          </div>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center px-6 pt-24 pb-20 text-center md:pt-32 md:pb-28">
-        <span className="mb-6 text-sm font-medium text-[#B8860B]">
-          For freelancers & service providers
-        </span>
-
-        <h1 className="max-w-3xl text-balance text-4xl font-bold leading-tight md:text-5xl lg:text-6xl">
-          Know exactly what to charge. Every time.
-        </h1>
-
-        <p className="mt-6 max-w-xl text-pretty text-lg leading-relaxed text-white/70">
-          Pricis generates professional pricing and scope documents in seconds — so you stop undercharging and start getting paid what your work is worth. Then when the client pushes back? We've got that covered too.
-        </p>
-
-        <a
-          href="/generate"
-          className="mt-10 inline-flex rounded-lg bg-[#B8860B] px-6 py-3 font-semibold text-[#0B1D35] transition-colors hover:bg-[#a07609]"
-        >
-          Generate Your Free Scope &rarr;
-        </a>
-      </section>
-
-      {/* Value Props Section */}
-      <section className="px-6 pb-16 md:pb-24">
-        <div className="mx-auto grid max-w-5xl gap-10 md:grid-cols-3 md:gap-8">
-          <ValueProp
-            icon={<Ruler className="h-6 w-6 text-[#B8860B]" />}
-            title="Instant Pricing"
-            description="Accurate, market-aligned pricing for your industry in seconds."
-          />
-          <ValueProp
-            icon={<FileText className="h-6 w-6 text-[#B8860B]" />}
-            title="Professional Scopes"
-            description="Auto-generated scope documents that protect you from scope creep."
-          />
-          <ValueProp
-            icon={<Send className="h-6 w-6 text-[#B8860B]" />}
-            title="Send to Clients"
-            description="Export a PDF or share a link your client can accept digitally."
-          />
-        </div>
-      </section>
-
-      {/* From First Quote Section */}
-      <section className="px-6 pb-16 md:pb-24">
-        <h2 className="text-center text-2xl md:text-3xl font-bold mb-12">
-          From first quote to final agreement.
-        </h2>
-        <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-2">
-          <div className="rounded-2xl border border-[#B8860B]/20 bg-[#0F2440] p-8 transition-all duration-200 hover:border-[#B8860B]/40">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#B8860B]/10">
-                <FileText className="h-6 w-6 text-[#B8860B]" />
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-[#B8860B] tracking-wider uppercase">STEP 1</p>
-                <h3 className="text-xl font-semibold">Know what to charge</h3>
-              </div>
-            </div>
-            <p className="text-white/70 mb-6">
-              Generate a professional scope and accurate pricing in seconds. Export a PDF your client can accept digitally.
+            
+            <p 
+              className="mt-4 text-sm"
+              style={{ color: 'rgba(255,255,255,0.3)' }}
+            >
+              Free to use · No credit card required
             </p>
-            <Link
-              href="/generate"
-              className="inline-flex items-center gap-2 px-5 py-3 bg-[#B8860B] text-[#0B1D35] font-medium rounded-lg hover:bg-[#c99414] transition-colors"
-            >
-              Generate Scope
-              <Send className="h-4 w-4" />
-            </Link>
           </div>
+        </section>
 
-          <div className="rounded-2xl border border-[#B8860B]/20 bg-[#0F2440] p-8 transition-all duration-200 hover:border-[#B8860B]/40">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#B8860B]/10">
-                <MessageSquare className="h-6 w-6 text-[#B8860B]" />
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-[#B8860B] tracking-wider uppercase">STEP 2</p>
-                <h3 className="text-xl font-semibold">Hold your ground</h3>
-              </div>
-            </div>
-            <p className="text-white/70 mb-6">
-              When the client negotiates, you're ready. Get strategy, draft responses, and practice the conversation before it happens.
-            </p>
-            <Link
-              href="/negotiate"
-              className="inline-flex items-center gap-2 px-5 py-3 bg-[#B8860B] text-[#0B1D35] font-medium rounded-lg hover:bg-[#c99414] transition-colors"
-            >
-              Try Negotiation Assistant
-              <Send className="h-4 w-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Final CTA Section */}
-      <section className="flex flex-col items-center justify-center px-6 py-20 text-center md:py-28">
-        <h2 className="max-w-xl text-balance text-2xl font-bold md:text-3xl">
-          Stop guessing. Start charging with confidence.
-        </h2>
-
-        <a
-          href="/signup"
-          className="mt-8 inline-flex rounded-lg bg-[#B8860B] px-6 py-3 font-semibold text-[#0B1D35] transition-colors hover:bg-[#a07609]"
+        {/* Footer */}
+        <footer 
+          style={{ 
+            backgroundColor: '#060B14',
+            borderTop: '1px solid rgba(255,255,255,0.06)',
+            padding: '32px 24px'
+          }}
         >
-          Get Started Free →
-        </a>
-
-        <p className="mt-4 text-sm text-white/50">No sign-up required.</p>
-      </section>
-
-      {/* Footer */}
-      <footer className="px-6 py-8">
-        <p className="text-center text-sm text-white/40">
-          © 2025 Pricis. Built for freelancers who know their worth.
-        </p>
-      </footer>
-    </main>
-  );
-}
-
-function ValueProp({
-  icon,
-  title,
-  description,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}) {
-  return (
-    <div className="flex flex-col items-center text-center md:items-start md:text-left">
-      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-[#B8860B]/10">
-        {icon}
+          <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span 
+                className="font-bold text-lg"
+                style={{ color: '#FFFFFF' }}
+              >
+                Pricis
+              </span>
+              <span 
+                className="text-sm"
+                style={{ color: 'rgba(255,255,255,0.3)' }}
+              >
+                2025
+              </span>
+            </div>
+            <p 
+              className="text-sm"
+              style={{ color: 'rgba(255,255,255,0.3)' }}
+            >
+              Built for freelancers who know their worth.
+            </p>
+          </div>
+        </footer>
       </div>
-      <h3 className="mb-2 text-lg font-semibold">{title}</h3>
-      <p className="text-white/70">{description}</p>
-    </div>
+    </>
   );
 }

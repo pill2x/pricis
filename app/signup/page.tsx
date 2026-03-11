@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 export default function SignupPage() {
@@ -57,17 +57,37 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B1D35] text-white flex items-center justify-center px-6">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-[#B8860B] mb-2">Pricis</h1>
-          <p className="text-white/70">Create your account</p>
-        </div>
+    <>
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+      `}</style>
+      
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12" style={{ fontFamily: 'Inter, sans-serif', backgroundColor: '#F7F8FA' }}>
+        
+        {/* Top Logo */}
+        <Link href="/" className="mb-8">
+          <div className="font-bold text-xl" style={{ color: '#0A0F1E' }}>Pricis</div>
+        </Link>
 
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-8">
-          <form onSubmit={handleSignUp} className="space-y-6">
+        {/* Main Card */}
+        <div className="w-full max-w-md" style={{ backgroundColor: '#FFFFFF', border: '1px solid #E8EAED', borderRadius: '16px', padding: '32px', boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
+          
+          {/* Card Header */}
+          <div className="mb-8">
+            <h1 className="font-black tracking-[-0.02em]" style={{ fontSize: '32px', color: '#0A0F1E' }}>
+              Create your account
+            </h1>
+            <p className="mt-2 text-sm" style={{ color: '#4B5563' }}>
+              Start generating professional scopes for free.
+            </p>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSignUp} className="space-y-4">
+            
+            {/* Full Name */}
             <div>
-              <label htmlFor="fullName" className="block text-sm font-medium mb-2">
+              <label htmlFor="fullName" className="block text-sm font-medium mb-1.5" style={{ color: '#0A0F1E' }}>
                 Full Name
               </label>
               <input
@@ -76,37 +96,60 @@ export default function SignupPage() {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 required
-                className={[
-                  "w-full rounded-xl border bg-[#0B1D35] text-white",
-                  "border-white/15 px-4 py-3 leading-relaxed",
-                  "placeholder:text-white/40",
-                  "focus:outline-none focus:ring-2 focus:ring-[#B8860B] focus:border-transparent",
-                ].join(" ")}
+                className="w-full rounded-xl px-4 py-3 text-sm transition-all"
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #E8EAED',
+                  color: '#0A0F1E',
+                  outline: 'none'
+                }}
                 placeholder="John Doe"
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#2563EB';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#E8EAED';
+                  e.target.style.boxShadow = 'none';
+                }}
               />
             </div>
 
+            {/* Business Name */}
             <div>
-              <label htmlFor="businessName" className="block text-sm font-medium mb-2">
-                Business Name (Optional)
+              <label htmlFor="businessName" className="block text-sm font-medium mb-1.5" style={{ color: '#0A0F1E' }}>
+                Business Name
               </label>
               <input
                 id="businessName"
                 type="text"
                 value={businessName}
                 onChange={(e) => setBusinessName(e.target.value)}
-                className={[
-                  "w-full rounded-xl border bg-[#0B1D35] text-white",
-                  "border-white/15 px-4 py-3 leading-relaxed",
-                  "placeholder:text-white/40",
-                  "focus:outline-none focus:ring-2 focus:ring-[#B8860B] focus:border-transparent",
-                ].join(" ")}
-                placeholder="Your Business"
+                className="w-full rounded-xl px-4 py-3 text-sm transition-all"
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #E8EAED',
+                  color: '#0A0F1E',
+                  outline: 'none'
+                }}
+                placeholder="Your Studio / Freelance name"
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#2563EB';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#E8EAED';
+                  e.target.style.boxShadow = 'none';
+                }}
               />
+              <p className="text-xs mt-1" style={{ color: '#9CA3AF' }}>
+                (Optional — shown on your scopes)
+              </p>
             </div>
 
+            {/* Email */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium mb-2">
+              <label htmlFor="email" className="block text-sm font-medium mb-1.5" style={{ color: '#0A0F1E' }}>
                 Email
               </label>
               <input
@@ -115,18 +158,28 @@ export default function SignupPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className={[
-                  "w-full rounded-xl border bg-[#0B1D35] text-white",
-                  "border-white/15 px-4 py-3 leading-relaxed",
-                  "placeholder:text-white/40",
-                  "focus:outline-none focus:ring-2 focus:ring-[#B8860B] focus:border-transparent",
-                ].join(" ")}
-                placeholder="you@example.com"
+                className="w-full rounded-xl px-4 py-3 text-sm transition-all"
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #E8EAED',
+                  color: '#0A0F1E',
+                  outline: 'none'
+                }}
+                placeholder="you@email.com"
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#2563EB';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#E8EAED';
+                  e.target.style.boxShadow = 'none';
+                }}
               />
             </div>
 
+            {/* Password */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium mb-2">
+              <label htmlFor="password" className="block text-sm font-medium mb-1.5" style={{ color: '#0A0F1E' }}>
                 Password
               </label>
               <input
@@ -135,58 +188,84 @@ export default function SignupPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                minLength={6}
-                className={[
-                  "w-full rounded-xl border bg-[#0B1D35] text-white",
-                  "border-white/15 px-4 py-3 leading-relaxed",
-                  "placeholder:text-white/40",
-                  "focus:outline-none focus:ring-2 focus:ring-[#B8860B] focus:border-transparent",
-                ].join(" ")}
-                placeholder="••••••••"
+                minLength={8}
+                className="w-full rounded-xl px-4 py-3 text-sm transition-all"
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #E8EAED',
+                  color: '#0A0F1E',
+                  outline: 'none'
+                }}
+                placeholder="Min. 8 characters"
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#2563EB';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#E8EAED';
+                  e.target.style.boxShadow = 'none';
+                }}
               />
             </div>
 
+            {/* Error Message */}
             {error && (
-              <div className="text-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded-lg p-3">
-                {error}
+              <div className="flex items-center gap-2 px-4 py-3 rounded-xl" style={{ backgroundColor: '#FEF2F2', border: '1px solid #FECACA', color: '#EF4444' }}>
+                <AlertCircle className="h-4 w-4" />
+                <span className="text-sm">{error}</span>
               </div>
             )}
 
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={isLoading}
-              className={[
-                "w-full inline-flex items-center justify-center gap-2",
-                "px-6 py-3.5 font-bold rounded-lg transition-colors",
-                isLoading
-                  ? "bg-white/15 text-white/50 cursor-not-allowed"
-                  : "bg-[#B8860B] text-[#0B1D35] hover:bg-[#c99414]",
-              ].join(" ")}
+              className="w-full font-bold text-sm py-3.5 rounded-xl transition-all"
+              style={{
+                backgroundColor: isLoading ? 'rgba(37,99,235,0.5)' : '#2563EB',
+                color: 'white',
+                boxShadow: '0 4px 14px rgba(37,99,235,0.25)',
+                marginTop: '8px',
+                cursor: isLoading ? 'not-allowed' : 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                if (!isLoading) e.currentTarget.style.backgroundColor = '#1D4ED8';
+              }}
+              onMouseLeave={(e) => {
+                if (!isLoading) e.currentTarget.style.backgroundColor = '#2563EB';
+              }}
             >
               {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Creating Account...
+                  Creating account...
                 </>
               ) : (
-                "Create Account"
+                "Create Account →"
               )}
             </button>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-sm text-white/60">
+          {/* Divider */}
+          <div className="mt-6 pt-6" style={{ borderTop: '1px solid #E8EAED' }}>
+            <p className="text-center text-sm" style={{ color: '#4B5563' }}>
               Already have an account?{" "}
               <Link
                 href="/login"
-                className="text-[#B8860B] hover:text-[#c99414] transition-colors font-medium"
+                className="font-semibold"
+                style={{ color: '#2563EB' }}
               >
                 Sign in
               </Link>
             </p>
           </div>
         </div>
+
+        {/* Footer */}
+        <p className="mt-8 text-xs text-center" style={{ color: '#9CA3AF' }}>
+          By signing up, you agree to our terms.
+        </p>
       </div>
-    </div>
+    </>
   );
 }
