@@ -38,6 +38,7 @@ export default function DashboardNegotiatePage() {
   const [currentNegotiationId, setCurrentNegotiationId] = useState<string | null>(null);
   const [deletingConversation, setDeletingConversation] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const userNameRef = useRef<string>("there");
 
   useEffect(() => {
     fetchConversations();
@@ -166,9 +167,24 @@ export default function DashboardNegotiatePage() {
     try {
       let negotiationId = currentNegotiationId;
 
+      // Fetch user once at the top
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+
+      // Only fetch name once per session
+      if (userNameRef.current === "there" && currentUser) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", currentUser.id)
+          .single();
+        if (profile?.full_name) {
+          userNameRef.current = profile.full_name.split(" ")[0];
+        }
+      }
+      const userName = userNameRef.current;
+
       if (!negotiationId) {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+        if (!currentUser) return;
 
         const { data: negotiation, error: negError } = await supabase
           .from("negotiations")
@@ -176,7 +192,7 @@ export default function DashboardNegotiatePage() {
             title: userContent.substring(0, 40),
             mode: currentMode,
             context: currentContext,
-            user_id: user.id,
+            user_id: currentUser.id,
           })
           .select()
           .single();
@@ -196,31 +212,16 @@ export default function DashboardNegotiatePage() {
         content: userContent,
       });
 
-      // Get user's first name for personalization
-      const { data: { user: currentUser } } = await supabase.auth.getUser();
-      let userName = "there";
-      if (currentUser) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("full_name")
-          .eq("id", currentUser.id)
-          .single();
-        if (profile?.full_name) {
-          userName = profile.full_name.split(" ")[0];
-        }
-      }
-
       // Get AI response
       const response = await fetch("/api/negotiate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: newMessages, mode: currentMode, context: currentContext }),
+        body: JSON.stringify({ messages: newMessages, mode: currentMode, context: currentContext, userName }),
       });
 
       const data = await response.json();
 
       if (data.message) {
-        // Save assistant message
         await supabase.from("negotiation_messages").insert({
           negotiation_id: negotiationId,
           role: "assistant",
