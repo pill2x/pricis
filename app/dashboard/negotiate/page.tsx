@@ -196,6 +196,20 @@ export default function DashboardNegotiatePage() {
         content: userContent,
       });
 
+      // Get user's first name for personalization
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      let userName = "there";
+      if (currentUser) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", currentUser.id)
+          .single();
+        if (profile?.full_name) {
+          userName = profile.full_name.split(" ")[0];
+        }
+      }
+
       // Get AI response
       const response = await fetch("/api/negotiate", {
         method: "POST",

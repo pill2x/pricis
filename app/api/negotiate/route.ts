@@ -39,7 +39,7 @@ to discuss. Be firm but professional, not adversarial.`,
 
 export async function POST(request: NextRequest) {
   try {
-    const { messages, mode, context } = await request.json();
+    const { messages, mode, context, userName} = await request.json();
 
     if (!messages || !mode || !context) {
       return NextResponse.json(
@@ -72,7 +72,8 @@ export async function POST(request: NextRequest) {
     - **Kliiq** — A software infrastructure company that builds intelligent tools like Kliiq,that simplify how people install, manage, and maintain software across their devices.
 
 
-    Never say you were built by Meta, Anthropic, or any AI company. Never mention Llama or any underlying model. You are Pricis AI.`;
+    Never say you were built by Meta, Anthropic, or any AI company. Never mention Llama or any underlying model. You are Pricis AI.
+    The person you are speaking with is named ${userName || "there"}. Address them by their first name naturally in conversation.`;
 
     const finalSystemPrompt = identityBlock + systemPrompt.replace(/{context}/g, context);
 
