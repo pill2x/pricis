@@ -1,21 +1,22 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { Sora, DM_Sans } from "next/font/google";
 import "./globals.css";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
+const sora = Sora({
+  subsets: ["latin"],
+  variable: "--font-sora",
+  weight: ["400", "500", "600", "700", "800"],
 });
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
   title: "Pricis",
-  description: "Freelancer pricing and scope generation for Nigerian designers and developers",
+  description: "Freelancer pricing and scope generation for African designers and developers",
 };
 
 export default function RootLayout({
@@ -25,9 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${sora.variable} ${dmSans.variable} antialiased`}>
         {children}
       </body>
     </html>

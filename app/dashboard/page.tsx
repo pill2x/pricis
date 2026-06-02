@@ -3,7 +3,10 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, Loader2, FileText, X, Trash2, Plus, Clock, CheckCircle2, RefreshCw, XCircle, Download } from "lucide-react";
+import { 
+  Bell, ChevronRight, Download, Target, MessageSquare, Plus, 
+  FileText, Loader2, X, Trash2, CheckCircle2, Clock, RefreshCw, XCircle 
+} from "lucide-react";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { supabase } from "@/lib/supabase";
 import ScopePDF from "@/components/ScopePDF";
@@ -30,14 +33,17 @@ export default function DashboardPage() {
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
-  const [deletingQuote, setDeletingQuote] = useState<string | null>(null);
+  const [user, setUser] = useState<any>(null);
   const router = useRouter();
 
   useEffect(() => {
-    fetchQuotes();
+    fetchUserAndQuotes();
   }, []);
 
-  const fetchQuotes = async () => {
+  const fetchUserAndQuotes = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setUser(user);
+    
     try {
       const { data, error } = await supabase
         .from("quotes")
@@ -56,32 +62,11 @@ export default function DashboardPage() {
     }
   };
 
-  const handleViewQuote = (quote: Quote) => {
-    setSelectedQuote(quote);
-  };
-
   const deleteQuote = async (quoteId: string) => {
     try {
-      const { error } = await supabase
-        .from("quotes")
-        .delete()
-        .eq("id", quoteId);
-
-      if (error) {
-        console.error("Error deleting quote:", error);
-        return;
-      }
-
-      // Remove from local state
+      await supabase.from("quotes").delete().eq("id", quoteId);
       setQuotes(prev => prev.filter(q => q.id !== quoteId));
-      
-      // Close modal if this quote was being viewed
-      if (selectedQuote?.id === quoteId) {
-        setSelectedQuote(null);
-      }
-      
-      // Clear delete confirmation
-      setDeletingQuote(null);
+      if (selectedQuote?.id === quoteId) setSelectedQuote(null);
     } catch (err) {
       console.error("Error:", err);
     }
@@ -89,24 +74,20 @@ export default function DashboardPage() {
 
   const getTierPrice = (quote: Quote) => {
     switch (quote.selected_tier) {
-      case "conservative":
-        return quote.price_conservative;
-      case "standard":
-        return quote.price_standard;
-      case "premium":
-        return quote.price_premium;
-      default:
-        return quote.price_standard;
+      case "conservative": return quote.price_conservative;
+      case "standard": return quote.price_standard;
+      case "premium": return quote.price_premium;
+      default: return quote.price_standard;
     }
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
+  const getStatus = (index: number) => {
+    const statuses = [
+      { text: "Viewed", bgClass: "bg-success/10", textClass: "text-success" },
+      { text: "Draft", bgClass: "bg-gray-100", textClass: "text-text-secondary" },
+      { text: "Sent", bgClass: "bg-primary-light", textClass: "text-primary" }
+    ];
+    return statuses[index % statuses.length];
   };
 
   const getIndustryLabel = (industry: string) => {
@@ -124,565 +105,196 @@ export default function DashboardPage() {
 
   return (
     <>
-      <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-      `}</style>
-      
-      <div className="min-h-screen" style={{ fontFamily: 'Inter, sans-serif', backgroundColor: '#060D18' }}>
-        <div className="px-6 py-10 md:py-14 max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
-            <div>
-              <h1 
-                className="font-black tracking-[-0.02em]"
-                style={{ fontSize: '30px', color: '#F1F5F9' }}
-              >
-                My Scopes
-              </h1>
-              <p 
-                className="mt-1"
-                style={{ fontSize: '14px', color: '#94A3B8' }}
-              >
-                {quotes.length} saved scope{quotes.length !== 1 ? 's' : ''}
-              </p>
-            </div>
-            <Link
-              href="/generate"
-              className="inline-flex items-center gap-2 font-semibold rounded-xl transition-colors"
-              style={{
-                backgroundColor: '#2563EB',
-                color: 'white',
-                fontSize: '14px',
-                padding: '10px 20px'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1D4ED8'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2563EB'}
-            >
-              New Scope
-              <Plus className="h-4 w-4" />
+      {/* Header */}
+      <div className="flex justify-between items-start mb-10">
+        <div>
+          <h1 className="text-2xl font-bold text-text-dark mb-1 font-display">
+            Welcome back, {user?.user_metadata?.first_name || user?.email?.split('@')[0] || 'User'} 👋
+          </h1>
+          <p className="text-text-secondary text-sm font-body">Let&apos;s create a scope or continue where you left off.</p>
+        </div>
+        <div className="flex items-center gap-4">
+          <button className="text-text-muted hover:text-text-dark transition-colors">
+            <Bell size={22} />
+          </button>
+          <Link href="/generate" className="hidden sm:flex bg-primary hover:bg-primary-hover text-white px-5 py-2.5 rounded-full text-sm font-semibold items-center gap-2 transition-colors shadow-blue font-body">
+            <Plus size={18} /> New Scope
+          </Link>
+        </div>
+      </div>
+
+      {/* Quick Action Cards */}
+      <div className="grid md:grid-cols-2 gap-6 mb-10">
+        <div className="bg-surface border border-border-light rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col items-start group">
+          <div className="w-12 h-12 rounded-xl bg-primary-light flex items-center justify-center mb-5 group-hover:bg-primary group-hover:text-white transition-colors">
+            <Target className="text-primary group-hover:text-white" size={24} />
+          </div>
+          <h3 className="font-bold text-text-dark mb-1.5 text-lg font-display">Scope Generator</h3>
+          <p className="text-sm text-text-secondary mb-6 font-body">Create accurate scopes, pricing and timelines.</p>
+          <Link href="/generate" className="bg-primary hover:bg-primary-hover text-white w-full py-3 rounded-full text-sm font-semibold transition-colors text-center shadow-sm font-body">
+            Start New
+          </Link>
+        </div>
+        
+        <div className="bg-surface border border-border-light rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col items-start group">
+          <div className="w-12 h-12 rounded-xl bg-primary-light flex items-center justify-center mb-5 group-hover:bg-primary group-hover:text-white transition-colors">
+            <MessageSquare className="text-primary group-hover:text-white" size={24} />
+          </div>
+          <h3 className="font-bold text-text-dark mb-1.5 text-lg font-display">Negotiation Assistant</h3>
+          <p className="text-sm text-text-secondary mb-6 font-body">Get help with strategy, messages and practice.</p>
+          <button className="bg-transparent border-[1.5px] border-border-light text-text-dark hover:bg-gray-50 w-full py-3 rounded-full text-sm font-semibold transition-colors font-body">
+            Open Assistant
+          </button>
+        </div>
+      </div>
+
+      {/* Recent Scopes Table */}
+      <div>
+        <div className="flex justify-between items-center mb-4 px-1">
+          <h3 className="font-semibold text-text-dark text-lg font-display">Recent Scopes</h3>
+          <Link href="/dashboard/scopes" className="text-primary text-sm font-semibold hover:text-primary-hover font-body">View all →</Link>
+        </div>
+        
+        {isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : quotes.length === 0 ? (
+          <div className="text-center py-20 bg-surface border border-border-light rounded-lg shadow-sm">
+            <FileText className="h-10 w-10 mx-auto mb-3 text-text-muted" />
+            <h2 className="text-lg font-bold text-text-dark mb-1 font-display">No scopes yet</h2>
+            <p className="text-sm text-text-secondary mb-6 font-body">Generate your first scope to see it here.</p>
+            <Link href="/generate" className="bg-primary hover:bg-primary-hover text-white text-sm font-semibold px-6 py-2.5 rounded-full shadow-blue font-body">
+              Create Scope
             </Link>
           </div>
-
-          {/* Content */}
-          {isLoading ? (
-            <div className="flex items-center justify-center" style={{ padding: '80px 0' }}>
-              <Loader2 className="h-8 w-8 animate-spin" style={{ color: '#B8860B' }} />
-            </div>
-          ) : quotes.length === 0 ? (
-            <div className="text-center" style={{ padding: '80px 0' }}>
-              <FileText className="h-12 w-12 mx-auto mb-4" style={{ color: '#475569' }} />
-              <h2 
-                className="text-xl font-semibold mt-4 mb-2"
-                style={{ color: '#F1F5F9' }}
-              >
-                No scopes yet
-              </h2>
-              <p 
-                className="text-sm max-w-xs mx-auto text-center"
-                style={{ color: '#94A3B8' }}
-              >
-                Generate your first scope and it'll appear here.
-              </p>
-              <Link
-                href="/generate"
-                className="inline-block mt-6 font-semibold rounded-xl transition-colors"
-                style={{
-                  backgroundColor: '#2563EB',
-                  color: 'white',
-                  fontSize: '14px',
-                  padding: '12px 24px'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1D4ED8'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2563EB'}
-              >
-                Generate a Scope
-              </Link>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {quotes.map((quote) => (
-                <div
-                  key={quote.id}
-                  className="group rounded-2xl p-5 cursor-pointer transition-all relative"
-                  style={{
-                    backgroundColor: '#0C1827',
-                    border: '1px solid rgba(255,255,255,0.08)'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)';
-                    e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.3)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
-                    e.currentTarget.style.boxShadow = 'none';
-                  }}
-                >
-                  {/* Delete button */}
-                  <button
-                    onClick={() => setDeletingQuote(quote.id)}
-                    className="p-1.5 rounded-lg transition-all"
-                    style={{
-                      position: 'absolute',
-                      top: '12px',
-                      right: '12px',
-                      opacity: 0,
-                      backgroundColor: 'rgba(6,13,24,0.8)',
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(255,255,255,0.08)',
-                      color: '#475569',
-                      zIndex: 10
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.opacity = '1';
-                      e.currentTarget.style.color = '#EF4444';
-                      e.currentTarget.style.borderColor = 'rgba(239,68,68,0.3)';
-                      e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.08)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.opacity = '0';
-                      e.currentTarget.style.color = '#475569';
-                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
-                      e.currentTarget.style.backgroundColor = 'rgba(6,13,24,0.8)';
-                    }}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-
-                  {/* Delete confirmation */}
-                  {deletingQuote === quote.id && (
-                    <div 
-                      className="flex items-center justify-between gap-3 mb-3"
-                      style={{
-                        backgroundColor: 'rgba(239,68,68,0.08)',
-                        border: '1px solid rgba(239,68,68,0.2)',
-                        borderRadius: '12px',
-                        padding: '12px 16px'
-                      }}
-                    >
-                      <div className="text-xs" style={{ color: '#EF4444' }}>
-                        Delete this scope?
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => deleteQuote(quote.id)}
-                          className="text-xs font-medium px-3 py-1.5 rounded-lg"
-                          style={{
-                            backgroundColor: 'rgba(239,68,68,0.15)',
-                            color: '#EF4444'
-                          }}
-                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.25)'}
-                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.15)'}
-                        >
-                          Yes, delete
-                        </button>
-                        <button
-                          onClick={() => setDeletingQuote(null)}
-                          className="text-xs font-medium px-3 py-1.5 rounded-lg"
-                          style={{
-                            backgroundColor: 'rgba(255,255,255,0.05)',
-                            color: '#94A3B8'
-                          }}
-                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
-                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'}
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Top row */}
-                  <div className="flex items-start justify-between mb-3">
-                    <div
-                      className="inline-flex items-center px-2.5 py-1 rounded-full text-xs"
-                      style={{
-                        backgroundColor: 'rgba(255,255,255,0.05)',
-                        color: '#94A3B8'
-                      }}
-                    >
-                      {getIndustryLabel(quote.industry)}
-                    </div>
-                    <div style={{ width: '28px', height: '28px' }} />
-                  </div>
-
-                  {/* Title */}
-                  <h3 
-                    className="font-bold mb-1 leading-snug"
-                    style={{ 
-                      fontSize: '16px', 
-                      color: '#F1F5F9',
-                      display: '-webkit-box',
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden'
-                    }}
-                  >
-                    {quote.project_title}
-                  </h3>
-
-                  {/* Date */}
-                  <p 
-                    className="text-xs mb-4"
-                    style={{ color: '#475569' }}
-                  >
-                    {formatDate(quote.created_at)}
-                  </p>
-
-                  {/* Divider */}
-                  <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', marginBottom: '16px' }} />
-
-                  {/* Pricing row */}
-                  <div className="grid grid-cols-3 gap-2 mb-4">
-                    <div>
-                      <p 
-                        className="text-xs uppercase tracking-wide"
-                        style={{ color: '#475569', marginBottom: '2px' }}
-                      >
-                        Conservative
-                      </p>
-                      <p 
-                        className="text-sm font-bold"
-                        style={{ color: '#F1F5F9' }}
-                      >
-                        ₦{quote.price_conservative.toLocaleString()}
-                      </p>
-                    </div>
-                    <div>
-                      <p 
-                        className="text-xs uppercase tracking-wide"
-                        style={{ color: '#475569', marginBottom: '2px' }}
-                      >
-                        Standard
-                      </p>
-                      <p 
-                        className="text-sm font-bold"
-                        style={{ 
-                          color: quote.selected_tier === 'standard' ? '#2563EB' : '#F1F5F9'
-                        }}
-                      >
-                        ₦{quote.price_standard.toLocaleString()}
-                      </p>
-                    </div>
-                    <div>
-                      <p 
-                        className="text-xs uppercase tracking-wide"
-                        style={{ color: '#475569', marginBottom: '2px' }}
-                      >
-                        Premium
-                      </p>
-                      <p 
-                        className="text-sm font-bold"
-                        style={{ color: '#F1F5F9' }}
-                      >
-                        ₦{quote.price_premium.toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Bottom row */}
-                  <div className="flex items-center justify-between mt-4">
-                    <div
-                      className="text-xs font-medium px-2.5 py-1 rounded-full"
-                      style={{
-                        backgroundColor: 'rgba(37,99,235,0.1)',
-                        border: '1px solid rgba(37,99,235,0.2)',
-                        color: '#2563EB'
-                      }}
-                    >
-                      {quote.selected_tier} selected
-                    </div>
-                    
-                    <button
-                      onClick={() => handleViewQuote(quote)}
-                      className="text-xs font-medium transition-colors"
-                      style={{ color: '#94A3B8' }}
-                      onMouseEnter={(e) => e.currentTarget.style.color = '#2563EB'}
-                      onMouseLeave={(e) => e.currentTarget.style.color = '#94A3B8'}
-                    >
-                      View →
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Modal */}
-        {selectedQuote && (
-          <div 
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            style={{
-              backgroundColor: 'rgba(0,0,0,0.7)',
-              backdropFilter: 'blur(4px)'
-            }}
-          >
-            <div 
-              className="relative"
-              style={{
-                backgroundColor: '#0C1827',
-                border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '16px',
-                maxWidth: '672px',
-                width: '100%',
-                margin: '0 16px',
-                maxHeight: '90vh',
-                overflowY: 'auto',
-                boxShadow: '0 40px 80px rgba(0,0,0,0.6)'
-              }}
-            >
-              {/* Header */}
-              <div 
-                className="flex items-start justify-between gap-4"
-                style={{ 
-                  padding: '24px 24px 16px',
-                  borderBottom: '1px solid rgba(255,255,255,0.06)'
-                }}
-              >
-                <h2 
-                  className="font-black tracking-[-0.02em]"
-                  style={{ fontSize: '24px', color: '#F1F5F9' }}
-                >
-                  {selectedQuote.project_title}
-                </h2>
-                <button
-                  onClick={() => setSelectedQuote(null)}
-                  className="p-1 rounded-lg transition-colors"
-                  style={{ color: '#94A3B8' }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.color = '#F1F5F9';
-                    e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.color = '#94A3B8';
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                  }}
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-
-              {/* Content */}
-              <div style={{ padding: '20px 24px' }}>
-                {/* Industry + tier row */}
-                <div className="flex gap-2 mb-5">
-                  <div
-                    className="inline-flex items-center px-2.5 py-1 rounded-full text-xs"
-                    style={{
-                      backgroundColor: 'rgba(255,255,255,0.05)',
-                      color: '#94A3B8'
-                    }}
-                  >
-                    {getIndustryLabel(selectedQuote.industry)}
-                  </div>
-                  <div
-                    className="inline-flex items-center px-2.5 py-1 rounded-full text-xs"
-                    style={{
-                      backgroundColor: 'rgba(37,99,235,0.1)',
-                      border: '1px solid rgba(37,99,235,0.2)',
-                      color: '#2563EB'
-                    }}
-                  >
-                    {selectedQuote.selected_tier} selected
-                  </div>
-                </div>
-
-                {/* Pricing section */}
-                <div className="grid grid-cols-3 gap-4 mb-6">
-                  <div
-                    className="rounded-xl p-4"
-                    style={{
-                      backgroundColor: selectedQuote.selected_tier === 'conservative' ? 'rgba(37,99,235,0.06)' : '#0C1827',
-                      border: selectedQuote.selected_tier === 'conservative' ? 'rgba(37,99,235,0.5)' : 'rgba(255,255,255,0.08)',
-                      borderWidth: '1px'
-                    }}
-                  >
-                    <p 
-                      className="text-xs tracking-widest uppercase font-medium mb-1"
-                      style={{ color: '#94A3B8' }}
-                    >
-                      Conservative
-                    </p>
-                    <p 
-                      className="font-black tracking-[-0.02em]"
-                      style={{ fontSize: '24px', color: '#F1F5F9' }}
-                    >
-                      ₦{selectedQuote.price_conservative.toLocaleString()}
-                    </p>
-                  </div>
-                  <div
-                    className="rounded-xl p-4"
-                    style={{
-                      backgroundColor: selectedQuote.selected_tier === 'standard' ? 'rgba(37,99,235,0.06)' : '#0C1827',
-                      border: selectedQuote.selected_tier === 'standard' ? 'rgba(37,99,235,0.5)' : 'rgba(255,255,255,0.08)',
-                      borderWidth: '1px'
-                    }}
-                  >
-                    <p 
-                      className="text-xs tracking-widest uppercase font-medium mb-1"
-                      style={{ color: '#94A3B8' }}
-                    >
-                      Standard
-                    </p>
-                    <p 
-                      className="font-black tracking-[-0.02em]"
-                      style={{ fontSize: '24px', color: '#F1F5F9' }}
-                    >
-                      ₦{selectedQuote.price_standard.toLocaleString()}
-                    </p>
-                  </div>
-                  <div
-                    className="rounded-xl p-4"
-                    style={{
-                      backgroundColor: selectedQuote.selected_tier === 'premium' ? 'rgba(37,99,235,0.06)' : '#0C1827',
-                      border: selectedQuote.selected_tier === 'premium' ? 'rgba(37,99,235,0.5)' : 'rgba(255,255,255,0.08)',
-                      borderWidth: '1px'
-                    }}
-                  >
-                    <p 
-                      className="text-xs tracking-widest uppercase font-medium mb-1"
-                      style={{ color: '#94A3B8' }}
-                    >
-                      Premium
-                    </p>
-                    <p 
-                      className="font-black tracking-[-0.02em]"
-                      style={{ fontSize: '24px', color: '#F1F5F9' }}
-                    >
-                      ₦{selectedQuote.price_premium.toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Scope sections */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                  {/* Deliverables */}
+        ) : (
+          <div className="bg-surface border border-border-light rounded-lg overflow-hidden shadow-sm">
+            <div className="divide-y divide-border-light">
+              {quotes.map((quote, index) => {
+                const status = getStatus(index);
+                return (
                   <div 
-                    className="rounded-xl p-5"
-                    style={{ backgroundColor: '#0C1827', border: '1px solid rgba(255,255,255,0.08)' }}
+                    key={quote.id} 
+                    onClick={() => setSelectedQuote(quote)}
+                    className="flex items-center justify-between p-4 hover:bg-surface-secondary cursor-pointer transition-colors group"
                   >
-                    <div className="text-sm font-semibold uppercase tracking-wide mb-3 flex items-center gap-2" style={{ color: '#94A3B8' }}>
-                      <CheckCircle2 className="h-4 w-4" />
-                      Deliverables
+                    <div className="text-sm font-bold text-text-dark truncate pr-4 flex-1 font-body">
+                      {quote.project_title}
                     </div>
-                    {selectedQuote.deliverables.map((item, idx) => (
-                      <div key={idx} className="flex items-start gap-2 py-1">
-                        <div className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: '#2563EB' }} />
-                        <span className="text-sm leading-relaxed" style={{ color: '#F1F5F9' }}>
-                          {item}
-                        </span>
+                    <div className="flex items-center gap-6 md:gap-10 flex-shrink-0">
+                      <div className="text-sm font-semibold text-text-dark w-24 text-right font-body">
+                        ₦{getTierPrice(quote).toLocaleString()}
                       </div>
-                    ))}
-                  </div>
-
-                  {/* Timeline */}
-                  <div 
-                    className="rounded-xl p-5"
-                    style={{ backgroundColor: '#0C1827', border: '1px solid rgba(255,255,255,0.08)' }}
-                  >
-                    <div className="text-sm font-semibold uppercase tracking-wide mb-3 flex items-center gap-2" style={{ color: '#94A3B8' }}>
-                      <Clock className="h-4 w-4" />
-                      Timeline
-                    </div>
-                    <div className="flex items-start gap-2 py-1">
-                      <div className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: '#2563EB' }} />
-                      <span className="text-sm leading-relaxed" style={{ color: '#F1F5F9' }}>
-                        {selectedQuote.timeline}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Revision Policy */}
-                  <div 
-                    className="rounded-xl p-5"
-                    style={{ backgroundColor: '#0C1827', border: '1px solid rgba(255,255,255,0.08)' }}
-                  >
-                    <div className="text-sm font-semibold uppercase tracking-wide mb-3 flex items-center gap-2" style={{ color: '#94A3B8' }}>
-                      <RefreshCw className="h-4 w-4" />
-                      Revision Policy
-                    </div>
-                    <div className="flex items-start gap-2 py-1">
-                      <div className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: '#2563EB' }} />
-                      <span className="text-sm leading-relaxed" style={{ color: '#F1F5F9' }}>
-                        {selectedQuote.revision_policy}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Out of Scope */}
-                  <div 
-                    className="rounded-xl p-5"
-                    style={{ backgroundColor: '#0C1827', border: '1px solid rgba(255,255,255,0.08)' }}
-                  >
-                    <div className="text-sm font-semibold uppercase tracking-wide mb-3 flex items-center gap-2" style={{ color: '#94A3B8' }}>
-                      <XCircle className="h-4 w-4" />
-                      Out of Scope
-                    </div>
-                    {selectedQuote.out_of_scope.map((item, idx) => (
-                      <div key={idx} className="flex items-start gap-2 py-1">
-                        <div className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: '#EF4444', opacity: 0.7 }} />
-                        <span className="text-sm leading-relaxed" style={{ color: '#EF4444', opacity: 0.7 }}>
-                          {item}
-                        </span>
+                      <div className={`text-xs font-semibold px-3 py-1 rounded-full w-16 text-center font-body ${status.bgClass} ${status.textClass}`}>
+                        {status.text}
                       </div>
-                    ))}
+                      <ChevronRight size={18} className="text-text-muted group-hover:text-primary transition-colors" />
+                    </div>
                   </div>
-                </div>
-
-                {/* Action row */}
-                <div 
-                  className="flex gap-3 justify-end pt-5"
-                  style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
-                >
-                  <button
-                    onClick={() => setDeletingQuote(selectedQuote.id)}
-                    className="text-sm font-medium rounded-lg transition-colors"
-                    style={{
-                      color: '#EF4444',
-                      padding: '8px 16px'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.08)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                    }}
-                  >
-                    Delete
-                  </button>
-                  
-                  <PDFDownloadLink
-                    document={<ScopePDF scope={selectedQuote} selectedTier={selectedQuote.selected_tier as any} />}
-                    fileName={`pricis-scope-${Date.now()}.pdf`}
-                  >
-                    {({ loading }) => (
-                      <button
-                        type="button"
-                        className="font-medium rounded-xl transition-colors flex items-center gap-2"
-                        style={{
-                          border: '1px solid rgba(255,255,255,0.12)',
-                          color: '#F1F5F9',
-                          fontSize: '14px',
-                          padding: '10px 20px'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = 'transparent';
-                        }}
-                      >
-                        <Download className="h-4 w-4" />
-                        {loading ? "Preparing..." : "Export PDF"}
-                      </button>
-                    )}
-                  </PDFDownloadLink>
-                </div>
-              </div>
+                );
+              })}
             </div>
           </div>
         )}
       </div>
+
+      {/* Detail Modal */}
+      {selectedQuote && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="relative bg-surface rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-lg border border-border-light">
+            {/* Header */}
+            <div className="flex items-start justify-between gap-4 p-6 border-b border-border-light sticky top-0 bg-surface z-10 rounded-t-xl">
+              <h2 className="font-bold text-xl text-text-dark pr-8 font-display">{selectedQuote.project_title}</h2>
+              <button
+                onClick={() => setSelectedQuote(null)}
+                className="p-2 rounded-full hover:bg-surface-secondary text-text-muted transition-colors absolute right-4 top-4"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-6">
+              <div className="flex gap-2 mb-6">
+                <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-surface-secondary text-text-secondary font-body">
+                  {getIndustryLabel(selectedQuote.industry)}
+                </div>
+                <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-primary-light text-primary font-body">
+                  {selectedQuote.selected_tier} selected
+                </div>
+              </div>
+
+              {/* Pricing */}
+              <div className="grid grid-cols-3 gap-4 mb-8">
+                {(['conservative', 'standard', 'premium'] as const).map((tier) => (
+                  <div
+                    key={tier}
+                    className={`rounded-lg p-4 border ${selectedQuote.selected_tier === tier ? 'border-primary bg-primary-light' : 'border-border-light bg-surface'}`}
+                  >
+                    <p className="text-xs font-semibold uppercase text-text-secondary mb-1 font-body">{tier}</p>
+                    <p className={`font-extrabold text-lg font-display ${selectedQuote.selected_tier === tier ? 'text-primary' : 'text-text-dark'}`}>
+                      ₦{(selectedQuote[`price_${tier}` as keyof Quote] as number)?.toLocaleString()}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Scope sections */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div className="rounded-lg p-5 border border-border-light bg-surface-secondary">
+                  <div className="text-xs font-semibold uppercase text-text-secondary mb-4 flex items-center gap-2 tracking-wide font-body">
+                    <CheckCircle2 className="h-4 w-4 text-primary" /> Deliverables
+                  </div>
+                  {selectedQuote.deliverables.map((item, idx) => (
+                    <div key={idx} className="flex items-start gap-2 py-1.5">
+                      <div className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0 bg-primary" />
+                      <span className="text-sm font-medium text-text-dark font-body">{item}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="rounded-lg p-5 border border-border-light bg-surface-secondary">
+                  <div className="text-xs font-semibold uppercase text-text-secondary mb-4 flex items-center gap-2 tracking-wide font-body">
+                    <XCircle className="h-4 w-4 text-danger" /> Out of Scope
+                  </div>
+                  {selectedQuote.out_of_scope.map((item, idx) => (
+                    <div key={idx} className="flex items-start gap-2 py-1.5">
+                      <div className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0 bg-danger" />
+                      <span className="text-sm font-medium text-text-dark font-body">{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3 justify-end pt-6 border-t border-border-light">
+                <button
+                  onClick={() => deleteQuote(selectedQuote.id)}
+                  className="text-sm font-semibold text-danger hover:bg-danger/10 px-4 py-2 rounded-full transition-colors font-body"
+                >
+                  Delete Scope
+                </button>
+                
+                <PDFDownloadLink
+                  document={<ScopePDF scope={selectedQuote} selectedTier={selectedQuote.selected_tier as any} />}
+                  fileName={`pricis-scope-${Date.now()}.pdf`}
+                >
+                  {({ loading }) => (
+                    <button
+                      type="button"
+                      className="bg-primary hover:bg-primary-hover text-white font-semibold text-sm px-6 py-2.5 rounded-full transition-colors flex items-center gap-2 shadow-blue font-body"
+                    >
+                      <Download className="h-4 w-4" />
+                      {loading ? "Preparing PDF..." : "Export PDF"}
+                    </button>
+                  )}
+                </PDFDownloadLink>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

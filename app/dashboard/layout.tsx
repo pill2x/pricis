@@ -1,10 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { FileText, MessageSquare, Settings, LogOut, Menu, X } from "lucide-react";
+import { 
+  FileText, MessageSquare, Settings, LogOut, Menu, X, 
+  LayoutDashboard, Bookmark, Receipt, Star, Crown
+} from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import Logo from "@/components/Logo";
 
 export default function DashboardLayout({
   children,
@@ -15,6 +19,7 @@ export default function DashboardLayout({
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     checkUser();
@@ -37,112 +42,133 @@ export default function DashboardLayout({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0B1D35] flex items-center justify-center">
-        <div className="text-white">Loading...</div>
+      <div className="min-h-screen bg-surface-secondary flex items-center justify-center">
+        <div className="text-primary font-medium flex items-center gap-2 font-body">
+          <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+          Loading workspace...
+        </div>
       </div>
     );
   }
 
   const navItems = [
-    { icon: FileText, label: "My Scopes", href: "/dashboard" },
-    { icon: MessageSquare, label: "Negotiation Assistant", href: "/dashboard/negotiate" },
+    { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
+    { icon: FileText, label: "Scopes", href: "/dashboard/scopes" },
+    { icon: MessageSquare, label: "Negotiations", href: "/dashboard/negotiate" },
+    { icon: Bookmark, label: "Templates", href: "/dashboard/templates" },
+    { icon: Receipt, label: "Invoices", href: "/dashboard/invoices" },
     { icon: Settings, label: "Settings", href: "/dashboard/settings" },
   ];
 
+  const isActive = (href: string) => pathname === href;
+
   return (
-    <div className="min-h-screen bg-[#0B1D35] flex">
+    <div className="min-h-screen bg-surface-secondary flex font-body text-text-dark">
       {/* Desktop Sidebar */}
-      <div className="hidden md:flex fixed left-0 top-0 h-full w-60 bg-[#080F1A] flex-col">
-        <div className="p-6 border-b border-white/10">
-          <h1 className="text-xl font-bold text-[#B8860B] mb-1">Pricis</h1>
-          <p className="text-xs text-white/50">Your freelance command centre</p>
+      <div className="hidden md:flex fixed left-0 top-0 h-full w-[220px] bg-surface border-r border-border-light flex-col py-6 px-4 z-40">
+        <div className="mb-10 px-2">
+          <Link href="/dashboard">
+            <Logo variant="dark" />
+          </Link>
         </div>
         
-        <nav className="flex-1 p-4">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg text-white/70 hover:text-white hover:bg-white/5 transition-colors mb-1"
-            >
-              <item.icon className="h-5 w-5" />
-              <span className="text-sm">{item.label}</span>
-            </Link>
-          ))}
+        <nav className="flex-1 space-y-1">
+          {navItems.map((item) => {
+            const active = isActive(item.href);
+            return (
+              <Link
+                key={item.label}
+                href={item.href}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors relative ${
+                  active 
+                    ? "bg-primary-light text-primary" 
+                    : "text-text-secondary hover:text-text-dark hover:bg-surface-secondary"
+                }`}
+              >
+                <item.icon size={20} />
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
         </nav>
 
-        <div className="p-4 border-t border-white/10">
-          <div className="mb-3">
-            <p className="text-xs text-white/50 truncate">{user?.email}</p>
+        <div className="mt-auto pt-6 space-y-4">
+          {/* Upgrade Card */}
+          <div className="flex items-center gap-3 px-3 py-2 cursor-pointer group hover:bg-surface-secondary rounded-lg transition-colors">
+            <div className="text-text-dark">
+              <Crown size={22} className="text-text-dark" fill="currentColor" />
+            </div>
+            <div>
+              <div className="text-sm font-bold text-text-dark font-display">Upgrade to Pro</div>
+              <div className="text-xs text-text-secondary mt-0.5">Unlock all features</div>
+            </div>
           </div>
+          
           <button
             onClick={handleSignOut}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/50 hover:text-red-400 transition-colors text-sm w-full"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary hover:text-danger hover:bg-danger/10 transition-colors text-sm font-medium w-full"
           >
-            <LogOut className="h-4 w-4" />
+            <LogOut size={20} />
             Sign Out
           </button>
         </div>
       </div>
 
-      {/* Mobile Bottom Nav */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#080F1A] border-t border-white/10 z-50">
-        <div className="flex justify-around py-2">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="flex flex-col items-center gap-1 px-3 py-2 text-white/50 hover:text-[#B8860B] transition-colors"
-            >
-              <item.icon className="h-5 w-5" />
-              <span className="text-xs">{item.label}</span>
-            </Link>
-          ))}
-        </div>
-      </div>
-
       {/* Mobile Menu Button */}
-      <div className="md:hidden fixed top-4 left-4 z-40">
+      <div className="md:hidden fixed top-4 left-4 z-50">
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-2 rounded-lg bg-white/10 text-white"
+          className="bg-surface text-text-dark p-2.5 rounded-xl shadow-md border border-border-light"
         >
-          {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
       </div>
 
-      {/* Mobile Sidebar */}
+      {/* Mobile Sidebar Overlay */}
       {mobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 bg-black/50 z-30" onClick={() => setMobileMenuOpen(false)}>
-          <div className="fixed left-0 top-0 h-full w-60 bg-[#080F1A]" onClick={(e) => e.stopPropagation()}>
-            <div className="p-6 border-b border-white/10">
-              <h1 className="text-xl font-bold text-[#B8860B] mb-1">Pricis</h1>
-              <p className="text-xs text-white/50">Your freelance command centre</p>
+        <div className="md:hidden fixed inset-0 bg-black/60 z-40 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}>
+          <div className="fixed left-0 top-0 h-full w-[280px] bg-surface border-r border-border-light flex flex-col py-6 px-4" onClick={(e) => e.stopPropagation()}>
+            <div className="mb-10 px-2 flex justify-between items-center">
+              <Logo variant="dark" />
             </div>
             
-            <nav className="flex-1 p-4">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-white/70 hover:text-white hover:bg-white/5 transition-colors mb-1"
-                >
-                  <item.icon className="h-5 w-5" />
-                  <span className="text-sm">{item.label}</span>
-                </Link>
-              ))}
+            <nav className="flex-1 space-y-1">
+              {navItems.map((item) => {
+                const active = isActive(item.href);
+                return (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex items-center gap-3 px-3 py-3 rounded-lg text-base font-medium transition-colors relative ${
+                      active 
+                        ? "bg-primary-light text-primary" 
+                        : "text-text-secondary hover:text-text-dark hover:bg-surface-secondary"
+                    }`}
+                  >
+                    <item.icon size={22} />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
             </nav>
 
-            <div className="p-4 border-t border-white/10">
-              <div className="mb-3">
-                <p className="text-xs text-white/50 truncate">{user?.email}</p>
+            <div className="mt-auto pt-6 space-y-4">
+              <div className="flex items-center gap-3 px-3 py-2 cursor-pointer group hover:bg-surface-secondary rounded-lg transition-colors">
+                <div className="text-text-dark">
+                  <Crown size={24} className="text-text-dark" fill="currentColor" />
+                </div>
+                <div>
+                  <div className="text-base font-bold text-text-dark font-display">Upgrade to Pro</div>
+                  <div className="text-sm text-text-secondary mt-0.5">Unlock all features</div>
+                </div>
               </div>
+
               <button
                 onClick={handleSignOut}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/50 hover:text-red-400 transition-colors text-sm w-full"
+                className="flex items-center gap-3 px-3 py-3 rounded-lg text-text-secondary hover:text-danger hover:bg-danger/10 transition-colors text-base font-medium w-full"
               >
-                <LogOut className="h-4 w-4" />
+                <LogOut size={22} />
                 Sign Out
               </button>
             </div>
@@ -150,9 +176,9 @@ export default function DashboardLayout({
         </div>
       )}
 
-      {/* Main Content */}
-      <div className="flex-1 md:ml-60">
-        <main className="p-4 md:p-8 pb-20 md:pb-8">
+      {/* Main Content Area */}
+      <div className="flex-1 md:ml-[220px]">
+        <main className="w-full max-w-[1000px] mx-auto p-6 md:p-10 pb-24">
           {children}
         </main>
       </div>
