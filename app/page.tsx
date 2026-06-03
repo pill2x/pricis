@@ -7,198 +7,332 @@ import {
   LayoutTemplate, PenTool, ChevronDown, Check,
   Twitter, Linkedin, Instagram, ArrowRight, Code, FileSignature, Users,
   Grid, UserCheck, FileText as FileTextIcon, Star, DownloadCloud, Bookmark, TrendingUp,
-  ChevronUp, Mail, Send
+  ChevronUp, Mail, Send, Menu
 } from "lucide-react";
 import Logo from "@/components/Logo";
 import { useState } from "react";
 
-const Navbar = () => (
-  <nav className="sticky top-0 z-50 w-full h-[64px] bg-bg-dark/95 backdrop-blur-sm border-b border-border">
-    <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
-      <Link href="/">
-        <Logo variant="muted" />
-      </Link>
-      
-      <div className="hidden md:flex items-center gap-8 text-sm font-medium text-text-muted font-body">
-        <div className="flex items-center gap-1 cursor-pointer hover:text-white transition-colors">Features <ChevronDown size={14}/></div>
-        <Link href="#how-it-works" className="hover:text-white transition-colors">How it Works</Link>
-        <Link href="#pricing" className="hover:text-white transition-colors">Pricing</Link>
-        <div className="flex items-center gap-1 cursor-pointer hover:text-white transition-colors">Resources <ChevronDown size={14}/></div>
-        <Link href="#templates" className="hover:text-white transition-colors">Templates</Link>
-      </div>
+const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
 
-      <div className="flex items-center gap-2 sm:gap-4">
-        <Link href="/login" className="hidden sm:block text-sm font-medium text-text-white hover:text-gray-200 transition-colors bg-white/10 border border-white/15 rounded-full px-5 py-2 hover:bg-white/20">
-          Log in
+  return (
+    <nav className="sticky top-0 z-50 w-full bg-bg-dark/95 backdrop-blur-sm border-b border-border">
+      <div className="max-w-7xl mx-auto px-6 h-[64px] flex items-center justify-between">
+        <Link href="/">
+          <Logo variant="muted" />
         </Link>
-        <Link href="/signup" className="text-xs sm:text-sm font-semibold bg-primary hover:bg-primary-hover shadow-blue text-white px-4 sm:px-5 py-2 rounded-full transition-all whitespace-nowrap">
-          Get Started Free
-        </Link>
+        
+        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-text-muted font-body">
+          <div className="flex items-center gap-1 cursor-pointer hover:text-white transition-colors">Features <ChevronDown size={14}/></div>
+          <Link href="#how-it-works" className="hover:text-white transition-colors">How it Works</Link>
+          <Link href="#pricing" className="hover:text-white transition-colors">Pricing</Link>
+          <div className="flex items-center gap-1 cursor-pointer hover:text-white transition-colors">Resources <ChevronDown size={14}/></div>
+          <Link href="#templates" className="hover:text-white transition-colors">Templates</Link>
+        </div>
+
+        <div className="flex items-center gap-2 sm:gap-4">
+          <Link href="/login" className="hidden sm:block text-sm font-medium text-text-white hover:text-gray-200 transition-colors bg-white/10 border border-white/15 rounded-full px-5 py-2 hover:bg-white/20">
+            Log in
+          </Link>
+          <Link href="/signup" className="text-xs sm:text-sm font-semibold bg-primary hover:bg-primary-hover shadow-blue text-white px-4 sm:px-5 py-2 rounded-full transition-all whitespace-nowrap">
+            Get Started Free
+          </Link>
+          <button 
+            className="md:hidden text-white p-1 ml-1"
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            <Menu size={24} />
+          </button>
+        </div>
       </div>
-    </div>
-  </nav>
-);
+      
+      {/* Mobile Menu */}
+      {isOpen && (
+        <div className="md:hidden border-t border-border bg-bg-dark px-6 py-4 space-y-4">
+          <Link href="#features" className="block text-white hover:text-primary transition-colors py-2 font-medium" onClick={() => setIsOpen(false)}>Features</Link>
+          <Link href="#how-it-works" className="block text-white hover:text-primary transition-colors py-2 font-medium" onClick={() => setIsOpen(false)}>How it Works</Link>
+          <Link href="#pricing" className="block text-white hover:text-primary transition-colors py-2 font-medium" onClick={() => setIsOpen(false)}>Pricing</Link>
+          <Link href="#templates" className="block text-white hover:text-primary transition-colors py-2 font-medium" onClick={() => setIsOpen(false)}>Templates</Link>
+          <Link href="/login" className="block text-white hover:text-primary transition-colors py-2 font-medium sm:hidden" onClick={() => setIsOpen(false)}>Log in</Link>
+        </div>
+      )}
+    </nav>
+  );
+};
 
 const DashboardMockup = () => (
-  <div className="relative mx-auto w-full max-w-[850px] text-left flex justify-center lg:justify-end lg:block">
-    <div 
-      className="relative w-full aspect-[1.57/1] max-w-[850px] flex-shrink-0"
-      style={{ containerType: 'inline-size' }}
-    >
+  <>
+    {/* DESKTOP MOCKUP (Scaled, Fixed Width) */}
+    <div className="hidden lg:block relative mx-auto w-full max-w-[850px] text-left flex justify-center lg:justify-end">
       <div 
-        className="absolute top-0 left-0 origin-top-left dashboard-mock-scale"
-        style={{ 
-          width: '850px', 
-          height: '541px'
-        }}
+        className="relative w-full aspect-[1.57/1] max-w-[850px] flex-shrink-0"
+        style={{ containerType: 'inline-size' }}
       >
-        {/* Dashboard Modal */}
-        <div className="w-full h-full shadow-2xl rounded-[2rem] border border-border-light bg-surface flex overflow-hidden">
-          {/* Sidebar */}
-          <div className="w-[220px] bg-surface border-r border-border-light p-4 flex flex-col justify-between">
-            <div>
-              <div className="mb-10 px-2 mt-2">
-                <Logo variant="dark" />
-              </div>
-              <nav className="space-y-1.5">
-                <div className="flex items-center gap-3 bg-primary-light text-primary px-3 py-2.5 rounded-lg font-semibold text-sm font-body">
-                  <Grid size={18} /> Dashboard
+        <div 
+          className="absolute top-0 left-0 origin-top-left dashboard-mock-scale"
+          style={{ 
+            width: '850px', 
+            height: '541px'
+          }}
+        >
+          {/* Dashboard Modal */}
+          <div className="w-full h-full shadow-2xl rounded-[2rem] border border-border-light bg-surface flex overflow-hidden">
+            {/* Sidebar */}
+            <div className="w-[220px] bg-surface border-r border-border-light p-4 flex flex-col justify-between">
+              <div>
+                <div className="mb-10 px-2 mt-2">
+                  <Logo variant="dark" />
                 </div>
-                {[
-                  { icon: FileTextIcon, label: "Scopes" },
-                  { icon: MessageSquare, label: "Negotiations" },
-                  { icon: Bookmark, label: "Templates" },
-                  { icon: Receipt, label: "Invoices" },
-                  { icon: Settings, label: "Settings" }
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-3 text-text-secondary px-3 py-2.5 rounded-lg font-medium text-sm font-body hover:text-text-dark hover:bg-surface-secondary cursor-pointer transition-colors">
-                    <item.icon size={18} /> {item.label}
+                <nav className="space-y-1.5">
+                  <div className="flex items-center gap-3 bg-primary-light text-primary px-3 py-2.5 rounded-lg font-semibold text-sm font-body">
+                    <Grid size={18} /> Dashboard
                   </div>
-                ))}
-              </nav>
-            </div>
-            
-            {/* Upgrade Card */}
-            <div className="bg-surface border border-border-light p-4 rounded-xl flex items-start gap-3 shadow-sm cursor-pointer hover:border-border transition-all">
-              <div className="mt-0.5 w-6 h-6 flex items-center justify-center flex-shrink-0">
-                 <span className="text-xl leading-none">👑</span>
-              </div>
-              <div>
-                <div className="text-sm font-bold text-text-dark font-body">Upgrade to Pro</div>
-                <div className="text-xs text-text-secondary mt-0.5 font-body">Unlock all features</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Main Content */}
-          <div className="flex-1 bg-[#F9FAFB] p-10 overflow-hidden relative">
-            <div className="flex justify-between items-start mb-8">
-              <div>
-                <h1 className="text-3xl font-extrabold text-text-dark font-display mb-1.5">Welcome back, Daniel 👋</h1>
-                <p className="text-text-secondary text-base font-body">Let&apos;s create a scope or continue where you left off.</p>
-              </div>
-              <div className="flex items-center gap-4">
-                <button className="bg-primary hover:bg-primary-hover text-white px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 transition-colors shadow-sm font-body">
-                  + New Scope
-                </button>
-              </div>
-            </div>
-
-            {/* Action Cards */}
-            <div className="grid grid-cols-2 gap-5 mb-10 pr-[200px]">
-              <div className="bg-surface border border-border-light rounded-xl p-6 shadow-sm flex flex-col items-start">
-                <div className="w-12 h-12 rounded-full bg-success/10 flex items-center justify-center mb-5">
-                  <Target className="text-success" size={24} />
-                </div>
-                <h3 className="font-bold text-text-dark mb-1 font-body text-base">Scope Generator</h3>
-                <p className="text-xs text-text-secondary mb-auto h-8 font-body leading-relaxed">Create accurate scopes, pricing and timelines.</p>
-                <button className="bg-primary text-white w-full py-2.5 rounded-lg text-sm font-semibold transition-colors font-body hover:bg-primary-hover mt-8">Start New</button>
-              </div>
-              <div className="bg-surface border border-border-light rounded-xl p-6 shadow-sm flex flex-col items-start">
-                <div className="w-12 h-12 rounded-full bg-primary-light flex items-center justify-center mb-5">
-                  <TrendingUp className="text-primary" size={24} />
-                </div>
-                <h3 className="font-bold text-text-dark mb-1 font-body text-base">Negotiation Assistant</h3>
-                <p className="text-xs text-text-secondary mb-auto h-8 font-body leading-relaxed">Get help with strategy, messages and practice.</p>
-                <button className="bg-primary text-white w-full py-2.5 rounded-lg text-sm font-semibold transition-colors font-body hover:bg-primary-hover mt-8">Open Assistant</button>
-              </div>
-            </div>
-
-            {/* Recent Scopes List */}
-            <div className="pr-[200px]">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="font-bold text-text-dark font-display text-lg">Recent Scopes</h3>
-                <span className="text-primary text-sm font-semibold hover:text-primary-hover cursor-pointer font-body">View all</span>
-              </div>
-              <div className="divide-y divide-border-light border-y border-border-light">
-                {[
-                  { title: "Brand Identity Design for Fintech Startup", price: "₦650,000", status: "Viewed", statusClass: "bg-success/10 text-success" },
-                  { title: "Website Redesign for E-commerce Store", price: "₦1,250,000", status: "Draft", statusClass: "bg-gray-100 text-text-secondary" },
-                  { title: "Social Media Management (3 Months)", price: "₦450,000", status: "Sent", statusClass: "bg-primary-light text-primary" },
-                ].map((scope, i) => (
-                  <div key={i} className="flex items-center justify-between py-3.5 hover:bg-gray-50 transition-colors cursor-pointer group">
-                    <div className="text-sm font-bold text-text-dark truncate pr-4 font-body flex-1">{scope.title}</div>
-                    <div className="flex items-center gap-6 flex-shrink-0">
-                      <div className="text-sm font-semibold text-text-dark w-20 text-right font-body">{scope.price}</div>
-                      <div className={`text-xs font-semibold px-2 py-1 rounded-full w-16 text-center font-body ${scope.statusClass}`}>{scope.status}</div>
-                      <ChevronRight size={16} className="text-text-muted group-hover:text-primary" />
+                  {[
+                    { icon: FileTextIcon, label: "Scopes" },
+                    { icon: MessageSquare, label: "Negotiations" },
+                    { icon: Bookmark, label: "Templates" },
+                    { icon: Receipt, label: "Invoices" },
+                    { icon: Settings, label: "Settings" }
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center gap-3 text-text-secondary px-3 py-2.5 rounded-lg font-medium text-sm font-body hover:text-text-dark hover:bg-surface-secondary cursor-pointer transition-colors">
+                      <item.icon size={18} /> {item.label}
                     </div>
+                  ))}
+                </nav>
+              </div>
+              
+              {/* Upgrade Card */}
+              <div className="bg-surface border border-border-light p-4 rounded-xl flex items-start gap-3 shadow-sm cursor-pointer hover:border-border transition-all">
+                <div className="mt-0.5 w-6 h-6 flex items-center justify-center flex-shrink-0">
+                   <span className="text-xl leading-none">👑</span>
+                </div>
+                <div>
+                  <div className="text-sm font-bold text-text-dark font-body">Upgrade to Pro</div>
+                  <div className="text-xs text-text-secondary mt-0.5 font-body">Unlock all features</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Main Content */}
+            <div className="flex-1 bg-[#F9FAFB] p-10 overflow-hidden relative">
+              <div className="flex justify-between items-start mb-8">
+                <div>
+                  <h1 className="text-3xl font-extrabold text-text-dark font-display mb-1.5">Welcome back, Daniel 👋</h1>
+                  <p className="text-text-secondary text-base font-body">Let&apos;s create a scope or continue where you left off.</p>
+                </div>
+                <div className="flex items-center gap-4">
+                  <button className="bg-primary hover:bg-primary-hover text-white px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 transition-colors shadow-sm font-body">
+                    + New Scope
+                  </button>
+                </div>
+              </div>
+
+              {/* Action Cards */}
+              <div className="grid grid-cols-2 gap-5 mb-10 pr-[200px]">
+                <div className="bg-surface border border-border-light rounded-xl p-6 shadow-sm flex flex-col items-start">
+                  <div className="w-12 h-12 rounded-full bg-success/10 flex items-center justify-center mb-5">
+                    <Target className="text-success" size={24} />
                   </div>
-                ))}
+                  <h3 className="font-bold text-text-dark mb-1 font-body text-base">Scope Generator</h3>
+                  <p className="text-xs text-text-secondary mb-auto h-8 font-body leading-relaxed">Create accurate scopes, pricing and timelines.</p>
+                  <button className="bg-primary text-white w-full py-2.5 rounded-lg text-sm font-semibold transition-colors font-body hover:bg-primary-hover mt-8">Start New</button>
+                </div>
+                <div className="bg-surface border border-border-light rounded-xl p-6 shadow-sm flex flex-col items-start">
+                  <div className="w-12 h-12 rounded-full bg-primary-light flex items-center justify-center mb-5">
+                    <TrendingUp className="text-primary" size={24} />
+                  </div>
+                  <h3 className="font-bold text-text-dark mb-1 font-body text-base">Negotiation Assistant</h3>
+                  <p className="text-xs text-text-secondary mb-auto h-8 font-body leading-relaxed">Get help with strategy, messages and practice.</p>
+                  <button className="bg-primary text-white w-full py-2.5 rounded-lg text-sm font-semibold transition-colors font-body hover:bg-primary-hover mt-8">Open Assistant</button>
+                </div>
+              </div>
+
+              {/* Recent Scopes List */}
+              <div className="pr-[200px]">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="font-bold text-text-dark font-display text-lg">Recent Scopes</h3>
+                  <span className="text-primary text-sm font-semibold hover:text-primary-hover cursor-pointer font-body">View all</span>
+                </div>
+                <div className="divide-y divide-border-light border-y border-border-light">
+                  {[
+                    { title: "Brand Identity Design for Fintech Startup", price: "₦650,000", status: "Viewed", statusClass: "bg-success/10 text-success" },
+                    { title: "Website Redesign for E-commerce Store", price: "₦1,250,000", status: "Draft", statusClass: "bg-gray-100 text-text-secondary" },
+                    { title: "Social Media Management (3 Months)", price: "₦450,000", status: "Sent", statusClass: "bg-primary-light text-primary" },
+                  ].map((scope, i) => (
+                    <div key={i} className="flex items-center justify-between py-3.5 hover:bg-gray-50 transition-colors cursor-pointer group">
+                      <div className="text-sm font-bold text-text-dark truncate pr-4 font-body flex-1">{scope.title}</div>
+                      <div className="flex items-center gap-6 flex-shrink-0">
+                        <div className="text-sm font-semibold text-text-dark w-20 text-right font-body">{scope.price}</div>
+                        <div className={`text-xs font-semibold px-2 py-1 rounded-full w-16 text-center font-body ${scope.statusClass}`}>{scope.status}</div>
+                        <ChevronRight size={16} className="text-text-muted group-hover:text-primary" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Mobile Mockup (Overlapping) */}
-        <div className="absolute -right-12 -bottom-16 w-[260px] h-[520px] bg-white rounded-[2.5rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] border-[8px] border-[#1a1a1a] overflow-hidden flex flex-col z-20 ring-1 ring-gray-200/50">
-          {/* Notch */}
-          <div className="w-[120px] h-[24px] bg-[#1a1a1a] absolute top-0 left-1/2 -translate-x-1/2 rounded-b-[16px] z-30 flex justify-center items-end pb-1 gap-2">
-            <div className="w-10 h-1.5 rounded-full bg-[#333]"></div>
-            <div className="w-1.5 h-1.5 rounded-full bg-[#333]"></div>
-          </div>
-          
-          {/* Status Bar */}
-          <div className="flex justify-between items-center px-6 pt-3 pb-2 text-[11px] font-medium text-gray-800 z-20 relative bg-white">
-            <span>9:41</span>
-            <div className="flex gap-1.5 items-center">
-              <div className="w-3.5 h-2.5 border border-gray-800 rounded-[2px] relative">
-                <div className="absolute right-[-2px] top-[2px] w-[1px] h-1 bg-gray-800"></div>
+          {/* Mobile Mockup (Overlapping) */}
+          <div className="absolute -right-12 -bottom-16 w-[260px] h-[520px] bg-white rounded-[2.5rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] border-[8px] border-[#1a1a1a] overflow-hidden flex flex-col z-20 ring-1 ring-gray-200/50">
+            {/* Notch */}
+            <div className="w-[120px] h-[24px] bg-[#1a1a1a] absolute top-0 left-1/2 -translate-x-1/2 rounded-b-[16px] z-30 flex justify-center items-end pb-1 gap-2">
+              <div className="w-10 h-1.5 rounded-full bg-[#333]"></div>
+              <div className="w-1.5 h-1.5 rounded-full bg-[#333]"></div>
+            </div>
+            
+            {/* Status Bar */}
+            <div className="flex justify-between items-center px-6 pt-3 pb-2 text-[11px] font-medium text-gray-800 z-20 relative bg-white">
+              <span>9:41</span>
+              <div className="flex gap-1.5 items-center">
+                <div className="w-3.5 h-2.5 border border-gray-800 rounded-[2px] relative">
+                  <div className="absolute right-[-2px] top-[2px] w-[1px] h-1 bg-gray-800"></div>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="bg-white px-5 pb-5 pt-2 relative flex-1 flex flex-col">
-            <div className="text-[11px] font-semibold text-gray-500 mb-1 font-body">Scope Summary</div>
-            <div className="text-[13px] font-medium text-gray-900 mb-4 font-body">Total Price</div>
-            <div className="text-3xl font-extrabold text-gray-900 mb-1 font-display tracking-tight">₦650,000</div>
-            <div className="text-[11px] text-gray-500 mb-6 bg-gray-50 border border-gray-100 inline-block px-2.5 py-1 rounded-md font-body font-medium w-fit">Valid 30 days</div>
-            
-            <button className="w-full bg-blue-600 text-white font-semibold py-2.5 rounded-xl mb-3 shadow-md shadow-blue-600/20 font-body hover:bg-blue-700 transition-colors text-[13px]">View Scope</button>
-            <button className="w-full bg-white border-2 border-gray-100 text-gray-800 font-semibold py-2.5 rounded-xl mb-6 hover:bg-gray-50 transition-colors font-body text-[13px]">Share Link</button>
-            
-            <div className="text-[11px] font-bold text-gray-900 mb-1 font-body">Next Step</div>
-            <div className="text-[11px] text-gray-500 mb-3 font-body">Send to client or download your PDF.</div>
-            
-            <div className="space-y-2 mt-auto">
-              <div className="flex items-center justify-between p-3.5 border border-gray-100 rounded-xl hover:border-blue-200 hover:bg-blue-50 cursor-pointer transition-all group">
-                <div className="flex items-center gap-3 text-[13px] font-medium text-gray-800 font-body group-hover:text-blue-600">
-                  <DownloadCloud size={16} className="text-gray-400 group-hover:text-blue-600" /> Download PDF
+            <div className="bg-white px-5 pb-5 pt-2 relative flex-1 flex flex-col">
+              <div className="text-[11px] font-semibold text-gray-500 mb-1 font-body">Scope Summary</div>
+              <div className="text-[13px] font-medium text-gray-900 mb-4 font-body">Total Price</div>
+              <div className="text-3xl font-extrabold text-gray-900 mb-1 font-display tracking-tight">₦650,000</div>
+              <div className="text-[11px] text-gray-500 mb-6 bg-gray-50 border border-gray-100 inline-block px-2.5 py-1 rounded-md font-body font-medium w-fit">Valid 30 days</div>
+              
+              <button className="w-full bg-blue-600 text-white font-semibold py-2.5 rounded-xl mb-3 shadow-md shadow-blue-600/20 font-body hover:bg-blue-700 transition-colors text-[13px]">View Scope</button>
+              <button className="w-full bg-white border-2 border-gray-100 text-gray-800 font-semibold py-2.5 rounded-xl mb-6 hover:bg-gray-50 transition-colors font-body text-[13px]">Share Link</button>
+              
+              <div className="text-[11px] font-bold text-gray-900 mb-1 font-body">Next Step</div>
+              <div className="text-[11px] text-gray-500 mb-3 font-body">Send to client or download your PDF.</div>
+              
+              <div className="space-y-2 mt-auto">
+                <div className="flex items-center justify-between p-3.5 border border-gray-100 rounded-xl hover:border-blue-200 hover:bg-blue-50 cursor-pointer transition-all group">
+                  <div className="flex items-center gap-3 text-[13px] font-medium text-gray-800 font-body group-hover:text-blue-600">
+                    <DownloadCloud size={16} className="text-gray-400 group-hover:text-blue-600" /> Download PDF
+                  </div>
+                  <ChevronRight size={16} className="text-gray-300 group-hover:text-blue-600" />
                 </div>
-                <ChevronRight size={16} className="text-gray-300 group-hover:text-blue-600" />
-              </div>
-              <div className="flex items-center justify-between p-3.5 border border-gray-100 rounded-xl hover:border-blue-200 hover:bg-blue-50 cursor-pointer transition-all group">
-                <div className="flex items-center gap-3 text-[13px] font-medium text-gray-800 font-body group-hover:text-blue-600">
-                  <LinkIcon size={16} className="text-gray-400 group-hover:text-blue-600" /> Copy Link
+                <div className="flex items-center justify-between p-3.5 border border-gray-100 rounded-xl hover:border-blue-200 hover:bg-blue-50 cursor-pointer transition-all group">
+                  <div className="flex items-center gap-3 text-[13px] font-medium text-gray-800 font-body group-hover:text-blue-600">
+                    <LinkIcon size={16} className="text-gray-400 group-hover:text-blue-600" /> Copy Link
+                  </div>
+                  <ChevronRight size={16} className="text-gray-300 group-hover:text-blue-600" />
                 </div>
-                <ChevronRight size={16} className="text-gray-300 group-hover:text-blue-600" />
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+
+    {/* MOBILE MOCKUP (Natively Responsive) */}
+    <div className="lg:hidden relative mx-auto w-full max-w-[850px] text-left">
+      {/* Dashboard Modal */}
+      <div className="w-full shadow-xl md:shadow-2xl rounded-2xl md:rounded-[2rem] border border-border-light bg-surface flex flex-col md:flex-row overflow-hidden relative z-10 lg:h-[541px]">
+        
+        {/* Mobile Top bar (replaces sidebar on small screens) */}
+        <div className="md:hidden flex items-center justify-between p-4 border-b border-border-light bg-surface">
+          <Logo variant="dark" />
+          <div className="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center cursor-pointer">
+            <Menu size={16} className="text-primary" />
+          </div>
+        </div>
+
+        {/* Sidebar - Hidden on mobile, visible on md+ */}
+        <div className="hidden md:flex w-[220px] bg-surface border-r border-border-light p-4 flex-col justify-between flex-shrink-0">
+          <div>
+            <div className="mb-10 px-2 mt-2">
+              <Logo variant="dark" />
+            </div>
+            <nav className="space-y-1.5">
+              <div className="flex items-center gap-3 bg-primary-light text-primary px-3 py-2.5 rounded-lg font-semibold text-sm font-body">
+                <Grid size={18} /> Dashboard
+              </div>
+              {[
+                { icon: FileTextIcon, label: "Scopes" },
+                { icon: MessageSquare, label: "Negotiations" },
+                { icon: Bookmark, label: "Templates" },
+                { icon: Receipt, label: "Invoices" },
+                { icon: Settings, label: "Settings" }
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-3 text-text-secondary px-3 py-2.5 rounded-lg font-medium text-sm font-body hover:text-text-dark hover:bg-surface-secondary cursor-pointer transition-colors">
+                  <item.icon size={18} /> {item.label}
+                </div>
+              ))}
+            </nav>
+          </div>
+          
+          {/* Upgrade Card */}
+          <div className="bg-surface border border-border-light p-4 rounded-xl flex items-start gap-3 shadow-sm cursor-pointer hover:border-border transition-all">
+            <div className="mt-0.5 w-6 h-6 flex items-center justify-center flex-shrink-0">
+               <span className="text-xl leading-none">👑</span>
+            </div>
+            <div>
+              <div className="text-sm font-bold text-text-dark font-body">Upgrade to Pro</div>
+              <div className="text-xs text-text-secondary mt-0.5 font-body">Unlock all features</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1 bg-[#F9FAFB] p-5 md:p-10 overflow-y-auto relative">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 md:mb-8 gap-4">
+            <div>
+              <h1 className="text-xl md:text-3xl font-extrabold text-text-dark font-display mb-1 md:mb-1.5">Welcome back, Daniel 👋</h1>
+              <p className="text-text-secondary text-sm md:text-base font-body">Let&apos;s create a scope or continue where you left off.</p>
+            </div>
+            <div className="flex items-center gap-4 w-full sm:w-auto">
+              <button className="bg-primary hover:bg-primary-hover text-white px-4 md:px-5 py-2.5 rounded-full text-sm font-semibold flex items-center justify-center gap-2 transition-colors shadow-sm font-body w-full sm:w-auto">
+                + New Scope
+              </button>
+            </div>
+          </div>
+
+          {/* Action Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5 mb-8 md:mb-10 lg:pr-[200px]">
+            <div className="bg-surface border border-border-light rounded-xl p-5 md:p-6 shadow-sm flex flex-col items-start">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-success/10 flex items-center justify-center mb-4 md:mb-5">
+                <Target className="text-success" size={20} />
+              </div>
+              <h3 className="font-bold text-text-dark mb-1 font-body text-sm md:text-base">Scope Generator</h3>
+              <p className="text-xs md:text-sm text-text-secondary mb-auto h-8 font-body leading-relaxed">Create accurate scopes, pricing and timelines.</p>
+              <button className="bg-primary text-white w-full py-2.5 rounded-lg text-sm font-semibold transition-colors font-body hover:bg-primary-hover mt-6 md:mt-8">Start New</button>
+            </div>
+            <div className="bg-surface border border-border-light rounded-xl p-5 md:p-6 shadow-sm flex flex-col items-start">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary-light flex items-center justify-center mb-4 md:mb-5">
+                <TrendingUp className="text-primary" size={20} />
+              </div>
+              <h3 className="font-bold text-text-dark mb-1 font-body text-sm md:text-base">Negotiation Assistant</h3>
+              <p className="text-xs md:text-sm text-text-secondary mb-auto h-8 font-body leading-relaxed">Get help with strategy, messages and practice.</p>
+              <button className="bg-primary text-white w-full py-2.5 rounded-lg text-sm font-semibold transition-colors font-body hover:bg-primary-hover mt-6 md:mt-8">Open Assistant</button>
+            </div>
+          </div>
+
+          {/* Recent Scopes List */}
+          <div className="lg:pr-[200px]">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-bold text-text-dark font-display text-base md:text-lg">Recent Scopes</h3>
+              <span className="text-primary text-sm font-semibold hover:text-primary-hover cursor-pointer font-body">View all</span>
+            </div>
+            <div className="divide-y divide-border-light border-y border-border-light">
+              {[
+                { title: "Brand Identity Design for Fintech Startup", price: "₦650,000", status: "Viewed", statusClass: "bg-success/10 text-success" },
+                { title: "Website Redesign for E-commerce Store", price: "₦1,250,000", status: "Draft", statusClass: "bg-gray-100 text-text-secondary" },
+                { title: "Social Media Management (3 Months)", price: "₦450,000", status: "Sent", statusClass: "bg-primary-light text-primary" },
+              ].map((scope, i) => (
+                <div key={i} className="flex items-center justify-between py-3 md:py-3.5 hover:bg-gray-50 transition-colors cursor-pointer group">
+                  <div className="text-xs md:text-sm font-bold text-text-dark truncate pr-2 md:pr-4 font-body flex-1">{scope.title}</div>
+                  <div className="flex items-center gap-2 md:gap-6 flex-shrink-0">
+                    <div className="text-xs md:text-sm font-semibold text-text-dark text-right font-body">{scope.price}</div>
+                    <div className={`text-[10px] md:text-xs font-semibold px-2 py-1 rounded-full w-14 md:w-16 text-center font-body ${scope.statusClass}`}>{scope.status}</div>
+                    <ChevronRight size={16} className="hidden sm:block text-text-muted group-hover:text-primary" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </>
 );
 
 const Hero = () => (
@@ -681,7 +815,7 @@ const Footer = () => (
     </div>
 
     <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between pt-8 border-t border-border text-xs font-medium">
-      <p>© 2024 Pricis. All rights reserved.</p>
+      <p>© 2025 Pricis. All rights reserved.</p>
       <div className="flex gap-6 mt-4 md:mt-0">
         <Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link>
         <Link href="#" className="hover:text-white transition-colors">Terms of Service</Link>

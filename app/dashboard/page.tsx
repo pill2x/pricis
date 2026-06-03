@@ -106,9 +106,9 @@ export default function DashboardPage() {
   return (
     <>
       {/* Header */}
-      <div className="flex justify-between items-start mb-10">
+      <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8 sm:mb-10 pt-12 sm:pt-0">
         <div>
-          <h1 className="text-2xl font-bold text-text-dark mb-1 font-display">
+          <h1 className="text-xl sm:text-2xl font-bold text-text-dark mb-1 font-display">
             Welcome back, {user?.user_metadata?.first_name || user?.email?.split('@')[0] || 'User'} 👋
           </h1>
           <p className="text-text-secondary text-sm font-body">Let&apos;s create a scope or continue where you left off.</p>
@@ -177,16 +177,16 @@ export default function DashboardPage() {
                   <div 
                     key={quote.id} 
                     onClick={() => setSelectedQuote(quote)}
-                    className="flex items-center justify-between p-4 hover:bg-surface-secondary cursor-pointer transition-colors group"
+                    className="flex items-center justify-between p-3 sm:p-4 hover:bg-surface-secondary cursor-pointer transition-colors group"
                   >
-                    <div className="text-sm font-bold text-text-dark truncate pr-4 flex-1 font-body">
+                    <div className="text-xs sm:text-sm font-bold text-text-dark truncate pr-2 sm:pr-4 flex-1 font-body">
                       {quote.project_title}
                     </div>
-                    <div className="flex items-center gap-6 md:gap-10 flex-shrink-0">
-                      <div className="text-sm font-semibold text-text-dark w-24 text-right font-body">
+                    <div className="flex items-center gap-2 sm:gap-6 md:gap-10 flex-shrink-0">
+                      <div className="text-xs sm:text-sm font-semibold text-text-dark text-right font-body">
                         ₦{getTierPrice(quote).toLocaleString()}
                       </div>
-                      <div className={`text-xs font-semibold px-3 py-1 rounded-full w-16 text-center font-body ${status.bgClass} ${status.textClass}`}>
+                      <div className={`hidden sm:block text-xs font-semibold px-3 py-1 rounded-full w-16 text-center font-body ${status.bgClass} ${status.textClass}`}>
                         {status.text}
                       </div>
                       <ChevronRight size={18} className="text-text-muted group-hover:text-primary transition-colors" />
@@ -226,13 +226,13 @@ export default function DashboardPage() {
               </div>
 
               {/* Pricing */}
-              <div className="grid grid-cols-3 gap-4 mb-8">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-8">
                 {(['conservative', 'standard', 'premium'] as const).map((tier) => (
                   <div
                     key={tier}
-                    className={`rounded-lg p-4 border ${selectedQuote.selected_tier === tier ? 'border-primary bg-primary-light' : 'border-border-light bg-surface'}`}
+                    className={`rounded-lg p-3 sm:p-4 border flex sm:flex-col items-center sm:items-start justify-between sm:justify-start ${selectedQuote.selected_tier === tier ? 'border-primary bg-primary-light' : 'border-border-light bg-surface'}`}
                   >
-                    <p className="text-xs font-semibold uppercase text-text-secondary mb-1 font-body">{tier}</p>
+                    <p className="text-xs font-semibold uppercase text-text-secondary sm:mb-1 font-body">{tier}</p>
                     <p className={`font-extrabold text-lg font-display ${selectedQuote.selected_tier === tier ? 'text-primary' : 'text-text-dark'}`}>
                       ₦{(selectedQuote[`price_${tier}` as keyof Quote] as number)?.toLocaleString()}
                     </p>
@@ -268,10 +268,10 @@ export default function DashboardPage() {
               </div>
 
               {/* Actions */}
-              <div className="flex gap-3 justify-end pt-6 border-t border-border-light">
+              <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end pt-6 border-t border-border-light">
                 <button
                   onClick={() => deleteQuote(selectedQuote.id)}
-                  className="text-sm font-semibold text-danger hover:bg-danger/10 px-4 py-2 rounded-full transition-colors font-body"
+                  className="text-sm font-semibold text-danger hover:bg-danger/10 px-4 py-2 rounded-full transition-colors font-body text-center"
                 >
                   Delete Scope
                 </button>
@@ -283,7 +283,7 @@ export default function DashboardPage() {
                   {({ loading }) => (
                     <button
                       type="button"
-                      className="bg-primary hover:bg-primary-hover text-white font-semibold text-sm px-6 py-2.5 rounded-full transition-colors flex items-center gap-2 shadow-blue font-body"
+                      className="bg-primary hover:bg-primary-hover text-white font-semibold text-sm px-6 py-2.5 rounded-full transition-colors flex items-center justify-center gap-2 shadow-blue font-body w-full sm:w-auto"
                     >
                       <Download className="h-4 w-4" />
                       {loading ? "Preparing PDF..." : "Export PDF"}
@@ -295,6 +295,14 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Mobile FAB for New Scope */}
+      <Link 
+        href="/generate" 
+        className="sm:hidden fixed bottom-6 right-6 z-40 bg-primary hover:bg-primary-hover text-white w-14 h-14 rounded-full shadow-lg shadow-primary/30 flex items-center justify-center transition-all active:scale-95"
+      >
+        <Plus size={24} />
+      </Link>
     </>
   );
 }
