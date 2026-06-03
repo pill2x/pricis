@@ -46,4 +46,14 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+
+  .dashboard-mock-scale {
+    transform: scale(min(calc((100vw - 48px) / 850), 1));
+  }
+
+  @supports (width: 100cqw) {
+    .dashboard-mock-scale {
+      transform: scale(calc(100cqw / 850));
+    }
+  }
 }

@@ -27,11 +27,11 @@ const Navbar = () => (
         <Link href="#templates" className="hover:text-white transition-colors">Templates</Link>
       </div>
 
-      <div className="flex items-center gap-4">
-        <Link href="/login" className="text-sm font-medium text-text-white hover:text-gray-200 transition-colors bg-white/10 border border-white/15 rounded-full px-5 py-2 hover:bg-white/20">
+      <div className="flex items-center gap-2 sm:gap-4">
+        <Link href="/login" className="hidden sm:block text-sm font-medium text-text-white hover:text-gray-200 transition-colors bg-white/10 border border-white/15 rounded-full px-5 py-2 hover:bg-white/20">
           Log in
         </Link>
-        <Link href="/signup" className="text-sm font-semibold bg-primary hover:bg-primary-hover shadow-blue text-white px-5 py-2 rounded-full transition-all">
+        <Link href="/signup" className="text-xs sm:text-sm font-semibold bg-primary hover:bg-primary-hover shadow-blue text-white px-4 sm:px-5 py-2 rounded-full transition-all whitespace-nowrap">
           Get Started Free
         </Link>
       </div>
@@ -46,11 +46,10 @@ const DashboardMockup = () => (
       style={{ containerType: 'inline-size' }}
     >
       <div 
-        className="absolute top-0 left-0 origin-top-left"
+        className="absolute top-0 left-0 origin-top-left dashboard-mock-scale"
         style={{ 
           width: '850px', 
-          height: '541px', 
-          transform: 'scale(calc(100cqw / 850))' 
+          height: '541px'
         }}
       >
         {/* Dashboard Modal */}
@@ -316,15 +315,18 @@ const HowItWorks = () => (
       From uncertainty to a <span className="text-primary">confident quote</span> in minutes.
     </h2>
 
-    <div className="flex flex-col lg:flex-row items-center justify-center gap-4 relative">
+    <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-4 relative w-full max-w-sm lg:max-w-none mx-auto">
+      {/* Mobile Roadmap Line */}
+      <div className="absolute top-10 bottom-10 left-1/2 w-px border-l-2 border-dashed border-border-light lg:hidden z-0"></div>
+      
       {[
         { step: "1", title: "Choose Your Service", desc: "Select the service you offer from our library.", icon: Grid },
         { step: "2", title: "Client Read", desc: "Answer 4 quick questions about your client.", icon: UserCheck },
         { step: "3", title: "Add Project Details", desc: "Share key details about the project and deliverables.", icon: FileTextIcon },
         { step: "4", title: "Get Your Scope", desc: "Receive a professional scope, price, and timeline.", icon: Star }
       ].map((item, i) => (
-        <div key={i} className="flex items-center">
-          <div className="bg-surface p-6 text-left relative flex flex-col w-[260px]">
+        <div key={i} className={`flex w-full lg:w-auto relative z-10 ${i % 2 === 0 ? 'justify-end lg:justify-center' : 'justify-start lg:justify-center'}`}>
+          <div className="bg-surface p-5 sm:p-6 text-left relative flex flex-col w-[85%] sm:w-[260px] rounded-2xl lg:rounded-none">
             <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm shadow-blue mb-4 font-display">
               {item.step}
             </div>
@@ -334,7 +336,7 @@ const HowItWorks = () => (
             <h3 className="font-semibold text-text-dark mb-2 text-lg font-display leading-tight">{item.title}</h3>
             <p className="text-sm text-text-secondary leading-relaxed font-body">{item.desc}</p>
           </div>
-          {i < 3 && <ChevronRight className="hidden lg:block text-border-light mx-2 flex-shrink-0" size={24} />}
+          {i < 3 && <ChevronRight className="hidden lg:block text-border-light mx-2 flex-shrink-0 self-center" size={24} />}
         </div>
       ))}
     </div>
@@ -344,7 +346,7 @@ const HowItWorks = () => (
 const Features = () => (
   <section className="py-24 px-6 bg-surface-secondary border-t border-border-light" id="features">
     <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_2fr] gap-16 items-start">
-      <div className="sticky top-24">
+      <div className="lg:sticky lg:top-24">
         <div className="font-body text-xs font-semibold tracking-[0.1em] uppercase text-primary mb-3">POWERFUL FEATURES</div>
         <h2 className="text-3xl md:text-4xl font-extrabold text-text-dark mb-6 leading-tight font-display">
           Everything you need to price, propose and <span className="text-success">protect</span> your value.

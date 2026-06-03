@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Sora, DM_Sans } from "next/font/google";
 import "./globals.css";
 
@@ -17,6 +17,13 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: "Pricis",
   description: "Freelancer pricing and scope generation for African designers and developers",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
