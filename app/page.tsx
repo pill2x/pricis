@@ -10,55 +10,11 @@ import {
   ChevronUp, Mail, Send, Menu
 } from "lucide-react";
 import Logo from "@/components/Logo";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { useState } from "react";
 
-const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
 
-  return (
-    <nav className="sticky top-0 z-50 w-full bg-bg-dark/95 backdrop-blur-sm border-b border-border">
-      <div className="max-w-7xl mx-auto px-6 h-[64px] flex items-center justify-between">
-        <Link href="/">
-          <Logo variant="muted" />
-        </Link>
-        
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-text-muted font-body">
-          <div className="flex items-center gap-1 cursor-pointer hover:text-white transition-colors">Features <ChevronDown size={14}/></div>
-          <Link href="#how-it-works" className="hover:text-white transition-colors">How it Works</Link>
-          <Link href="#pricing" className="hover:text-white transition-colors">Pricing</Link>
-          <div className="flex items-center gap-1 cursor-pointer hover:text-white transition-colors">Resources <ChevronDown size={14}/></div>
-          <Link href="#templates" className="hover:text-white transition-colors">Templates</Link>
-        </div>
-
-        <div className="flex items-center gap-2 sm:gap-4">
-          <Link href="/login" className="hidden sm:block text-sm font-medium text-text-white hover:text-gray-200 transition-colors bg-white/10 border border-white/15 rounded-full px-5 py-2 hover:bg-white/20">
-            Log in
-          </Link>
-          <Link href="/signup" className="text-xs sm:text-sm font-semibold bg-primary hover:bg-primary-hover shadow-blue text-white px-4 sm:px-5 py-2 rounded-full transition-all whitespace-nowrap">
-            Get Started Free
-          </Link>
-          <button 
-            className="md:hidden text-white p-1 ml-1"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            <Menu size={24} />
-          </button>
-        </div>
-      </div>
-      
-      {/* Mobile Menu */}
-      {isOpen && (
-        <div className="md:hidden border-t border-border bg-bg-dark px-6 py-4 space-y-4">
-          <Link href="#features" className="block text-white hover:text-primary transition-colors py-2 font-medium" onClick={() => setIsOpen(false)}>Features</Link>
-          <Link href="#how-it-works" className="block text-white hover:text-primary transition-colors py-2 font-medium" onClick={() => setIsOpen(false)}>How it Works</Link>
-          <Link href="#pricing" className="block text-white hover:text-primary transition-colors py-2 font-medium" onClick={() => setIsOpen(false)}>Pricing</Link>
-          <Link href="#templates" className="block text-white hover:text-primary transition-colors py-2 font-medium" onClick={() => setIsOpen(false)}>Templates</Link>
-          <Link href="/login" className="block text-white hover:text-primary transition-colors py-2 font-medium sm:hidden" onClick={() => setIsOpen(false)}>Log in</Link>
-        </div>
-      )}
-    </nav>
-  );
-};
 
 const DashboardMockup = () => (
   <>
@@ -354,26 +310,26 @@ const Hero = () => (
           Generate accurate scopes, professional proposals, and strong responses when clients push back on price.
         </p>
 
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-3 mb-12 text-xs text-white font-medium font-body">
-          <div className="flex items-center gap-3 bg-bg-dark-3/50 px-2.5 py-2 rounded-xl hover:bg-bg-dark-3 transition-colors cursor-pointer">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-3 mb-12 text-xs text-white font-medium font-body select-none">
+          <div className="flex items-center gap-3 bg-bg-dark-3/50 px-2.5 py-2 rounded-xl">
             <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
               <Target size={18} className="text-primary" />
             </div>
             <div className="leading-tight text-left">Scope<br/>Generator</div>
           </div>
-          <div className="flex items-center gap-3 bg-bg-dark-3/50 px-2.5 py-2 rounded-xl hover:bg-bg-dark-3 transition-colors cursor-pointer">
+          <div className="flex items-center gap-3 bg-bg-dark-3/50 px-2.5 py-2 rounded-xl">
             <div className="w-9 h-9 rounded-lg bg-success/10 flex items-center justify-center flex-shrink-0">
               <MessageSquare size={18} className="text-success" />
             </div>
             <div className="leading-tight text-left">Negotiation<br/>Assistant</div>
           </div>
-          <div className="flex items-center gap-3 bg-bg-dark-3/50 px-2.5 py-2 rounded-xl hover:bg-bg-dark-3 transition-colors cursor-pointer">
+          <div className="flex items-center gap-3 bg-bg-dark-3/50 px-2.5 py-2 rounded-xl">
             <div className="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
               <FileText size={18} className="text-text-muted" />
             </div>
             <div className="leading-tight text-left">PDF<br/>Export</div>
           </div>
-          <div className="flex items-center gap-3 bg-bg-dark-3/50 px-2.5 py-2 rounded-xl hover:bg-bg-dark-3 transition-colors cursor-pointer">
+          <div className="flex items-center gap-3 bg-bg-dark-3/50 px-2.5 py-2 rounded-xl">
             <div className="w-9 h-9 rounded-lg bg-success/10 flex items-center justify-center flex-shrink-0">
               <LinkIcon size={18} className="text-success" />
             </div>
@@ -740,90 +696,6 @@ const FAQ = () => {
   );
 };
 
-const Newsletter = () => (
-  <section className="py-24 px-6 bg-surface-secondary border-t border-border-light">
-    <div className="max-w-2xl mx-auto text-center">
-      <div className="w-16 h-16 rounded-2xl bg-primary-light flex items-center justify-center mx-auto mb-6">
-        <Mail size={28} className="text-primary" />
-      </div>
-      <h2 className="text-3xl md:text-4xl font-extrabold text-text-dark font-display mb-4">
-        Stay ahead of the <span className="text-primary">game</span>
-      </h2>
-      <p className="text-text-secondary font-body text-lg mb-8 leading-relaxed">
-        Get weekly pricing tips, negotiation strategies, and product updates. Join 2,500+ freelancers who price smarter.
-      </p>
-      <form className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
-        <input 
-          type="email" 
-          placeholder="Enter your email address" 
-          className="flex-1 bg-surface border border-border-light rounded-full px-5 py-3 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 text-text-dark placeholder:text-text-muted transition-all font-body"
-        />
-        <button type="submit" className="bg-primary hover:bg-primary-hover shadow-blue text-white font-semibold px-6 py-3 rounded-full transition-all font-body flex items-center justify-center gap-2 whitespace-nowrap">
-          Subscribe <Send size={16} />
-        </button>
-      </form>
-      <p className="text-xs text-text-muted mt-4 font-body">No spam, ever. Unsubscribe anytime.</p>
-    </div>
-  </section>
-);
-
-const Footer = () => (
-  <footer className="bg-bg-dark border-t border-border pt-20 pb-8 px-6 text-text-muted text-sm font-body">
-    <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-8 mb-16">
-      <div className="lg:col-span-2">
-        <Link href="/" className="mb-6 block">
-          <Logo variant="light" />
-        </Link>
-        <p className="mb-8 font-medium text-text-muted text-base leading-relaxed max-w-sm">
-          Price with confidence. Negotiate with clarity.
-        </p>
-        <div className="flex items-center gap-4">
-          <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 hover:text-white transition-colors"><Twitter size={18} /></a>
-          <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 hover:text-white transition-colors"><Linkedin size={18} /></a>
-          <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 hover:text-white transition-colors"><Instagram size={18} /></a>
-        </div>
-      </div>
-      
-      <div>
-        <h4 className="text-white font-semibold mb-6 tracking-wide">Product</h4>
-        <ul className="space-y-4 font-medium">
-          <li><Link href="#features" className="hover:text-primary transition-colors">Features</Link></li>
-          <li><Link href="#how-it-works" className="hover:text-primary transition-colors">How it Works</Link></li>
-          <li><Link href="#pricing" className="hover:text-primary transition-colors">Pricing</Link></li>
-          <li><Link href="#templates" className="hover:text-primary transition-colors">Templates</Link></li>
-        </ul>
-      </div>
-
-      <div>
-        <h4 className="text-white font-semibold mb-6 tracking-wide">Resources</h4>
-        <ul className="space-y-4 font-medium">
-          <li><Link href="#" className="hover:text-primary transition-colors">Blog</Link></li>
-          <li><Link href="#" className="hover:text-primary transition-colors">Pricing Guide</Link></li>
-          <li><Link href="#" className="hover:text-primary transition-colors">Negotiation Tips</Link></li>
-          <li><Link href="#" className="hover:text-primary transition-colors">Help Center</Link></li>
-        </ul>
-      </div>
-
-      <div>
-        <h4 className="text-white font-semibold mb-6 tracking-wide">Company</h4>
-        <ul className="space-y-4 font-medium">
-          <li><Link href="#" className="hover:text-primary transition-colors">About Us</Link></li>
-          <li><Link href="#" className="hover:text-primary transition-colors">Careers</Link></li>
-          <li><Link href="#" className="hover:text-primary transition-colors">Contact</Link></li>
-        </ul>
-      </div>
-    </div>
-
-    <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between pt-8 border-t border-border text-xs font-medium">
-      <p>© 2025 Pricis. All rights reserved.</p>
-      <div className="flex gap-6 mt-4 md:mt-0">
-        <Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link>
-        <Link href="#" className="hover:text-white transition-colors">Terms of Service</Link>
-      </div>
-    </div>
-  </footer>
-);
-
 export default function Home() {
   return (
     <div className="min-h-screen bg-bg-dark text-white font-sans selection:bg-primary-light">
@@ -839,7 +711,6 @@ export default function Home() {
         <Logos />
         <Pricing />
         <FAQ />
-        <Newsletter />
       </div>
       <Footer />
     </div>
