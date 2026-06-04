@@ -233,7 +233,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden fixed inset-0 top-[64px] bg-bg-dark z-40 overflow-y-auto border-t border-border">
+        <div className="md:hidden absolute left-0 top-full w-full h-[calc(100vh-64px)] bg-bg-dark z-40 overflow-y-auto border-t border-border">
           <div className="px-6 py-6 space-y-1">
             <Link
               href="/features"

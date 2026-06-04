@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Twitter, Linkedin, Instagram, Send } from "lucide-react";
+import { Twitter, Linkedin, Instagram, Send, Mail } from "lucide-react";
 import Logo from "@/components/Logo";
 import { useState } from "react";
 
@@ -20,39 +20,42 @@ export default function Footer() {
   return (
     <>
       {/* Newsletter Section */}
-      <section className="py-24 px-6 bg-bg-dark border-t border-border" data-section="newsletter">
+      <section className="py-24 px-6 bg-surface-secondary border-t border-border-light" data-section="newsletter">
         <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-white font-display mb-4">
-            Ready to price with <span className="text-primary">confidence?</span>
+          <div className="w-12 h-12 rounded-xl bg-primary-light text-primary flex items-center justify-center mx-auto mb-6">
+            <Mail size={24} />
+          </div>
+          <h2 className="text-3xl md:text-4xl font-extrabold text-text-dark font-display mb-4">
+            Stay ahead of the <span className="text-primary">game</span>
           </h2>
-          <p className="text-text-muted font-body text-lg mb-8 leading-relaxed">
-            Join thousands of freelancers who now charge what they&apos;re worth.
+          <p className="text-text-secondary font-body text-base mb-8 max-w-lg mx-auto leading-relaxed">
+            Get weekly pricing tips, negotiation strategies, and product updates. Join 2,500+ freelancers who price smarter.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-            <Link
-              href="/signup"
-              className="w-full sm:w-auto bg-primary hover:bg-primary-hover shadow-blue text-white font-semibold px-8 py-3.5 rounded-full transition-all font-body text-center"
-            >
-              Get Started Free
-            </Link>
-            <Link
-              href="/pricing"
-              className="w-full sm:w-auto bg-white/5 border border-white/15 hover:bg-white/10 text-white font-semibold px-8 py-3.5 rounded-full transition-all font-body text-center"
-            >
-              See Pricing
-            </Link>
-          </div>
-          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-text-muted font-body">
-            <span className="flex items-center gap-1.5">
-              <span className="text-success">✓</span> No credit card required
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="text-success">✓</span> Free forever plan
-            </span>
-            <span className="flex items-center gap-1.5">
-              <span className="text-success">✓</span> Upgrade anytime
-            </span>
-          </div>
+          {subscribed ? (
+            <div className="max-w-md mx-auto mb-4 bg-success/10 border border-success/20 text-success py-3 px-6 rounded-full font-semibold font-body shadow-sm">
+              Thanks for subscribing! 🎉
+            </div>
+          ) : (
+            <form className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto mb-4" onSubmit={handleSubscribe}>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email address"
+                className="flex-1 w-full bg-white border border-border-light rounded-full px-5 py-3 text-sm text-text-dark placeholder:text-text-muted focus:outline-none focus:border-primary transition-colors shadow-sm"
+                required
+              />
+              <button
+                type="submit"
+                className="w-full sm:w-auto bg-primary hover:bg-primary-hover text-white px-6 py-3 rounded-full text-sm font-semibold transition-colors flex items-center justify-center gap-2 shadow-blue flex-shrink-0"
+              >
+                Subscribe <Send size={16} />
+              </button>
+            </form>
+          )}
+          <p className="text-xs text-text-muted font-body">
+            No spam, ever. Unsubscribe anytime.
+          </p>
         </div>
       </section>
 
@@ -61,7 +64,7 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-8 mb-16">
           <div className="lg:col-span-2">
             <Link href="/" className="mb-6 block">
-              <Logo variant="light" />
+              <Logo variant="muted" />
             </Link>
             <p className="mb-8 font-medium text-text-muted text-base leading-relaxed max-w-sm">
               Price with <span className="text-primary">confidence</span>.
@@ -109,26 +112,7 @@ export default function Footer() {
               <li><Link href="/contact" className="hover:text-primary transition-colors">Contact Us</Link></li>
             </ul>
 
-            <h4 className="text-white font-semibold mb-4 mt-8 tracking-wide">Stay in the loop</h4>
-            {subscribed ? (
-              <p className="text-success text-sm font-medium">Thanks for subscribing! 🎉</p>
-            ) : (
-              <form onSubmit={handleSubscribe} className="flex gap-2">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="flex-1 min-w-0 bg-white/5 border border-white/10 rounded-full px-4 py-2 text-xs text-white placeholder:text-text-muted focus:outline-none focus:border-primary transition-colors"
-                />
-                <button
-                  type="submit"
-                  className="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-full text-xs font-semibold transition-colors flex-shrink-0"
-                >
-                  Subscribe
-                </button>
-              </form>
-            )}
+
           </div>
         </div>
 
