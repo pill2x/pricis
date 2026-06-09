@@ -1,448 +1,844 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, AlertTriangle, CheckCircle2, LogOut, Trash2 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
-
-interface Profile {
-  full_name: string;
-  business_name: string;
-  email: string;
-  auto_save_quotes?: boolean;
-}
+import { 
+  User, Palette, CreditCard, Sliders, Users, Puzzle, Bell, Shield,
+  ArrowLeft, Upload, CheckCircle2, Info, LucideIcon
+} from "lucide-react";
 
 export default function SettingsPage() {
-  const [profile, setProfile] = useState<Profile>({
-    full_name: "",
-    business_name: "",
-    email: "",
-    auto_save_quotes: true,
-  });
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [showComingSoon, setShowComingSoon] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState<"home" | "profile" | "branding" | "billing" | "preferences" | "team" | "integrations" | "notifications" | "security">("home");
+  const [showSavedSuccess, setShowSavedSuccess] = useState(false);
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
+  // Profile Form States
+  const [fullName, setFullName] = useState("Alex John");
+  const [email, setEmail] = useState("alexjohn@example.com");
+  const [phone, setPhone] = useState("+234 801 234 5678");
+  const [country, setCountry] = useState("Nigeria");
+  const [timezone, setTimezone] = useState("(GMT+1) West Africa Time");
 
-  const fetchProfile = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        router.push("/login");
-        return;
-      }
+  // Branding Form States
+  const [brandName, setBrandName] = useState("Alex John Studio");
+  const [primaryColor, setPrimaryColor] = useState("#2563EB");
+  const [secondaryColor, setSecondaryColor] = useState("#1E40AF");
+  const [brandFont, setBrandFont] = useState("Inter");
+  const [footerNote, setFooterNote] = useState("Thank you for the opportunity to work together.");
 
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
+  // Preferences Form States
+  const [currency, setCurrency] = useState("NGN - Nigerian Naira (₦)");
+  const [paymentTerms, setPaymentTerms] = useState("50% upfront, 50% on completion");
+  const [revisionLimit, setRevisionLimit] = useState("2 revisions");
+  const [timeline, setTimeline] = useState("4 weeks");
+  const [projectStart, setProjectStart] = useState("Upon payment");
+  const [validity, setValidity] = useState("Default validity");
 
-      if (error && error.code !== "PGRST116") {
-        console.error("Error fetching profile:", error);
-      } else if (data) {
-        setProfile({
-          full_name: data.full_name || "",
-          business_name: data.business_name || "",
-          email: data.email || user.email || "",
-          auto_save_quotes: data.auto_save_quotes !== undefined ? data.auto_save_quotes : true,
-        });
-      } else {
-        // Profile doesn't exist, create it
-        setProfile({
-          full_name: "",
-          business_name: "",
-          email: user.email || "",
-          auto_save_quotes: true,
-        });
-      }
-    } catch (err) {
-      console.error("Error:", err);
-    } finally {
-      setLoading(false);
-    }
+  // Security Form States
+  const [currentPassword, setCurrentPassword] = useState("••••••••");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [twoFactor, setTwoFactor] = useState(false);
+
+  // Notifications Form States
+  const [emailScopeViewed, setEmailScopeViewed] = useState(true);
+  const [emailInvoiceViewed, setEmailInvoiceViewed] = useState(true);
+  const [emailInvoicePaid, setEmailInvoicePaid] = useState(true);
+  const [emailKovaMessage, setEmailKovaMessage] = useState(true);
+  const [emailWeeklySummary, setEmailWeeklySummary] = useState(false);
+  const [inAppAll, setInAppAll] = useState(true);
+
+  // Integrations states
+  const [connectedApps, setConnectedApps] = useState({
+    calendar: false,
+    drive: false,
+    dropbox: false,
+    slack: false,
+    zapier: false
+  });
+
+  const handleSaveChanges = () => {
+    setShowSavedSuccess(true);
   };
 
-  const handleSave = async () => {
-    setSaving(true);
-    setSuccessMessage(null);
-    setErrorMessage(null);
-    
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      // For now, only save the basic profile fields (auto_save_quotes column needs to be added to database)
-      const { error } = await supabase
-        .from("profiles")
-        .upsert({
-          id: user.id,
-          email: profile.email,
-          full_name: profile.full_name,
-          business_name: profile.business_name,
-        });
-
-      if (error) {
-        console.error("Error saving profile:", error);
-        setErrorMessage("Failed to save profile");
-      } else {
-        setSuccessMessage("Profile updated successfully.");
-        setTimeout(() => setSuccessMessage(null), 3000);
-      }
-    } catch (err) {
-      console.error("Error:", err);
-      setErrorMessage("An unexpected error occurred");
-    } finally {
-      setSaving(false);
-    }
+  const handleToggleApp = (appKey: keyof typeof connectedApps) => {
+    setConnectedApps({
+      ...connectedApps,
+      [appKey]: !connectedApps[appKey]
+    });
   };
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    router.push("/");
-  };
-
-  const handleDeleteAccount = () => {
-    setShowComingSoon(true);
-    setTimeout(() => setShowComingSoon(false), 3000);
-  };
-
-  if (loading) {
+  // Helper for rendering sidebar tab buttons
+  const renderTabButton = (
+    tabId: typeof activeTab, 
+    label: string, 
+    Icon: LucideIcon, 
+    isPro: boolean = false
+  ) => {
+    const isSelected = activeTab === tabId;
     return (
-      <>
-        <style jsx global>{`
-          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-        `}</style>
-        
-        <div className="min-h-screen flex items-center justify-center" style={{ fontFamily: 'Inter, sans-serif', backgroundColor: '#060D18' }}>
-          <Loader2 className="h-8 w-8 animate-spin" style={{ color: '#B8860B' }} />
+      <button
+        onClick={() => { setActiveTab(tabId); setShowSavedSuccess(false); }}
+        className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-between ${
+          isSelected 
+            ? "bg-primary-light text-primary" 
+            : "text-text-secondary hover:text-text-dark hover:bg-slate-100"
+        }`}
+      >
+        <div className="flex items-center gap-2.5">
+          <Icon size={15} className={isSelected ? "text-primary" : "text-text-secondary"} />
+          <span>{label}</span>
         </div>
-      </>
+        {isPro && (
+          <span className="bg-[#FF9F43]/15 text-[#FF9F43] text-[8px] font-black px-1.5 py-0.5 rounded uppercase font-display">Pro</span>
+        )}
+      </button>
+    );
+  };
+
+  // ----------------- GRID HUB STATE -----------------
+  if (activeTab === "home") {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-extrabold text-text-dark font-display tracking-tight">Settings</h1>
+          <p className="text-text-secondary text-sm font-medium mt-1">Manage your profiles, preferences and account.</p>
+        </div>
+
+        {/* 8-Card Settings Directory Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[
+            { id: "profile", label: "Profile", desc: "Manage your personal information and account details.", icon: User, bg: "bg-purple-50 text-purple-600 border-purple-100" },
+            { id: "branding", label: "Branding", desc: "Customize your brand and how you appear on proposals.", icon: Palette, bg: "bg-blue-50 text-blue-600 border-blue-100", isPro: true },
+            { id: "billing", label: "Billing & Plan", desc: "View your plan details, usage and billing history.", icon: CreditCard, bg: "bg-indigo-50 text-indigo-600 border-indigo-100" },
+            { id: "preferences", label: "Preferences", desc: "Manage your preferences and default settings.", icon: Sliders, bg: "bg-emerald-50 text-emerald-600 border-emerald-100" },
+            { id: "team", label: "Team", desc: "Invite team members and manage roles.", icon: Users, bg: "bg-green-50 text-green-600 border-green-100", isPro: true },
+            { id: "integrations", label: "Integrations", desc: "Connect Pricis with your favorite tools.", icon: Puzzle, bg: "bg-orange-50 text-orange-600 border-orange-100", isPro: true },
+            { id: "notifications", label: "Notifications", desc: "Choose how and when you want to be notified.", icon: Bell, bg: "bg-amber-50 text-amber-600 border-amber-100" },
+            { id: "security", label: "Security", desc: "Manage your password and security settings.", icon: Shield, bg: "bg-teal-50 text-teal-600 border-teal-100" }
+          ].map((card) => (
+            <button
+              key={card.id}
+              onClick={() => setActiveTab(card.id as typeof activeTab)}
+              className="bg-white border border-border-light rounded-2xl p-6 text-left hover:shadow-md hover:border-primary/20 transition-all group flex flex-col justify-between min-h-[160px]"
+            >
+              <div className="space-y-4 w-full">
+                <div className="flex justify-between items-start w-full">
+                  <div className={`w-10 h-10 rounded-xl ${card.bg} border flex items-center justify-center group-hover:scale-105 transition-transform`}>
+                    <card.icon size={20} />
+                  </div>
+                  {card.isPro && (
+                    <span className="bg-[#FF9F43]/15 text-[#FF9F43] text-[9px] font-black px-2 py-0.5 rounded uppercase font-display">Pro</span>
+                  )}
+                </div>
+                <div>
+                  <span className="font-bold text-sm text-text-dark block group-hover:text-primary transition-colors font-display">{card.label}</span>
+                  <p className="text-xs text-text-secondary mt-1 font-semibold leading-normal">{card.desc}</p>
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
     );
   }
 
+  // ----------------- SUB-PAGES TAB VIEW -----------------
   return (
-    <>
-      <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-      `}</style>
-      
-      <div className="min-h-screen" style={{ fontFamily: 'Inter, sans-serif', backgroundColor: '#060D18' }}>
-        <div className="px-6 py-10 max-w-4xl mx-auto">
-          
-          {/* Page Header */}
-          <div className="mb-8">
-            <h1 className="font-black tracking-[-0.02em]" style={{ fontSize: '48px', color: '#F1F5F9' }}>
-              Settings
-            </h1>
-            <p className="mt-1 text-sm" style={{ color: '#94A3B8' }}>
-              Manage your profile and account.
-            </p>
-          </div>
+    <div className="space-y-6 max-w-5xl mx-auto">
+      {/* Breadcrumbs Navigation */}
+      <div className="flex justify-between items-center border-b border-border-light pb-4">
+        <button 
+          onClick={() => { setActiveTab("home"); setShowSavedSuccess(false); }} 
+          className="flex items-center gap-1.5 text-text-secondary hover:text-text-dark transition-colors text-xs font-bold"
+        >
+          <ArrowLeft size={14} /> Back to Settings
+        </button>
+        <div className="text-[11px] font-black uppercase tracking-wider text-text-secondary">
+          Settings &gt; <span className="text-text-dark">{activeTab}</span>
+        </div>
+      </div>
 
-          {/* SECTION 1 — PROFILE */}
-          <div className="mb-5 overflow-hidden rounded-2xl" style={{ backgroundColor: '#0C1827', border: '1px solid rgba(255,255,255,0.08)' }}>
-            
-            {/* Section Header */}
-            <div className="px-6 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-              <div className="text-sm font-semibold" style={{ color: '#F1F5F9' }}>
-                Profile Information
-              </div>
-              <div className="text-xs mt-0.5" style={{ color: '#94A3B8' }}>
-                Update your name and business details.
-              </div>
-            </div>
-
-            {/* Section Content */}
-            <div className="px-6 py-5">
-              <div className="space-y-4">
-                
-                {/* Full Name */}
-                <div>
-                  <label htmlFor="fullName" className="block text-sm font-medium mb-1.5" style={{ color: '#94A3B8' }}>
-                    Full Name
-                  </label>
-                  <input
-                    id="fullName"
-                    type="text"
-                    value={profile.full_name}
-                    onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
-                    className="w-full rounded-xl transition-all"
-                    style={{
-                      backgroundColor: '#060D18',
-                      border: '1px solid rgba(255,255,255,0.08)',
-                      padding: '12px 16px',
-                      fontSize: '14px',
-                      color: '#F1F5F9',
-                      outline: 'none'
-                    }}
-                    placeholder="Enter your full name"
-                    onFocus={(e) => {
-                      e.target.style.borderColor = 'rgba(37,99,235,0.6)';
-                      e.target.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.1)';
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = 'rgba(255,255,255,0.08)';
-                      e.target.style.boxShadow = 'none';
-                    }}
-                  />
-                </div>
-
-                {/* Business Name */}
-                <div>
-                  <label htmlFor="businessName" className="block text-sm font-medium mb-1.5" style={{ color: '#94A3B8' }}>
-                    Business Name
-                  </label>
-                  <input
-                    id="businessName"
-                    type="text"
-                    value={profile.business_name}
-                    onChange={(e) => setProfile({ ...profile, business_name: e.target.value })}
-                    className="w-full rounded-xl transition-all"
-                    style={{
-                      backgroundColor: '#060D18',
-                      border: '1px solid rgba(255,255,255,0.08)',
-                      padding: '12px 16px',
-                      fontSize: '14px',
-                      color: '#F1F5F9',
-                      outline: 'none'
-                    }}
-                    placeholder="Enter your business name (optional)"
-                    onFocus={(e) => {
-                      e.target.style.borderColor = 'rgba(37,99,235,0.6)';
-                      e.target.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.1)';
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = 'rgba(255,255,255,0.08)';
-                      e.target.style.boxShadow = 'none';
-                    }}
-                  />
-                  <p className="text-xs mt-1" style={{ color: '#475569' }}>
-                    Shown on your exported scope PDFs
-                  </p>
-                </div>
-
-                {/* Email */}
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium mb-1.5" style={{ color: '#94A3B8' }}>
-                    Email
-                  </label>
-                  <input
-                    id="email"
-                    type="email"
-                    value={profile.email}
-                    disabled
-                    className="w-full rounded-xl"
-                    style={{
-                      backgroundColor: 'rgba(255,255,255,0.02)',
-                      border: '1px solid rgba(255,255,255,0.08)',
-                      padding: '12px 16px',
-                      fontSize: '14px',
-                      color: '#475569',
-                      cursor: 'not-allowed'
-                    }}
-                    placeholder="Your email address"
-                  />
-                  <p className="text-xs mt-1" style={{ color: '#475569' }}>
-                    Email cannot be changed
-                  </p>
-                </div>
-
-                {/* Auto-save Quotes Toggle - Temporarily Hidden */}
-                {/* 
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-sm font-medium" style={{ color: '#94A3B8' }}>
-                      Auto-save generated quotes
-                    </label>
-                    <button
-                      onClick={() => setProfile({ ...profile, auto_save_quotes: !profile.auto_save_quotes })}
-                      className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
-                      style={{
-                        backgroundColor: profile.auto_save_quotes ? '#2563EB' : 'rgba(255,255,255,0.08)'
-                      }}
-                    >
-                      <span
-                        className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
-                        style={{
-                          transform: profile.auto_save_quotes ? 'translateX(20px)' : 'translateX(2px)'
-                        }}
-                      />
-                    </button>
-                  </div>
-                  <p className="text-xs" style={{ color: '#475569' }}>
-                    When enabled, quotes are automatically saved to your dashboard
-                  </p>
-                </div>
-                */}
-              </div>
-
-              {/* Success Message */}
-              {successMessage && (
-                <div className="flex items-center gap-2 px-4 py-3 rounded-xl mt-4" style={{ backgroundColor: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', color: '#10B981' }}>
-                  <CheckCircle2 className="h-4 w-4" />
-                  <span className="text-sm">{successMessage}</span>
-                </div>
-              )}
-
-              {/* Error Message */}
-              {errorMessage && (
-                <div className="flex items-center gap-2 px-4 py-3 rounded-xl mt-4" style={{ backgroundColor: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#EF4444' }}>
-                  <AlertTriangle className="h-4 w-4" />
-                  <span className="text-sm">{errorMessage}</span>
-                </div>
-              )}
-
-              {/* Save Button */}
-              <button
-                onClick={handleSave}
-                disabled={saving}
-                className="font-semibold text-sm px-6 py-2.5 rounded-xl transition-all mt-2"
-                style={{
-                  backgroundColor: saving ? 'rgba(37,99,235,0.5)' : '#2563EB',
-                  color: 'white',
-                  cursor: saving ? 'not-allowed' : 'pointer'
-                }}
-                onMouseEnter={(e) => {
-                  if (!saving) e.currentTarget.style.backgroundColor = '#1D4ED8';
-                }}
-                onMouseLeave={(e) => {
-                  if (!saving) e.currentTarget.style.backgroundColor = '#2563EB';
-                }}
-              >
-                {saving ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  "Save Changes"
-                )}
-              </button>
-            </div>
-          </div>
-
-          {/* SECTION 2 — ACCOUNT */}
-          <div className="mb-5 overflow-hidden rounded-2xl" style={{ backgroundColor: '#0C1827', border: '1px solid rgba(255,255,255,0.08)' }}>
-            
-            {/* Section Header */}
-            <div className="px-6 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-              <div className="text-sm font-semibold" style={{ color: '#F1F5F9' }}>
-                Account
-              </div>
-              <div className="text-xs mt-0.5" style={{ color: '#94A3B8' }}>
-                Manage your session.
-              </div>
-            </div>
-
-            {/* Section Content */}
-            <div className="px-6 py-5">
-              <div className="space-y-3">
-                
-                {/* Account Info Row */}
-                <div className="flex items-center justify-between py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                  <div>
-                    <div className="text-sm" style={{ color: '#94A3B8' }}>Signed in as</div>
-                    <div className="text-sm font-medium mt-0.5" style={{ color: '#F1F5F9' }}>
-                      {profile.email}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Sign Out Row */}
-                <div className="flex items-center justify-between py-3">
-                  <div>
-                    <div className="text-sm font-medium" style={{ color: '#F1F5F9' }}>
-                      Sign Out
-                    </div>
-                    <div className="text-xs mt-0.5" style={{ color: '#94A3B8' }}>
-                      You'll be redirected to homepage.
-                    </div>
-                  </div>
-                  <button
-                    onClick={handleSignOut}
-                    className="flex items-center gap-2 font-medium text-sm px-4 py-2 rounded-xl transition-all"
-                    style={{
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      color: '#94A3B8'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
-                      e.currentTarget.style.color = '#F1F5F9';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-                      e.currentTarget.style.color = '#94A3B8';
-                    }}
-                  >
-                    <LogOut className="h-4 w-4" />
-                    Sign Out
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* SECTION 3 — DANGER ZONE */}
-          <div className="mb-5 overflow-hidden rounded-2xl" style={{ backgroundColor: '#0C1827', border: '1px solid rgba(239,68,68,0.15)' }}>
-            
-            {/* Section Header */}
-            <div className="px-6 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-              <div className="text-sm font-semibold" style={{ color: '#EF4444' }}>
-                Danger Zone
-              </div>
-              <div className="text-xs mt-0.5" style={{ color: '#94A3B8' }}>
-                These actions are permanent.
-              </div>
-            </div>
-
-            {/* Section Content */}
-            <div className="px-6 py-5">
-              <div className="flex items-center justify-between py-2">
-                <div>
-                  <div className="text-sm font-medium" style={{ color: '#F1F5F9' }}>
-                    Delete Account
-                  </div>
-                  <div className="text-xs mt-0.5" style={{ color: '#94A3B8' }}>
-                    Permanently delete your account and all saved scopes. Cannot be undone.
-                  </div>
-                </div>
-                <button
-                  onClick={handleDeleteAccount}
-                  className="font-medium text-sm px-4 py-2 rounded-xl transition-all"
-                  style={{
-                    border: '1px solid rgba(239,68,68,0.3)',
-                    color: '#EF4444'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.08)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                  }}
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Delete Account
-                </button>
-              </div>
-            </div>
-          </div>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {/* Left Column Sidebar Tabs Navigation - HIDDEN ON MOBILE when subtab is open */}
+        <div className="hidden md:block md:col-span-1 bg-white border border-border-light rounded-2xl p-4 shadow-sm space-y-1 h-fit">
+          <span className="block text-[10px] font-black text-text-secondary uppercase tracking-widest mb-3 px-2">Directory</span>
+          {renderTabButton("profile", "Profile", User)}
+          {renderTabButton("branding", "Branding", Palette, true)}
+          {renderTabButton("billing", "Billing & Plan", CreditCard)}
+          {renderTabButton("preferences", "Preferences", Sliders)}
+          {renderTabButton("team", "Team", Users, true)}
+          {renderTabButton("integrations", "Integrations", Puzzle, true)}
+          {renderTabButton("notifications", "Notifications", Bell)}
+          {renderTabButton("security", "Security", Shield)}
         </div>
 
-        {/* Coming Soon Toast */}
-        {showComingSoon && (
-          <div className="fixed bottom-4 right-4 px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 z-50" style={{ backgroundColor: '#B8860B', color: '#0B1D35' }}>
-            <AlertTriangle className="h-4 w-4" />
-            <span>Coming soon</span>
-          </div>
-        )}
+        {/* Right Column Content Panel - FULL WIDTH ON MOBILE */}
+        <div className="col-span-1 md:col-span-3 bg-white border border-border-light rounded-2xl p-6 md:p-8 shadow-sm flex flex-col justify-between min-h-[480px]">
+          
+          {/* Saved Success splash state nested INSIDE right panel */}
+          {showSavedSuccess ? (
+            <div className="max-w-md mx-auto text-center py-16 space-y-6 flex flex-col items-center justify-center my-auto">
+              <div className="relative">
+                {/* Visual sparkles */}
+                <div className="absolute -top-3 -left-3 w-4 h-4 rounded-full bg-emerald-400/20 animate-ping"></div>
+                <div className="absolute -bottom-2 -right-4 w-3 h-3 rounded-full bg-blue-400/30 animate-pulse"></div>
+                <div className="absolute top-1 -right-4 w-2 h-2 rounded-full bg-amber-400/40"></div>
+                
+                <div className="w-16 h-16 rounded-full bg-green-50 border border-green-200 text-green-500 flex items-center justify-center shadow-inner">
+                  <CheckCircle2 size={36} className="animate-bounce" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <h3 className="font-bold text-text-dark text-xl font-display">Settings saved!</h3>
+                <p className="text-text-secondary text-xs font-semibold max-w-xs leading-relaxed">
+                  Your changes have been saved successfully.
+                </p>
+              </div>
+              <button 
+                onClick={() => { setShowSavedSuccess(false); router.push("/dashboard"); }}
+                className="bg-primary hover:bg-primary-hover text-white px-8 py-3 rounded-full text-xs font-bold shadow-blue transition-all"
+              >
+                Go to Dashboard
+              </button>
+            </div>
+          ) : (
+            <div>
+              {/* TAB: PROFILE */}
+              {activeTab === "profile" && (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="font-bold text-text-dark text-lg font-display mb-1">Profile</h3>
+                    <p className="text-text-secondary text-xs font-semibold">Manage your personal information and account details.</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
+                    <div>
+                      <label className="block text-xs font-bold text-text-secondary uppercase mb-2">Full Name</label>
+                      <input 
+                        type="text" 
+                        value={fullName} 
+                        onChange={(e) => setFullName(e.target.value)} 
+                        className="w-full bg-surface-secondary border border-border-light text-text-dark text-xs rounded-xl px-4 py-3 outline-none font-semibold focus:border-primary focus:bg-white transition-colors" 
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-text-secondary uppercase mb-2">Email Address</label>
+                      <input 
+                        type="email" 
+                        value={email} 
+                        onChange={(e) => setEmail(e.target.value)} 
+                        className="w-full bg-surface-secondary border border-border-light text-text-dark text-xs rounded-xl px-4 py-3 outline-none font-semibold focus:border-primary focus:bg-white transition-colors" 
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-text-secondary uppercase mb-2">Phone Number</label>
+                      <input 
+                        type="text" 
+                        value={phone} 
+                        onChange={(e) => setPhone(e.target.value)} 
+                        className="w-full bg-surface-secondary border border-border-light text-text-dark text-xs rounded-xl px-4 py-3 outline-none font-semibold focus:border-primary focus:bg-white transition-colors" 
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-text-secondary uppercase mb-2">Country</label>
+                      <select 
+                        value={country} 
+                        onChange={(e) => setCountry(e.target.value)} 
+                        className="w-full bg-surface-secondary border border-border-light text-text-dark text-xs rounded-xl px-4 py-3 outline-none font-semibold cursor-pointer focus:border-primary focus:bg-white transition-colors"
+                      >
+                        <option>Nigeria</option>
+                        <option>Ghana</option>
+                        <option>Kenya</option>
+                      </select>
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-xs font-bold text-text-secondary uppercase mb-2">Timezone</label>
+                      <select 
+                        value={timezone} 
+                        onChange={(e) => setTimezone(e.target.value)} 
+                        className="w-full bg-surface-secondary border border-border-light text-text-dark text-xs rounded-xl px-4 py-3 outline-none font-semibold cursor-pointer focus:border-primary focus:bg-white transition-colors"
+                      >
+                        <option>(GMT+1) West Africa Time</option>
+                        <option>(GMT) Greenwich Mean Time</option>
+                        <option>(GMT+3) East Africa Time</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="pt-6 border-t border-border-light flex items-center gap-5">
+                    <div className="w-14 h-14 rounded-full bg-slate-100 overflow-hidden flex-shrink-0 border border-border-light">
+                      <img src="https://i.pravatar.cc/100?img=12" alt="avatar" className="w-full h-full object-cover" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <span className="block text-[10px] font-bold text-text-secondary uppercase tracking-wider">Profile Photo</span>
+                      <p className="text-[10px] text-text-muted font-medium">JPG, PNG or GIF. Max size 2MB.</p>
+                      <button className="text-xs font-bold text-primary hover:underline block text-left">Upload New Photo</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB: BRANDING */}
+              {activeTab === "branding" && (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="font-bold text-text-dark text-lg font-display mb-1">Branding</h3>
+                    <p className="text-text-secondary text-xs font-semibold">Customize your brand and how you appear on proposals.</p>
+                  </div>
+
+                  {/* Pro Alert Box */}
+                  <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-xs font-semibold text-text-dark">
+                    <div className="flex gap-2.5 items-start sm:items-center">
+                      <Info size={16} className="text-primary flex-shrink-0 mt-0.5 sm:mt-0" />
+                      <span>Branding is a Pro feature. Upgrade to customize your proposals.</span>
+                    </div>
+                    <button className="bg-primary hover:bg-primary-hover text-white text-[10px] font-black px-4.5 py-2 rounded-xl whitespace-nowrap shadow-blue transition-colors">Upgrade to Pro</button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                    <div className="md:col-span-1 border-2 border-dashed border-border-light hover:border-primary/40 rounded-2xl p-6 text-center flex flex-col justify-center items-center gap-2 hover:bg-slate-50 cursor-pointer min-h-[150px] transition-colors">
+                      <Upload size={22} className="text-text-secondary" />
+                      <span className="block text-xs font-bold text-text-dark">Upload Logo</span>
+                      <p className="text-[10px] text-text-muted font-medium">PNG, JPG or SVG. Max 2MB.</p>
+                    </div>
+
+                    <div className="md:col-span-2 space-y-4">
+                      <div>
+                        <label className="block text-xs font-bold text-text-secondary uppercase mb-2">Brand Name</label>
+                        <input 
+                          type="text" 
+                          value={brandName} 
+                          onChange={(e) => setBrandName(e.target.value)} 
+                          className="w-full bg-surface-secondary border border-border-light text-text-dark text-xs rounded-xl px-4 py-3 outline-none font-semibold focus:border-primary focus:bg-white transition-colors" 
+                        />
+                      </div>
+                      
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-bold text-text-secondary uppercase mb-2">Primary Color</label>
+                          <div className="flex gap-2 bg-surface-secondary border border-border-light rounded-xl p-2 items-center">
+                            <input 
+                              type="color" 
+                              value={primaryColor} 
+                              onChange={(e) => setPrimaryColor(e.target.value)} 
+                              className="w-7 h-7 border-0 rounded-lg cursor-pointer outline-none bg-transparent flex-shrink-0" 
+                            />
+                            <input 
+                              type="text" 
+                              value={primaryColor} 
+                              onChange={(e) => setPrimaryColor(e.target.value)} 
+                              className="w-full text-xs font-bold text-text-dark bg-transparent outline-none uppercase font-body" 
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-text-secondary uppercase mb-2">Secondary Color</label>
+                          <div className="flex gap-2 bg-surface-secondary border border-border-light rounded-xl p-2 items-center">
+                            <input 
+                              type="color" 
+                              value={secondaryColor} 
+                              onChange={(e) => setSecondaryColor(e.target.value)} 
+                              className="w-7 h-7 border-0 rounded-lg cursor-pointer outline-none bg-transparent flex-shrink-0" 
+                            />
+                            <input 
+                              type="text" 
+                              value={secondaryColor} 
+                              onChange={(e) => setSecondaryColor(e.target.value)} 
+                              className="w-full text-xs font-bold text-text-dark bg-transparent outline-none uppercase font-body" 
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div className="md:col-span-1">
+                      <label className="block text-xs font-bold text-text-secondary uppercase mb-2">Brand Font</label>
+                      <select 
+                        value={brandFont} 
+                        onChange={(e) => setBrandFont(e.target.value)} 
+                        className="w-full bg-surface-secondary border border-border-light text-text-dark text-xs rounded-xl px-4 py-3 outline-none font-semibold cursor-pointer focus:border-primary focus:bg-white transition-colors"
+                      >
+                        <option>Inter</option>
+                        <option>Sora</option>
+                        <option>Outfit</option>
+                        <option>DM Sans</option>
+                      </select>
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-xs font-bold text-text-secondary uppercase mb-2">Footer Note on Proposals</label>
+                      <textarea 
+                        value={footerNote} 
+                        onChange={(e) => setFooterNote(e.target.value)} 
+                        rows={2} 
+                        className="w-full bg-surface-secondary border border-border-light text-text-dark text-xs rounded-xl px-4 py-2.5 outline-none font-semibold resize-none leading-relaxed focus:border-primary focus:bg-white transition-colors" 
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB: BILLING & PLAN */}
+              {activeTab === "billing" && (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="font-bold text-text-dark text-lg font-display mb-1">Billing & Plan</h3>
+                    <p className="text-text-secondary text-xs font-semibold">View your plan details, usage and billing history.</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Current Plan Card */}
+                    <div className="bg-slate-50 border border-border-light rounded-2xl p-6 space-y-4 shadow-sm flex flex-col justify-between">
+                      <div>
+                        <div className="flex justify-between items-start">
+                          <span className="block text-[10px] font-bold text-text-secondary uppercase tracking-wider">Current Plan</span>
+                          <span className="bg-primary/10 text-primary text-[9px] font-black px-2 py-0.5 rounded uppercase font-display">Pro Plan</span>
+                        </div>
+                        <h2 className="text-3xl font-extrabold text-text-dark font-display mt-3">₦7,500 <span className="text-xs text-text-secondary font-medium font-body">/ month</span></h2>
+                        <p className="text-[10px] text-text-muted mt-1.5 font-bold">Next invoice: July 1, 2026</p>
+                      </div>
+
+                      {/* Benefits bullets list */}
+                      <ul className="text-xs font-semibold text-text-dark space-y-2 pt-2">
+                        {["Unlimited scopes", "Unlimited invoices", "Unlimited Kova AI messages", "Custom branding enabled", "Client view tracking"].map((feature, idx) => (
+                          <li key={idx} className="flex items-center gap-2">
+                            <span className="w-4 h-4 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center flex-shrink-0 text-[10px]">✓</span>
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+
+                      <button className="bg-white border border-border-light hover:bg-slate-50 hover:border-border text-text-dark text-xs font-bold py-3 rounded-xl transition-all shadow-sm w-full mt-4">Manage Subscription</button>
+                    </div>
+
+                    {/* Usage Limits Panel */}
+                    <div className="bg-white border border-border-light rounded-2xl p-6 space-y-5 shadow-sm text-xs font-semibold text-text-dark">
+                      <div className="flex justify-between items-center border-b border-border-light/60 pb-2.5">
+                        <span className="text-[10px] font-bold text-text-secondary uppercase tracking-wider">Usage This Month</span>
+                        <button className="text-primary text-[10px] font-bold hover:underline">Details</button>
+                      </div>
+                      
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between text-[11px]">
+                          <span>Scopes Generated</span>
+                          <span>12 / Unlimited</span>
+                        </div>
+                        <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                          <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: "35%" }}></div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between text-[11px]">
+                          <span>Invoices</span>
+                          <span>8 / Unlimited</span>
+                        </div>
+                        <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                          <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: "22%" }}></div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between text-[11px]">
+                          <span>Kova AI Messages</span>
+                          <span>36 / Unlimited</span>
+                        </div>
+                        <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                          <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: "15%" }}></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Billing History Table */}
+                  <div className="space-y-3 border-t border-border-light pt-6">
+                    <span className="block text-[10px] font-bold text-text-secondary uppercase tracking-wider">Billing History</span>
+                    <div className="border border-border-light rounded-xl overflow-hidden shadow-sm">
+                      <table className="w-full text-left text-xs font-semibold text-text-dark">
+                        <thead>
+                          <tr className="bg-surface-secondary border-b border-border-light text-text-secondary text-[10px] uppercase font-bold">
+                            <th className="p-3.5">Date</th>
+                            <th className="p-3.5">Amount</th>
+                            <th className="p-3.5">Status</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border-light/50">
+                          {[
+                            { date: "May 1, 2026", amount: "₦7,500" },
+                            { date: "Apr 1, 2026", amount: "₦7,500" },
+                            { date: "Mar 1, 2026", amount: "₦7,500" }
+                          ].map((inv, idx) => (
+                            <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                              <td className="p-3.5 font-medium">{inv.date}</td>
+                              <td className="p-3.5 font-bold">{inv.amount}</td>
+                              <td className="p-3.5">
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-50 text-green-600 border border-green-100">Paid</span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB: PREFERENCES */}
+              {activeTab === "preferences" && (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="font-bold text-text-dark text-lg font-display mb-1">Preferences</h3>
+                    <p className="text-text-secondary text-xs font-semibold">Manage your preferences and default settings.</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
+                    <div>
+                      <label className="block text-xs font-bold text-text-secondary uppercase mb-2">Default Currency</label>
+                      <select 
+                        value={currency} 
+                        onChange={(e) => setCurrency(e.target.value)} 
+                        className="w-full bg-surface-secondary border border-border-light text-text-dark text-xs rounded-xl px-4 py-3 outline-none font-semibold cursor-pointer focus:border-primary focus:bg-white transition-colors"
+                      >
+                        <option>NGN - Nigerian Naira (₦)</option>
+                        <option>USD - US Dollar ($)</option>
+                        <option>KES - Kenyan Shilling (KSh)</option>
+                        <option>GHS - Ghanaian Cedi (₵)</option>
+                      </select>
+                      <p className="text-[10px] mt-1.5 text-text-secondary font-medium">This will be the default currency for new scopes and invoices.</p>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-text-secondary uppercase mb-2">Default Payment Terms</label>
+                      <select 
+                        value={paymentTerms} 
+                        onChange={(e) => setPaymentTerms(e.target.value)} 
+                        className="w-full bg-surface-secondary border border-border-light text-text-dark text-xs rounded-xl px-4 py-3 outline-none font-semibold cursor-pointer focus:border-primary focus:bg-white transition-colors"
+                      >
+                        <option>50% upfront, 50% on completion</option>
+                        <option>100% upfront payment</option>
+                        <option>Net 14 days</option>
+                        <option>Net 30 days</option>
+                      </select>
+                      <p className="text-[10px] mt-1.5 text-text-secondary font-medium">This will be the default payment terms for new invoices.</p>
+                    </div>
+                    
+                    <div className="md:col-span-2 pt-4 border-t border-border-light/60 mt-2">
+                      <span className="block text-[10px] font-black text-text-secondary uppercase tracking-widest mb-4">Default Scope Settings</span>
+                      
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                        <div>
+                          <label className="block text-[10px] font-bold text-text-secondary uppercase mb-2">Default Revision</label>
+                          <select 
+                            value={revisionLimit} 
+                            onChange={(e) => setRevisionLimit(e.target.value)} 
+                            className="w-full bg-surface-secondary border border-border-light text-text-dark text-xs rounded-xl px-3 py-2 outline-none font-semibold cursor-pointer focus:border-primary focus:bg-white transition-colors"
+                          >
+                            <option>2 revisions</option>
+                            <option>3 revisions</option>
+                            <option>5 revisions</option>
+                            <option>Unlimited</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-text-secondary uppercase mb-2">Default Timeline</label>
+                          <select 
+                            value={timeline} 
+                            onChange={(e) => setTimeline(e.target.value)} 
+                            className="w-full bg-surface-secondary border border-border-light text-text-dark text-xs rounded-xl px-3 py-2 outline-none font-semibold cursor-pointer focus:border-primary focus:bg-white transition-colors"
+                          >
+                            <option>4 weeks</option>
+                            <option>6 weeks</option>
+                            <option>8 weeks</option>
+                            <option>12 weeks</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-text-secondary uppercase mb-2">Default Project Start</label>
+                          <select 
+                            value={projectStart} 
+                            onChange={(e) => setProjectStart(e.target.value)} 
+                            className="w-full bg-surface-secondary border border-border-light text-text-dark text-xs rounded-xl px-3 py-2 outline-none font-semibold cursor-pointer focus:border-primary focus:bg-white transition-colors"
+                          >
+                            <option>Upon payment</option>
+                            <option>Immediate</option>
+                            <option>Flexible</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-text-secondary uppercase mb-2">Default Validity</label>
+                          <select 
+                            value={validity} 
+                            onChange={(e) => setValidity(e.target.value)} 
+                            className="w-full bg-surface-secondary border border-border-light text-text-dark text-xs rounded-xl px-3 py-2 outline-none font-semibold cursor-pointer focus:border-primary focus:bg-white transition-colors"
+                          >
+                            <option>Default validity</option>
+                            <option>15 days</option>
+                            <option>30 days</option>
+                            <option>60 days</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB: TEAM */}
+              {activeTab === "team" && (
+                <div className="space-y-6">
+                  <div className="flex justify-between items-center border-b border-border-light pb-4">
+                    <div>
+                      <h3 className="font-bold text-text-dark text-lg font-display mb-1 flex items-center gap-1.5">
+                        Team 
+                        <span className="bg-[#FF9F43]/15 text-[#FF9F43] text-[9px] font-black px-2 py-0.5 rounded uppercase font-display">Pro</span>
+                      </h3>
+                      <p className="text-text-secondary text-xs font-semibold">Invite team members and manage roles.</p>
+                    </div>
+                    <button className="bg-primary hover:bg-primary-hover text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-blue">+ Invite Member</button>
+                  </div>
+
+                  <div className="border border-border-light rounded-xl overflow-hidden shadow-sm">
+                    <table className="w-full text-left text-xs font-semibold text-text-dark">
+                      <thead>
+                        <tr className="bg-surface-secondary border-b border-border-light text-text-secondary text-[10px] uppercase font-bold">
+                          <th className="p-3.5">Member</th>
+                          <th className="p-3.5">Role</th>
+                          <th className="p-3.5">Status</th>
+                          <th className="p-3.5">Joined</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border-light/50">
+                        {[
+                          { name: "Alex John (You)", role: "Owner", status: "Active", joined: "May 12, 2026" },
+                          { name: "Jane Doe", role: "Editor", status: "Active", joined: "May 14, 2026" },
+                          { name: "Mark Smith", role: "Viewer", status: "Active", joined: "May 16, 2026" },
+                          { name: "Tobi Johnson", role: "Viewer", status: "Pending", joined: "May 20, 2026", isPending: true }
+                        ].map((member, idx) => (
+                          <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                            <td className="p-3.5 font-bold text-text-dark">{member.name}</td>
+                            <td className="p-3.5 text-text-secondary font-medium">{member.role}</td>
+                            <td className="p-3.5">
+                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                                member.isPending 
+                                  ? "bg-amber-50 text-amber-600 border-amber-100 animate-pulse" 
+                                  : "bg-green-50 text-green-600 border-green-100"
+                              }`}>{member.status}</span>
+                            </td>
+                            <td className="p-3.5 text-text-muted font-medium">{member.joined}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Roles Details */}
+                  <div className="bg-slate-50 border border-border-light rounded-2xl p-6 space-y-3 shadow-sm text-xs font-semibold text-text-dark">
+                    <span className="block text-[10px] font-bold text-text-secondary uppercase tracking-wider border-b border-border-light pb-2">Roles & Permissions</span>
+                    <div className="space-y-2 pt-1 leading-relaxed">
+                      <p><span className="text-text-dark font-bold">Owner:</span> Full access to all features, client management, and billing settings.</p>
+                      <p><span className="text-text-dark font-bold">Editor:</span> Can create and edit scopes, proposals, invoices and templates.</p>
+                      <p><span className="text-text-dark font-bold">Viewer:</span> Read-only access to view scopes, invoices, and activity feed.</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB: INTEGRATIONS */}
+              {activeTab === "integrations" && (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="font-bold text-text-dark text-lg font-display mb-1 flex items-center gap-1.5">
+                      Integrations 
+                      <span className="bg-[#FF9F43]/15 text-[#FF9F43] text-[9px] font-black px-2 py-0.5 rounded uppercase font-display">Pro</span>
+                    </h3>
+                    <p className="text-text-secondary text-xs font-semibold">Connect Pricis with your favorite tools.</p>
+                  </div>
+
+                  <div className="space-y-3.5">
+                    {[
+                      { key: "calendar", name: "Google Calendar", desc: "Sync meetings, deadlines, and project schedules.", icon: "📅" },
+                      { key: "drive", name: "Google Drive", desc: "Save and access files from Google Drive.", icon: "💾" },
+                      { key: "dropbox", name: "Dropbox", desc: "Attach files from your Dropbox account.", icon: "📦" },
+                      { key: "slack", name: "Slack", desc: "Receive real-time notifications in your Slack channels.", icon: "💬" },
+                      { key: "zapier", name: "Zapier", desc: "Automate your workflows by connecting to 5,000+ apps.", icon: "⚡" }
+                    ].map((app) => (
+                      <div key={app.key} className="flex justify-between items-center p-4 border border-border-light rounded-2xl hover:shadow-sm hover:border-primary/20 transition-all bg-white">
+                        <div className="flex gap-4 items-center">
+                          <div className="w-12 h-12 bg-slate-50 border border-slate-100 text-xl rounded-xl flex items-center justify-center flex-shrink-0 shadow-inner">{app.icon}</div>
+                          <div className="space-y-0.5">
+                            <span className="font-bold text-xs text-text-dark block">{app.name}</span>
+                            <p className="text-[11px] text-text-secondary font-medium leading-normal">{app.desc}</p>
+                          </div>
+                        </div>
+                        
+                        <button 
+                          onClick={() => handleToggleApp(app.key as keyof typeof connectedApps)}
+                          className={`text-xs font-bold px-4 py-2 rounded-xl border transition-all ${
+                            connectedApps[app.key as keyof typeof connectedApps]
+                              ? "bg-green-50 text-[#10B981] border-green-200 hover:bg-green-100"
+                              : "bg-white text-text-dark border-border-light hover:bg-slate-50 shadow-sm"
+                          }`}
+                        >
+                          {connectedApps[app.key as keyof typeof connectedApps] ? "Connected" : "Connect"}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* TAB: NOTIFICATIONS */}
+              {activeTab === "notifications" && (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="font-bold text-text-dark text-lg font-display mb-1">Notifications</h3>
+                    <p className="text-text-secondary text-xs font-semibold">Choose how and when you want to be notified.</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                    {/* Email Settings */}
+                    <div className="md:col-span-2 space-y-4 text-xs font-semibold text-text-dark">
+                      <span className="block text-[10px] font-bold text-text-secondary uppercase tracking-wider border-b border-border-light pb-2">Email Notifications</span>
+                      
+                      {[
+                        { label: "Receive updates via email", state: emailScopeViewed, setState: setEmailScopeViewed },
+                        { label: "Scope viewed by client", state: emailScopeViewed, setState: setEmailScopeViewed },
+                        { label: "Invoice viewed by client", state: emailInvoiceViewed, setState: setEmailInvoiceViewed },
+                        { label: "Invoice paid", state: emailInvoicePaid, setState: setEmailInvoicePaid },
+                        { label: "New message from Kova AI", state: emailKovaMessage, setState: setEmailKovaMessage },
+                        { label: "Weekly activity digest", state: emailWeeklySummary, setState: setEmailWeeklySummary }
+                      ].map((notify, idx) => (
+                        <div key={idx} className="flex justify-between items-center py-2 border-b border-border-light/40 last:border-0">
+                          <span className="font-semibold text-text-dark">{notify.label}</span>
+                          <input 
+                            type="checkbox" 
+                            checked={notify.state} 
+                            onChange={(e) => notify.setState(e.target.checked)}
+                            className="rounded border-border-light text-primary focus:ring-primary h-4.5 w-4.5 cursor-pointer transition-colors"
+                          />
+                        </div>
+                      ))}
+
+                      <div className="pt-5 border-t border-border-light flex justify-between items-center mt-4">
+                        <div>
+                          <span className="block text-xs font-bold text-text-dark">In-App Notifications</span>
+                          <span className="text-[10px] text-text-secondary block font-semibold mt-0.5">Receive real-time notifications inside Pricis dashboard</span>
+                        </div>
+                        <input 
+                          type="checkbox" 
+                          checked={inAppAll} 
+                          onChange={(e) => setInAppAll(e.target.checked)}
+                          className="rounded border-border-light text-primary focus:ring-primary h-4.5 w-4.5 cursor-pointer transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Sidebar Tip */}
+                    <div className="md:col-span-1 bg-slate-50 border border-border-light rounded-2xl p-6 shadow-sm flex flex-col justify-center items-center text-center gap-3">
+                      <div className="w-12 h-12 bg-primary-light text-primary rounded-full flex items-center justify-center font-bold text-lg">🔔</div>
+                      <div>
+                        <span className="font-bold text-xs text-text-dark block font-display">Stay in the loop</span>
+                        <p className="text-[10px] text-text-secondary mt-1 font-semibold leading-relaxed">We will only send you important alerts regarding client views, comments, and payment actions.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB: SECURITY */}
+              {activeTab === "security" && (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="font-bold text-text-dark text-lg font-display mb-1">Security</h3>
+                    <p className="text-text-secondary text-xs font-semibold">Manage your password and security settings.</p>
+                  </div>
+
+                  <div className="space-y-5 border-b border-border-light pb-6 pt-2">
+                    <span className="block text-[10px] font-bold text-text-secondary uppercase tracking-wider">Change Password</span>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold text-text-secondary mb-2">Current Password</label>
+                        <input 
+                          type="password" 
+                          value={currentPassword} 
+                          onChange={(e) => setCurrentPassword(e.target.value)} 
+                          className="w-full bg-surface-secondary border border-border-light text-text-dark text-xs rounded-xl px-4 py-3 outline-none font-semibold focus:border-primary focus:bg-white transition-colors" 
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-text-secondary mb-2">New Password</label>
+                        <input 
+                          type="password" 
+                          value={newPassword} 
+                          onChange={(e) => setNewPassword(e.target.value)} 
+                          className="w-full bg-surface-secondary border border-border-light text-text-dark text-xs rounded-xl px-4 py-3 outline-none font-semibold focus:border-primary focus:bg-white transition-colors" 
+                          placeholder="Min. 8 characters" 
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-text-secondary mb-2">Confirm New Password</label>
+                        <input 
+                          type="password" 
+                          value={confirmPassword} 
+                          onChange={(e) => setConfirmPassword(e.target.value)} 
+                          className="w-full bg-surface-secondary border border-border-light text-text-dark text-xs rounded-xl px-4 py-3 outline-none font-semibold focus:border-primary focus:bg-white transition-colors" 
+                        />
+                      </div>
+                    </div>
+                    
+                    <button 
+                      onClick={() => { 
+                        if (newPassword !== confirmPassword) {
+                          alert("New passwords do not match!");
+                          return;
+                        }
+                        setCurrentPassword("••••••••"); 
+                        setNewPassword(""); 
+                        setConfirmPassword(""); 
+                        handleSaveChanges(); 
+                      }} 
+                      className="bg-slate-50 border border-border-light hover:bg-slate-100 text-text-dark text-xs font-bold px-5 py-3 rounded-xl transition-all shadow-sm"
+                    >
+                      Update Password
+                    </button>
+                  </div>
+
+                  {/* Two Factor Switch */}
+                  <div className="flex justify-between items-center py-3">
+                    <div>
+                      <span className="block text-xs font-bold text-text-dark">Two-Factor Authentication</span>
+                      <span className="text-[10px] text-text-secondary block font-semibold mt-0.5">Protect your account with an additional security code on logins.</span>
+                    </div>
+                    <button 
+                      onClick={() => setTwoFactor(!twoFactor)}
+                      className={`relative inline-flex h-6.5 w-12 items-center rounded-full transition-colors outline-none cursor-pointer ${
+                        twoFactor ? "bg-[#10B981]" : "bg-slate-200"
+                      }`}
+                    >
+                      <span className={`inline-block h-4.5 w-4.5 transform rounded-full bg-white transition-transform ${
+                        twoFactor ? "translate-x-6.5" : "translate-x-1"
+                      }`} />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Bottom actions save bar (for profile, branding, preferences, notifications) - HIDDEN in success view */}
+          {!showSavedSuccess && ["profile", "branding", "preferences", "notifications"].includes(activeTab) && (
+            <div className="flex justify-end pt-5 border-t border-border-light mt-6">
+              <button 
+                onClick={handleSaveChanges}
+                className="bg-primary hover:bg-primary-hover text-white px-7 py-3 rounded-full text-xs font-bold shadow-blue transition-all"
+              >
+                Save Changes
+              </button>
+            </div>
+          )}
+        </div>
       </div>
-    </>
+    </div>
   );
 }

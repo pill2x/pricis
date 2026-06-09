@@ -1,674 +1,723 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { Brain, Search, PenTool, Users, Send, Plus, X, MessageSquare, SendHorizontal, ChevronLeft, Trash2 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { useState } from "react";
+import Link from "next/link";
+import { 
+  Plus, ArrowLeft, Check, Trash2, ChevronRight, 
+  Settings, Key, RefreshCw, AlertCircle, Link2, CheckCircle2, 
+  ShieldAlert, Sparkles, MessageSquare, SendHorizontal, Brain, 
+  Search, PenTool, Users, Copy, Download, Lock, CheckCircle,
+  MoreHorizontal, HelpCircle, ArrowUpRight, Volume2, Mic, Play, Smile
+} from "lucide-react";
 
-interface Message {
-  role: "user" | "assistant";
-  content: string;
-}
-
-interface Conversation {
+interface Negotiation {
   id: string;
   title: string;
-  mode: string;
-  context: string;
-  created_at: string;
+  scope: string;
+  status: "Active" | "Resolved" | "Practice";
+  lastMessage: string;
+  updated: string;
 }
 
-const modes = [
-  { id: "coach", icon: Brain, title: "Strategy Coach", description: "Get tactics & talking points" },
-  { id: "analyze", icon: Search, title: "Analyze Offer", description: "Paste an offer, get counters" },
-  { id: "draft", icon: PenTool, title: "Draft Message", description: "Craft negotiation emails" },
-  { id: "roleplay", icon: Users, title: "Roleplay Practice", description: "Spar with other side" },
-];
+export default function NegotiationAIPage() {
+  const [view, setView] = useState<"list" | "chat" | "options_hub" | "draft_response" | "practice_mode" | "resolved">("list");
+  
+  // Negotiations List
+  const [negotiations, setNegotiations] = useState<Negotiation[]>([
+    { id: "neg-1", title: "Client pushback on price", scope: "Acme Corp Website Redesign", status: "Active", lastMessage: "Client: That seems a bit high...", updated: "2h ago" },
+    { id: "neg-2", title: "Scope reduction request", scope: "Mobile App Design", status: "Active", lastMessage: "Client: Can we reduce the number of...", updated: "1d ago" },
+    { id: "neg-3", title: "Justifying timeline", scope: "Brand Identity Design", status: "Resolved", lastMessage: "You: Thanks, that makes sense...", updated: "3d ago" },
+    { id: "neg-4", title: "Rate increase conversation", scope: "E-commerce Website", status: "Resolved", lastMessage: "Client: I understand. Let's proceed.", updated: "5d ago" },
+    { id: "neg-5", title: "Practice: Handling objections", scope: "Practice Session", status: "Practice", lastMessage: "Kova: Great response! Here's...", updated: "1w ago" }
+  ]);
 
-const contexts = ["Job Offer", "Freelance Project", "Raise/Promotion", "Contract Renewal"];
+  const [selectedNeg, setSelectedNeg] = useState<Negotiation | null>({
+    id: "neg-1", 
+    title: "Client pushback on price", 
+    scope: "Acme Corp Website Redesign", 
+    status: "Active", 
+    lastMessage: "Client: That seems a bit high...", 
+    updated: "2h ago"
+  });
 
-export default function DashboardNegotiatePage() {
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [currentMode, setCurrentMode] = useState("coach");
-  const [currentContext, setCurrentContext] = useState("Freelance Project");
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [started, setStarted] = useState(false);
-  const [currentNegotiationId, setCurrentNegotiationId] = useState<string | null>(null);
-  const [deletingConversation, setDeletingConversation] = useState<string | null>(null);
-  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const userNameRef = useRef<string>("there");
+  // Chat/Objection Input
+  const [objectionText, setObjectionText] = useState("Thanks for the proposal. To be honest, the price seems a bit high for our budget. Is there any way you can reduce it?");
+  const [tone, setTone] = useState("Professional");
 
-  useEffect(() => {
-    fetchConversations();
-  }, []);
+  // Interactive Practice states
+  const [practiceHistory, setPracticeHistory] = useState([
+    { role: "kova", content: "Thanks for the proposal. To be honest, the price seems a bit high for our budget. Is there any way you can reduce it?" }
+  ]);
+  const [practiceInput, setPracticeInput] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  // General State Helpers
+  const [activeTab, setActiveTab] = useState<"All" | "Active" | "Resolved" | "Practice">("All");
+  const [showSuccessBanner, setShowSuccessBanner] = useState(false);
 
-  const fetchConversations = async () => {
-    const { data, error } = await supabase
-      .from("negotiations")
-      .select("*")
-      .order("created_at", { ascending: false });
-    if (!error) setConversations(data || []);
-  };
-
-  const fetchMessages = async (negotiationId: string): Promise<Message[]> => {
-    const { data, error } = await supabase
-      .from("negotiation_messages")
-      .select("*")
-      .eq("negotiation_id", negotiationId)
-      .order("created_at", { ascending: true });
-    if (error) return [];
-    return data?.map(m => ({ role: m.role as "user" | "assistant", content: m.content })) || [];
-  };
-
-  const selectConversation = async (conversation: Conversation) => {
-    setSelectedConversation(conversation);
-    setCurrentMode(conversation.mode);
-    setCurrentContext(conversation.context);
-    setCurrentNegotiationId(conversation.id);
-    setStarted(false);
-    setMessages([]);
-    const msgs = await fetchMessages(conversation.id);
-    setMessages(msgs);
-    setStarted(true);
-    setShowMobileSidebar(false);
-  };
-
-  const startNewConversation = () => {
-    setSelectedConversation(null);
-    setMessages([]);
-    setCurrentNegotiationId(null);
-    setStarted(false);
-    setInput("");
-    setShowMobileSidebar(false);
-  };
-
-  const deleteConversation = async (conversationId: string) => {
-    const { error } = await supabase
-      .from("negotiations")
-      .delete()
-      .eq("id", conversationId);
-    if (error) { console.error("Delete error:", error.message); return; }
-    setConversations(prev => prev.filter(c => c.id !== conversationId));
-    if (selectedConversation?.id === conversationId) startNewConversation();
-    setDeletingConversation(null);
-  };
-
-  const renderMessage = (content: string) => {
-    const lines = content.split('\n');
-    const elements: JSX.Element[] = [];
-    let currentList: string[] = [];
-    let listType: 'numbered' | 'bullet' | null = null;
-    let keyIndex = 0;
-
-    const flushList = () => {
-      if (currentList.length === 0) return;
-      if (listType === 'numbered') {
-        elements.push(
-          <ol key={keyIndex++} className="list-decimal list-inside space-y-1 my-3">
-            {currentList.map((item, idx) => <li key={idx} dangerouslySetInnerHTML={{ __html: item }} />)}
-          </ol>
-        );
-      } else {
-        elements.push(
-          <ul key={keyIndex++} className="list-disc list-inside space-y-1 my-3">
-            {currentList.map((item, idx) => <li key={idx} dangerouslySetInnerHTML={{ __html: item }} />)}
-          </ul>
-        );
-      }
-      currentList = [];
-      listType = null;
-    };
-
-    lines.forEach((line) => {
-      const t = line.trim();
-      if (!t) { flushList(); elements.push(<br key={keyIndex++} />); return; }
-      if (t.match(/^[📊⚠️💡🎯]/)) {
-        flushList();
-        elements.push(<h3 key={keyIndex++} className="font-semibold mt-4 mb-2" style={{ color: '#B8860B' }}>{t}</h3>);
-        return;
-      }
-      const numbered = t.match(/^\d+\.\s+(.+)/);
-      if (numbered) {
-        if (listType !== 'numbered') flushList();
-        listType = 'numbered';
-        currentList.push(numbered[1].replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'));
-        return;
-      }
-      const bullet = t.match(/^[-•]\s+(.+)/);
-      if (bullet) {
-        if (listType !== 'bullet') flushList();
-        listType = 'bullet';
-        currentList.push(bullet[1].replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'));
-        return;
-      }
-      flushList();
-      elements.push(<p key={keyIndex++} className="my-2" dangerouslySetInnerHTML={{ __html: t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>') }} />);
-    });
-
-    flushList();
-    return elements;
-  };
-
-  const handleSend = async () => {
-    if (!input.trim() || loading) return;
-
-    const userContent = input.trim();
-    const userMessage: Message = { role: "user", content: userContent };
-    const newMessages = [...messages, userMessage];
-    setMessages(newMessages);
-    setInput("");
-    setLoading(true);
-    setStarted(true);
-
-    try {
-      let negotiationId = currentNegotiationId;
-
-      // Fetch user once at top
-      const { data: { user: currentUser } } = await supabase.auth.getUser();
-
-      // Only fetch name once per session
-      if (userNameRef.current === "there" && currentUser) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("full_name")
-          .eq("id", currentUser.id)
-          .single();
-        if (profile?.full_name) {
-          userNameRef.current = profile.full_name.split(" ")[0];
-        }
-      }
-      const userName = userNameRef.current;
-
-      if (!negotiationId) {
-        if (!currentUser) return;
-
-        const { data: negotiation, error: negError } = await supabase
-          .from("negotiations")
-          .insert({
-            title: userContent.substring(0, 40),
-            mode: currentMode,
-            context: currentContext,
-            user_id: currentUser.id,
-          })
-          .select()
-          .single();
-
-        if (negError) { console.error("Negotiation create error:", negError.message); return; }
-
-        negotiationId = negotiation.id;
-        setCurrentNegotiationId(negotiationId);
-        setSelectedConversation(negotiation);
-        setConversations(prev => [negotiation, ...prev]);
-      }
-
-      // Save user message
-      await supabase.from("negotiation_messages").insert({
-        negotiation_id: negotiationId,
-        role: "user",
-        content: userContent,
-      });
-
-      // Get AI response
-      const response = await fetch("/api/negotiate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: newMessages, mode: currentMode, context: currentContext, userName }),
-      });
-
-      const data = await response.json();
-
-      if (data.message) {
-        await supabase.from("negotiation_messages").insert({
-          negotiation_id: negotiationId,
-          role: "assistant",
-          content: data.message,
-        });
-
-        setMessages([...newMessages, { role: "assistant", content: data.message }]);
-      }
-    } catch (error) {
-      console.error("Send error:", error);
-    } finally {
-      setLoading(false);
+  const handleSendToKova = () => {
+    if (objectionText.trim()) {
+      setView("options_hub");
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
+  const handleSendPracticeReply = () => {
+    if (practiceInput.trim()) {
+      const updatedHistory = [...practiceHistory, { role: "user", content: practiceInput }];
+      setPracticeHistory(updatedHistory);
+      setPracticeInput("");
+      setIsTyping(true);
+
+      setTimeout(() => {
+        setIsTyping(false);
+        setPracticeHistory([
+          ...updatedHistory,
+          { role: "kova", content: "Hmm, that makes sense but we really can't go above ₦500,000 right now. Can we drop the CMS features to save costs?" }
+        ]);
+      }, 1200);
+    }
   };
 
-  const getModeTitle = () => {
-    const mode = modes.find(m => m.id === currentMode);
-    return mode?.title || 'New Negotiation';
+  const handleResolveNegotiation = () => {
+    if (selectedNeg) {
+      const updatedList = negotiations.map(n => 
+        n.id === selectedNeg.id ? { ...n, status: "Resolved" as const, lastMessage: "Outcome: Client accepted proposal." } : n
+      );
+      setNegotiations(updatedList);
+      setSelectedNeg({ ...selectedNeg, status: "Resolved", lastMessage: "Outcome: Client accepted proposal." });
+      setView("resolved");
+    }
   };
 
   return (
-    <>
-      <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-      `}</style>
-      
-      <div className="h-screen overflow-hidden flex flex-col" style={{ fontFamily: 'Inter, sans-serif', backgroundColor: '#060D18' }}>
-        
-        {/* Top Bar */}
-        <div 
-          className="flex-shrink-0 px-4 flex items-center justify-between"
-          style={{ 
-            height: '56px',
-            borderBottom: '1px solid rgba(255,255,255,0.06)',
-            backgroundColor: 'rgba(6,13,24,0.9)',
-            backdropFilter: 'blur(10px)'
-          }}
-        >
-          <button
-            onClick={() => setShowMobileSidebar(true)}
-            className="lg:hidden flex items-center gap-2 text-sm"
-            style={{ color: '#94A3B8' }}
-          >
-            <ChevronLeft className="h-4 w-4" />
-            Back
-          </button>
-          
-          <div className="hidden lg:block" />
-          
-          <div className="font-semibold text-sm" style={{ color: '#F1F5F9' }}>
-            Negotiation Assistant
-          </div>
-          
-          <div />
-        </div>
-
-        {/* Main Area */}
-        <div className="flex-1 flex overflow-hidden">
-          
-          {/* Left Panel - Conversation History */}
-          <div 
-            className={`${showMobileSidebar ? 'block' : 'hidden'} lg:block lg:flex-shrink-0 flex flex-col`}
-            style={{ width: '288px', backgroundColor: '#060D18', borderRight: '1px solid rgba(255,255,255,0.06)' }}
-          >
-            {/* Panel Header */}
-            <div 
-              className="flex-shrink-0 px-4 py-4 flex items-center justify-between"
-              style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+    <div className="space-y-6">
+      {/* ----------------- LIST VIEW ----------------- */}
+      {view === "list" && (
+        <>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-text-dark font-display">Negotiations</h1>
+              <p className="text-text-secondary text-sm font-body">Get help from Kova, your AI negotiation assistant.</p>
+            </div>
+            <button 
+              onClick={() => {
+                const newId = `neg-${Date.now()}`;
+                const newNeg: Negotiation = {
+                  id: newId,
+                  title: "New Negotiation",
+                  scope: "Acme Corp Website Redesign",
+                  status: "Active",
+                  lastMessage: "Kova: Paste the client message...",
+                  updated: "Just now"
+                };
+                setNegotiations([newNeg, ...negotiations]);
+                setSelectedNeg(newNeg);
+                setObjectionText("");
+                setView("chat");
+              }}
+              className="bg-primary hover:bg-primary-hover text-white px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 shadow-blue transition-colors animate-pulse"
             >
-              <div className="text-xs font-semibold uppercase tracking-widest" style={{ color: '#94A3B8' }}>
-                Conversations
-              </div>
-              <button
-                onClick={startNewConversation}
-                className="flex items-center gap-1 font-semibold rounded-lg transition-colors"
-                style={{
-                  backgroundColor: 'rgba(37,99,235,0.12)',
-                  border: '1px solid rgba(37,99,235,0.2)',
-                  color: '#2563EB',
-                  fontSize: '12px',
-                  padding: '6px 12px'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(37,99,235,0.18)'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(37,99,235,0.12)'}
-              >
-                <Plus className="h-3 w-3" />
-                New
-              </button>
-            </div>
-
-            {/* Conversations List */}
-            <div className="flex-1 overflow-y-auto" style={{ padding: '8px' }}>
-              {conversations.length === 0 ? (
-                <div className="text-center" style={{ padding: '32px 12px' }}>
-                  <MessageSquare className="h-8 w-8 mx-auto mb-3" style={{ color: '#475569' }} />
-                  <div className="text-xs" style={{ color: '#475569' }}>
-                    No conversations yet
-                  </div>
-                </div>
-              ) : (
-                <div>
-                  {conversations.map((conversation) => (
-                    <div
-                      key={conversation.id}
-                      className="rounded-xl cursor-pointer transition-all mb-1 relative group"
-                      style={{
-                        padding: '12px',
-                        backgroundColor: selectedConversation?.id === conversation.id ? 'rgba(37,99,235,0.08)' : 'transparent',
-                        border: selectedConversation?.id === conversation.id ? '1px solid rgba(37,99,235,0.15)' : 'transparent'
-                      }}
-                      onMouseEnter={(e) => {
-                        if (selectedConversation?.id !== conversation.id) {
-                          e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.04)';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (selectedConversation?.id !== conversation.id) {
-                          e.currentTarget.style.backgroundColor = 'transparent';
-                        }
-                      }}
-                    >
-                      {/* Delete button */}
-                      <button
-                        onClick={() => setDeletingConversation(conversation.id)}
-                        className="p-1.5 rounded-lg transition-all"
-                        style={{
-                          position: 'absolute',
-                          top: '8px',
-                          right: '8px',
-                          opacity: 0,
-                          backgroundColor: 'rgba(6,13,24,0.8)',
-                          backdropFilter: 'blur(10px)',
-                          border: '1px solid rgba(255,255,255,0.08)',
-                          color: '#475569',
-                          zIndex: 10
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.opacity = '1';
-                          e.currentTarget.style.color = '#EF4444';
-                          e.currentTarget.style.borderColor = 'rgba(239,68,68,0.3)';
-                          e.currentTarget.style.backgroundColor = 'rgba(239,68,68,0.08)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.opacity = '0';
-                          e.currentTarget.style.color = '#475569';
-                          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
-                          e.currentTarget.style.backgroundColor = 'rgba(6,13,24,0.8)';
-                        }}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-
-                      <div className="flex items-start justify-between">
-                        <button
-                          onClick={() => selectConversation(conversation)}
-                          className="flex-1 text-left min-w-0"
-                        >
-                          <div className="text-sm font-medium line-clamp-1" style={{ color: '#F1F5F9' }}>
-                            {conversation.title}
-                          </div>
-                          <div className="flex items-center justify-between mt-1">
-                            <div className="text-xs" style={{ color: '#475569' }}>
-                              {conversation.context}
-                            </div>
-                            <div className="text-xs" style={{ color: '#475569' }}>
-                              {new Date(conversation.created_at).toLocaleDateString()}
-                            </div>
-                          </div>
-                        </button>
-                      </div>
-                      
-                      {deletingConversation === conversation.id && (
-                        <div 
-                          className="flex gap-2 mt-2 pt-2"
-                          style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
-                        >
-                          <span className="text-xs" style={{ color: '#EF4444' }}>Delete?</span>
-                          <button
-                            onClick={() => deleteConversation(conversation.id)}
-                            className="text-xs px-2 py-1 rounded-md"
-                            style={{ backgroundColor: 'rgba(239,68,68,0.1)', color: '#EF4444' }}
-                          >
-                            Yes
-                          </button>
-                          <button
-                            onClick={() => setDeletingConversation(null)}
-                            className="text-xs px-2 py-1 rounded-md"
-                            style={{ backgroundColor: 'rgba(255,255,255,0.05)', color: '#94A3B8' }}
-                          >
-                            No
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+              <Plus size={18} /> New Conversation
+            </button>
           </div>
 
-          {/* Right Panel - Chat Area */}
-          <div className="flex-1 flex flex-col overflow-hidden">
-            
-            {/* Chat Header */}
-            <div 
-              className="flex-shrink-0 px-6 py-4"
-              style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', backgroundColor: 'rgba(6,13,24,0.5)' }}
-            >
-              <div className="font-semibold" style={{ color: '#F1F5F9' }}>
-                {selectedConversation ? selectedConversation.title : getModeTitle()}
+          {/* Stats metrics panel */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { label: "Total Conversations", count: 12, desc: "All time" },
+              { label: "Active", count: 5, desc: "In progress", color: "text-[#2563EB]" },
+              { label: "Resolved", count: 4, desc: "Completed", color: "text-[#10B981]" },
+              { label: "Practice", count: 3, desc: "Role-play sessions", color: "text-purple-500" },
+            ].map((stat, i) => (
+              <div key={i} className="bg-white border border-border-light rounded-xl p-5 shadow-sm">
+                <span className={`text-2xl font-bold font-display ${stat.color}`}>{stat.count}</span>
+                <p className="text-xs font-semibold text-text-dark mt-1">{stat.label}</p>
+                <p className="text-[10px] text-text-secondary mt-0.5">{stat.desc}</p>
               </div>
-              {selectedConversation && (
-                <div 
-                  className="inline-flex items-center px-2.5 py-1 rounded-full text-xs ml-2"
-                  style={{
-                    backgroundColor: 'rgba(37,99,235,0.1)',
-                    border: '1px solid rgba(37,99,235,0.2)',
-                    color: '#2563EB'
-                  }}
-                >
-                  {selectedConversation.mode}
-                </div>
-              )}
-            </div>
+            ))}
+          </div>
 
-            {/* Mode Selector (show when starting new conversation) */}
-            {!selectedConversation && (
-              <div 
-                className="flex-shrink-0 px-6 py-3 flex gap-2 overflow-x-auto"
-                style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
-              >
-                {modes.map((mode) => (
-                  <button
-                    key={mode.id}
-                    onClick={() => setCurrentMode(mode.id)}
-                    className="px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all cursor-pointer"
-                    style={{
-                      backgroundColor: currentMode === mode.id ? 'rgba(37,99,235,0.12)' : 'rgba(255,255,255,0.04)',
-                      border: currentMode === mode.id ? '1px solid rgba(37,99,235,0.25)' : 'transparent',
-                      color: currentMode === mode.id ? '#2563EB' : '#94A3B8'
-                    }}
-                    onMouseEnter={(e) => {
-                      if (currentMode !== mode.id) {
-                        e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.07)';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (currentMode !== mode.id) {
-                        e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.04)';
-                      }
-                    }}
+          {/* Table list */}
+          <div className="bg-white border border-border-light rounded-2xl overflow-hidden shadow-sm">
+            <div className="p-4 border-b border-border-light flex justify-between items-center gap-4 bg-surface-secondary/50">
+              <input 
+                type="text" 
+                placeholder="Search conversations..." 
+                className="bg-white border border-border-light text-text-dark text-sm rounded-xl px-4 py-2 outline-none w-64 shadow-sm"
+              />
+              <div className="flex gap-2 text-xs font-semibold">
+                {(["All", "Active", "Resolved", "Practice"] as const).map((cat) => (
+                  <button 
+                    key={cat} 
+                    onClick={() => setActiveTab(cat)}
+                    className={`px-3.5 py-1.5 rounded-xl border transition-colors ${
+                      activeTab === cat ? "bg-primary text-white border-transparent" : "bg-white border-border-light text-text-secondary hover:bg-surface-secondary"
+                    }`}
                   >
-                    {mode.title}
+                    {cat}
                   </button>
                 ))}
               </div>
-            )}
-
-            {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto" style={{ padding: '24px' }}>
-              <div className="space-y-4">
-                {!started && messages.length === 0 ? (
-                  <div className="text-center" style={{ paddingTop: '48px' }}>
-                    <div 
-                      className="w-14 h-14 rounded-2xl mx-auto flex items-center justify-center mb-4"
-                      style={{
-                        backgroundColor: 'rgba(37,99,235,0.1)',
-                        border: '1px solid rgba(37,99,235,0.2)'
-                      }}
-                    >
-                      <MessageSquare className="h-6 w-6" style={{ color: '#2563EB' }} />
-                    </div>
-                    <div 
-                      className="text-xl font-bold mt-4 mb-2"
-                      style={{ color: '#F1F5F9' }}
-                    >
-                      Ready to negotiate?
-                    </div>
-                    <div 
-                      className="text-sm leading-relaxed"
-                      style={{ color: '#94A3B8' }}
-                    >
-                      Describe your situation below and I'll help you hold your ground.
-                    </div>
-                    
-                    {/* Context Input */}
-                    <div className="text-left mt-6">
-                      <div className="text-sm font-medium mb-2" style={{ color: '#94A3B8' }}>
-                        Give me some context (optional)
-                      </div>
-                      <textarea
-                        value={currentContext}
-                        onChange={(e) => setCurrentContext(e.target.value)}
-                        rows={3}
-                        className="w-full rounded-xl transition-all resize-none"
-                        style={{
-                          backgroundColor: '#0A1525',
-                          border: '1px solid rgba(255,255,255,0.08)',
-                          padding: '12px 16px',
-                          fontSize: '14px',
-                          color: '#F1F5F9',
-                          outline: 'none'
-                        }}
-                        placeholder="Client offered ₦80k, I quoted ₦150k for a website..."
-                        onFocus={(e) => {
-                          e.target.style.borderColor = 'rgba(37,99,235,0.5)';
-                          e.target.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.1)';
-                        }}
-                        onBlur={(e) => {
-                          e.target.style.borderColor = 'rgba(255,255,255,0.08)';
-                          e.target.style.boxShadow = 'none';
-                        }}
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    {messages.map((message, index) => (
-                      <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                        {message.role === "assistant" && (
-                          <div 
-                            className="w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center mr-3"
-                            style={{
-                              backgroundColor: 'rgba(37,99,235,0.1)',
-                              border: '1px solid rgba(37,99,235,0.15)'
-                            }}
-                          >
-                            <span className="text-xs font-bold" style={{ color: '#2563EB' }}>P</span>
-                          </div>
-                        )}
-                        <div 
-                          className="max-w-[75%] rounded-2xl px-4 py-3 text-sm leading-relaxed"
-                          style={{
-                            backgroundColor: message.role === "user" ? '#2563EB' : '#0C1827',
-                            border: message.role === "assistant" ? '1px solid rgba(255,255,255,0.08)' : 'transparent',
-                            color: message.role === "user" ? 'white' : '#F1F5F9',
-                            borderTopRightRadius: message.role === "user" ? '4px' : '16px',
-                            borderTopLeftRadius: message.role === "assistant" ? '4px' : '16px'
-                          }}
-                        >
-                          {message.role === "user" ? (
-                            <div>{message.content}</div>
-                          ) : (
-                            <div className="space-y-1">{renderMessage(message.content)}</div>
-                          )}
-                        </div>
-                      </div>
+            </div>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-surface-secondary border-b border-border-light text-text-secondary text-xs uppercase tracking-wider font-semibold">
+                    <th className="p-4">Conversation</th>
+                    <th className="p-4">Related Scope</th>
+                    <th className="p-4">Status</th>
+                    <th className="p-4">Last Message</th>
+                    <th className="p-4">Updated</th>
+                    <th className="p-4">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border-light text-sm font-medium">
+                  {negotiations
+                    .filter(n => activeTab === "All" || n.status === activeTab)
+                    .map((neg) => (
+                      <tr key={neg.id} className="hover:bg-surface-secondary/50 cursor-pointer" onClick={() => {
+                        setSelectedNeg(neg);
+                        if (neg.status === "Resolved") {
+                          setView("resolved");
+                        } else {
+                          setView("chat");
+                        }
+                      }}>
+                        <td className="p-4 text-text-dark font-bold flex items-center gap-2">
+                          <MessageSquare size={16} className="text-text-secondary" />
+                          {neg.title}
+                        </td>
+                        <td className="p-4 text-text-secondary">{neg.scope}</td>
+                        <td className="p-4">
+                          <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
+                            neg.status === "Resolved" ? "bg-green-50 text-[#10B981]" :
+                            neg.status === "Active" ? "bg-blue-50 text-primary" :
+                            "bg-purple-50 text-purple-600"
+                          }`}>{neg.status}</span>
+                        </td>
+                        <td className="p-4 text-text-muted truncate max-w-xs">{neg.lastMessage}</td>
+                        <td className="p-4 text-text-muted">{neg.updated}</td>
+                        <td className="p-4 text-text-muted hover:text-primary transition-colors" onClick={(e) => e.stopPropagation()}>
+                          <button className="p-1 rounded hover:bg-slate-100">
+                            <MoreHorizontal size={16} />
+                          </button>
+                        </td>
+                      </tr>
                     ))}
-                    
-                    {loading && (
-                      <div className="flex justify-start">
-                        <div 
-                          className="w-8 h-8 rounded-xl flex-shrink-0 flex items-center justify-center mr-3"
-                          style={{
-                            backgroundColor: 'rgba(37,99,235,0.1)',
-                            border: '1px solid rgba(37,99,235,0.15)'
-                          }}
-                        >
-                          <span className="text-xs font-bold" style={{ color: '#2563EB' }}>P</span>
-                        </div>
-                        <div 
-                          className="rounded-2xl px-4 py-3"
-                          style={{
-                            backgroundColor: '#0C1827',
-                            border: '1px solid rgba(255,255,255,0.08)',
-                            borderTopLeftRadius: '4px'
-                          }}
-                        >
-                          <div className="flex gap-1 items-center py-1">
-                            <div className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: '#475569', animationDelay: '0ms' }} />
-                            <div className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: '#475569', animationDelay: '100ms' }} />
-                            <div className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ backgroundColor: '#475569', animationDelay: '200ms' }} />
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ----------------- CHAT WORKSPACE VIEW ----------------- */}
+      {view === "chat" && selectedNeg && (
+        <div className="space-y-6 max-w-5xl mx-auto">
+          {/* Header */}
+          <div className="flex justify-between items-center border-b border-border-light pb-4">
+            <button onClick={() => setView("list")} className="flex items-center gap-2 text-text-secondary hover:text-text-dark transition-colors text-sm font-semibold">
+              <ArrowLeft size={16} /> Back to Conversations
+            </button>
+            <div className="flex gap-2">
+              <button className="bg-white border border-border-light text-text-dark px-4 py-2 rounded-xl text-xs font-semibold transition-all">Share</button>
+              <button className="bg-white border border-border-light text-text-dark p-2 rounded-xl text-xs font-semibold transition-all"><MoreHorizontal size={16} /></button>
+            </div>
+          </div>
+
+          <div className="flex justify-between items-center bg-white border border-border-light rounded-2xl p-6 shadow-sm">
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-xl font-bold text-text-dark font-display">{selectedNeg.title}</h2>
+                <span className="bg-blue-50 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Active</span>
+              </div>
+              <p className="text-xs text-text-secondary mt-1">Related Scope: <span className="font-semibold text-text-dark hover:underline cursor-pointer">{selectedNeg.scope} • View Scope</span></p>
+            </div>
+          </div>
+
+          {/* Chat main Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            {/* Center Chat Block */}
+            <div className="lg:col-span-2 bg-white border border-border-light rounded-2xl p-6 shadow-sm flex flex-col justify-between min-h-[400px]">
+              <div className="space-y-4 flex-grow overflow-y-auto mb-6">
+                <span className="block text-[10px] font-bold text-text-secondary uppercase tracking-wider mb-2">Conversation History</span>
+                
+                {/* Chat bubbles */}
+                <div className="flex gap-3 items-start">
+                  <div className="w-8 h-8 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center font-bold text-xs flex-shrink-0">K</div>
+                  <div className="bg-slate-50 border border-border-light rounded-2xl p-4 text-xs font-semibold text-text-dark max-w-lg leading-relaxed">
+                    Hi! I'm Kova, your AI negotiation assistant. Paste the client's message below and I'll help you respond with confidence.
+                  </div>
+                </div>
+
+                {objectionText && (
+                  <div className="flex gap-3 items-start justify-end">
+                    <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 text-xs font-semibold text-text-dark max-w-lg leading-relaxed">
+                      <p className="text-[9px] text-primary uppercase font-bold mb-1">Client Objection</p>
+                      {objectionText}
+                    </div>
+                    <div className="w-8 h-8 rounded-full bg-primary-light text-primary flex items-center justify-center font-bold text-xs flex-shrink-0">C</div>
+                  </div>
                 )}
-                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Input Area */}
+              <div className="border-t border-border-light pt-4 space-y-3">
+                <textarea 
+                  rows={3}
+                  value={objectionText}
+                  onChange={(e) => setObjectionText(e.target.value)}
+                  placeholder="Paste client message or describe the situation..."
+                  className="w-full bg-surface-secondary border border-border-light text-text-dark text-xs rounded-xl px-4 py-2.5 outline-none font-medium resize-none leading-relaxed"
+                />
+                
+                <div className="flex justify-between items-center">
+                  <div className="flex gap-2">
+                    <button className="bg-slate-50 hover:bg-slate-100 border border-border-light text-text-secondary px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all">Attach context</button>
+                    <select 
+                      value={tone}
+                      onChange={(e) => setTone(e.target.value)}
+                      className="bg-slate-50 hover:bg-slate-100 border border-border-light text-text-secondary px-2.5 py-1.5 rounded-lg text-[10px] font-bold outline-none cursor-pointer"
+                    >
+                      <option>Professional</option>
+                      <option>Casual</option>
+                      <option>Persuasive</option>
+                    </select>
+                  </div>
+                  
+                  <button 
+                    onClick={handleSendToKova}
+                    className="bg-primary hover:bg-primary-hover text-white px-5 py-2 rounded-xl text-xs font-bold shadow-blue transition-colors flex items-center gap-1.5"
+                  >
+                    Send to Kova <SendHorizontal size={14} />
+                  </button>
+                </div>
               </div>
             </div>
 
-            {/* Input Area */}
-            <div 
-              className="flex-shrink-0"
-              style={{ borderTop: '1px solid rgba(255,255,255,0.06)', backgroundColor: '#060D18', padding: '16px' }}
+            {/* Right details Sidebar */}
+            <div className="space-y-6">
+              {/* Context Panel */}
+              <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm space-y-4">
+                <div className="flex justify-between items-center border-b border-border-light pb-2">
+                  <span className="block text-xs font-bold text-text-secondary uppercase tracking-wider">Context</span>
+                  <button className="text-primary text-[10px] font-bold hover:underline">Edit</button>
+                </div>
+                
+                <div className="space-y-3 text-xs font-semibold text-text-dark">
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Project</span>
+                    <span>{selectedNeg.scope}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Scope Value</span>
+                    <span>₦500,000</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Client Type</span>
+                    <span>SME</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Relationship</span>
+                    <span>New Client</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Stage</span>
+                    <span className="text-[#FF9F43]">Negotiating</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Timeline</span>
+                    <span>4 weeks</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Kova Tips card */}
+              <div className="bg-primary/5 border border-primary/15 rounded-2xl p-5 shadow-sm space-y-3">
+                <div className="flex items-center gap-2 text-primary font-bold text-xs">
+                  <Brain size={16} />
+                  <span>Kova Tips</span>
+                </div>
+                <p className="text-xs text-text-secondary leading-relaxed font-semibold">
+                  Clients often push back on price. Focus on value, outcomes and ROI. Avoid justifying your rate.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* ----------------- KOVA OPTIONS HUB VIEW ----------------- */}
+      {view === "options_hub" && selectedNeg && (
+        <div className="max-w-3xl mx-auto space-y-8 py-4">
+          <button onClick={() => setView("chat")} className="flex items-center gap-2 text-text-secondary hover:text-text-dark transition-colors text-sm font-semibold">
+            <ArrowLeft size={16} /> Back to Chat
+          </button>
+
+          <div className="text-center space-y-3">
+            <div className="w-12 h-12 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center mx-auto shadow-sm">
+              <Brain size={24} />
+            </div>
+            <h2 className="text-xl font-bold text-text-dark font-display">Kova AI Advisor</h2>
+            <p className="text-sm text-text-secondary max-w-md mx-auto leading-relaxed">
+              I understand the budget is a concern. Here are some ways you can respond. Choose one to get started.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            {[
+              { id: "draft_response", icon: PenTool, title: "Draft Response", desc: "Get a ready-to-send response customized for your client.", color: "text-[#2563EB]", bg: "bg-blue-50" },
+              { id: "counter_offer", icon: Search, title: "Counter Offer", desc: "Offer alternative pricing, phases or scope reductions.", color: "text-[#28C76F]", bg: "bg-green-50" },
+              { id: "value_justification", icon: Brain, title: "Value Justification", desc: "Reinforce the value, benefits, and ROI of your work.", color: "text-[#FF9F43]", bg: "bg-amber-50" },
+              { id: "practice_mode", icon: Users, title: "Practice Mode", desc: "Role-play this conversation with Kova acting as the client.", color: "text-purple-600", bg: "bg-purple-50" }
+            ].map((opt) => (
+              <button 
+                key={opt.id}
+                onClick={() => {
+                  if (opt.id === "draft_response") { setView("draft_response"); }
+                  else if (opt.id === "practice_mode") { setPracticeHistory([{ role: "kova", content: objectionText }]); setView("practice_mode"); }
+                  else { alert(`${opt.title} loaded! Try Draft Response or Practice Mode.`); }
+                }}
+                className="bg-white border border-border-light rounded-2xl p-6 text-left hover:shadow-md transition-shadow group flex items-start gap-4"
+              >
+                <div className={`w-10 h-10 rounded-xl ${opt.bg} ${opt.color} flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform`}>
+                  <opt.icon size={20} />
+                </div>
+                <div className="space-y-1">
+                  <span className="font-bold text-sm text-text-dark block group-hover:text-primary transition-colors">{opt.title}</span>
+                  <p className="text-xs text-text-secondary leading-relaxed font-semibold">{opt.desc}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ----------------- DRAFT RESPONSE VIEW ----------------- */}
+      {view === "draft_response" && selectedNeg && (
+        <div className="space-y-6 max-w-5xl mx-auto">
+          {/* Header */}
+          <div className="flex justify-between items-center border-b border-border-light pb-4">
+            <button onClick={() => setView("options_hub")} className="flex items-center gap-2 text-text-secondary hover:text-text-dark transition-colors text-sm font-semibold">
+              <ArrowLeft size={16} /> Back to Options
+            </button>
+            <span className="text-xs font-bold text-text-secondary uppercase">Draft Response</span>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Draft column */}
+            <div className="lg:col-span-2 space-y-6">
+              
+              {/* Draft Box */}
+              <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm space-y-6">
+                <div className="flex justify-between items-center border-b border-border-light pb-4">
+                  <div>
+                    <h3 className="font-bold text-text-dark text-sm font-display">Kova's Suggested Response</h3>
+                    <p className="text-[10px] text-text-secondary mt-0.5">Use this response or edit it before sending.</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <select 
+                      value={tone}
+                      onChange={(e) => setTone(e.target.value)}
+                      className="bg-slate-50 border border-border-light text-text-dark px-2 py-1 rounded-lg text-[10px] font-bold outline-none cursor-pointer"
+                    >
+                      <option>Tone: Professional</option>
+                      <option>Tone: Casual</option>
+                      <option>Tone: Persuasive</option>
+                    </select>
+                    <button className="bg-white border border-border-light p-1.5 rounded-lg text-text-dark hover:bg-slate-50 transition-colors"><RefreshCw size={12} /></button>
+                  </div>
+                </div>
+
+                {/* Response text body */}
+                <div className="bg-slate-50 border border-border-light rounded-2xl p-6 text-xs font-semibold text-text-dark leading-relaxed space-y-4">
+                  <p>Thanks for your honesty — I appreciate you sharing that.</p>
+                  <p>
+                    I understand budget is an important factor. The price reflects the amount of planning, design, and development that goes into creating a website that not only looks great but also performs well and helps you achieve your business goals.
+                  </p>
+                  <p>
+                    That said, I'm open to exploring options that work for you. We can adjust the scope or phase the work to align better with your budget while still delivering the most impact. Would you like me to share a couple of options?
+                  </p>
+                </div>
+
+                {/* Explanation notes */}
+                <div className="space-y-3 pt-2">
+                  <span className="block text-[10px] font-bold text-text-secondary uppercase">Why this works:</span>
+                  <ul className="text-xs font-semibold text-text-secondary space-y-2 list-disc pl-4">
+                    <li><span className="text-text-dark">Acknowledges concern:</span> Validating their budget constraint builds empathy.</li>
+                    <li><span className="text-text-dark">Reinforces value:</span> Reminds them of the business goal without arguing.</li>
+                    <li><span className="text-text-dark">Opens door for options:</span> Steers the convo to a scope adjustment instead of giving a discount.</li>
+                  </ul>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-3 border-t border-border-light pt-6">
+                  <button 
+                    onClick={() => { navigator.clipboard.writeText("Thanks for your honesty..."); alert("Copied suggested response!"); }}
+                    className="bg-white hover:bg-slate-50 border border-border-light text-text-dark px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+                  >
+                    <Copy size={14} /> Copy
+                  </button>
+                  <button className="bg-white hover:bg-slate-50 border border-border-light text-text-dark px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5">
+                    Edit Response
+                  </button>
+                  <button 
+                    onClick={handleResolveNegotiation}
+                    className="flex-grow bg-primary hover:bg-primary-hover text-white py-2.5 rounded-xl text-xs font-bold transition-all shadow-blue text-center"
+                  >
+                    Send Response
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Right sidebar */}
+            <div className="space-y-6">
+              <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm space-y-4">
+                <span className="block text-xs font-bold text-text-secondary uppercase border-b border-border-light pb-2">Conversation Goal</span>
+                <p className="text-xs text-text-secondary leading-relaxed font-semibold">
+                  Find a solution that fits the client's budget without devaluing your work.
+                </p>
+              </div>
+              
+              <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm space-y-4">
+                <span className="block text-xs font-bold text-text-secondary uppercase border-b border-border-light pb-2">Context</span>
+                <div className="space-y-2 text-xs font-semibold text-text-secondary">
+                  <p>Client: <span className="text-text-dark font-bold">Acme Corp</span></p>
+                  <p>Project: <span className="text-text-dark font-bold">{selectedNeg.scope}</span></p>
+                  <p>Original Value: <span className="text-text-dark font-bold">₦500,000</span></p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* ----------------- PRACTICE ROLEPLAY MODE VIEW ----------------- */}
+      {view === "practice_mode" && selectedNeg && (
+        <div className="space-y-6 max-w-5xl mx-auto">
+          {/* Header */}
+          <div className="flex justify-between items-center border-b border-border-light pb-4">
+            <button onClick={() => setView("options_hub")} className="flex items-center gap-2 text-text-secondary hover:text-text-dark transition-colors text-sm font-semibold">
+              <ArrowLeft size={16} /> Back to Options
+            </button>
+            <button 
+              onClick={handleResolveNegotiation}
+              className="text-danger hover:text-red-700 text-xs font-bold transition-all"
             >
-              <div className="flex items-end gap-3" style={{ maxWidth: '1024px', margin: '0 auto' }}>
-                <textarea
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder={started ? "Continue the conversation..." : "Describe your situation..."}
-                  rows={1}
-                  className="flex-1 rounded-xl transition-all resize-none"
-                  style={{
-                    backgroundColor: '#0C1827',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    padding: '12px 16px',
-                    fontSize: '14px',
-                    color: '#F1F5F9',
-                    minHeight: '48px',
-                    maxHeight: '200px',
-                    outline: 'none'
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = 'rgba(37,99,235,0.5)';
-                    e.target.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.1)';
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = 'rgba(255,255,255,0.08)';
-                    e.target.style.boxShadow = 'none';
-                  }}
+              End Practice
+            </button>
+          </div>
+
+          <div className="flex justify-between items-center bg-white border border-border-light rounded-2xl p-6 shadow-sm">
+            <div>
+              <h2 className="text-xl font-bold text-text-dark font-display">Practice Mode</h2>
+              <p className="text-xs text-text-secondary mt-1">Role-play the conversation with Kova and improve your negotiation skills.</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            {/* Roleplay Chat box */}
+            <div className="lg:col-span-2 bg-white border border-border-light rounded-2xl p-6 shadow-sm flex flex-col justify-between min-h-[450px]">
+              
+              <div className="space-y-4 flex-grow overflow-y-auto mb-6">
+                <span className="block text-[10px] font-bold text-text-secondary uppercase tracking-wider mb-2">Practice Session</span>
+                
+                {practiceHistory.map((msg, i) => (
+                  <div key={i} className={`flex gap-3 items-start ${msg.role === "user" ? "justify-end" : ""}`}>
+                    {msg.role === "kova" && (
+                      <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-xs flex-shrink-0 font-display">K</div>
+                    )}
+                    <div className={`p-4 rounded-2xl text-xs font-semibold leading-relaxed max-w-md ${
+                      msg.role === "user" 
+                        ? "bg-primary text-white" 
+                        : "bg-slate-50 border border-border-light text-text-dark"
+                    }`}>
+                      {msg.role === "kova" && <p className="text-[9px] uppercase font-bold text-purple-600 mb-1">Kova (Client)</p>}
+                      {msg.content}
+                    </div>
+                    {msg.role === "user" && (
+                      <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs flex-shrink-0">You</div>
+                    )}
+                  </div>
+                ))}
+
+                {isTyping && (
+                  <div className="flex gap-3 items-start">
+                    <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-xs flex-shrink-0 animate-pulse">K</div>
+                    <div className="bg-slate-50 border border-border-light rounded-2xl px-4 py-3 text-xs text-text-secondary flex gap-1">
+                      <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></div>
+                      <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:0.2s]"></div>
+                      <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:0.4s]"></div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Chat Input */}
+              <div className="border-t border-border-light pt-4 flex gap-2">
+                <input 
+                  type="text" 
+                  value={practiceInput}
+                  onChange={(e) => setPracticeInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSendPracticeReply()}
+                  placeholder="Type your response here..."
+                  className="flex-grow bg-surface-secondary border border-border-light text-text-dark text-xs rounded-xl px-4 py-3 outline-none font-semibold"
                 />
-                <button
-                  onClick={handleSend}
-                  disabled={!input.trim() || loading}
-                  className="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center transition-all"
-                  style={{
-                    backgroundColor: input.trim() && !loading ? '#2563EB' : 'rgba(255,255,255,0.05)',
-                    cursor: input.trim() && !loading ? 'pointer' : 'not-allowed'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (input.trim() && !loading) {
-                      e.currentTarget.style.backgroundColor = '#1D4ED8';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (input.trim() && !loading) {
-                      e.currentTarget.style.backgroundColor = '#2563EB';
-                    }
-                  }}
+                <button 
+                  onClick={handleSendPracticeReply}
+                  className="bg-primary hover:bg-primary-hover text-white px-5 py-3 rounded-xl text-xs font-bold shadow-blue transition-colors flex items-center gap-1.5"
                 >
-                  <SendHorizontal className="h-4 w-4" style={{ color: input.trim() && !loading ? 'white' : '#475569' }} />
+                  Send Response
+                </button>
+              </div>
+
+            </div>
+
+            {/* Right tips card */}
+            <div className="space-y-6">
+              <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm space-y-4">
+                <span className="block text-xs font-bold text-text-secondary uppercase border-b border-border-light pb-2">Practice Tips</span>
+                
+                {[
+                  { title: "Stay Calm", desc: "Don't take it personally. Stay professional." },
+                  { title: "Focus on Value", desc: "Talk about outcomes, not just deliverables." },
+                  { title: "Offer Options", desc: "Provide alternatives, not discounts." }
+                ].map((tip, idx) => (
+                  <div key={idx} className="space-y-1">
+                    <span className="font-bold text-xs text-text-dark block">{tip.title}</span>
+                    <p className="text-[11px] text-text-secondary leading-relaxed font-semibold">{tip.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* ----------------- RESOLVED SUMMARY VIEW ----------------- */}
+      {view === "resolved" && selectedNeg && (
+        <div className="space-y-6 max-w-5xl mx-auto">
+          {/* Header */}
+          <div className="flex justify-between items-center border-b border-border-light pb-4">
+            <button onClick={() => setView("list")} className="flex items-center gap-2 text-text-secondary hover:text-text-dark transition-colors text-sm font-semibold">
+              <ArrowLeft size={16} /> Back to Conversations
+            </button>
+            <span className="text-xs font-bold text-text-secondary uppercase">Resolved Outcome</span>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Main details column */}
+            <div className="lg:col-span-2 space-y-6">
+              
+              {/* Green outcome banner card */}
+              <div className="bg-green-50 border border-green-100 rounded-2xl p-6 shadow-sm text-xs space-y-3 font-semibold text-text-dark">
+                <span className="block text-[10px] bg-green-200 text-[#10B981] font-bold px-2 py-0.5 rounded-full uppercase w-fit">Outcome</span>
+                <h3 className="text-sm font-bold text-text-dark font-display mt-2">Client accepted the proposal at ₦500,000</h3>
+                <p className="text-text-secondary leading-relaxed mt-1 font-semibold">
+                  Great job! You successfully resolved the price objection by offering phased scoping options.
+                </p>
+              </div>
+
+              {/* Kova feedback takeaways */}
+              <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm space-y-4">
+                <div className="flex items-center gap-2 text-purple-600 font-bold text-xs mb-2">
+                  <Brain size={16} />
+                  <span>Kova Analysis</span>
+                </div>
+                <p className="text-xs font-bold text-text-dark">Excellent! You handled that well.</p>
+                
+                <div className="space-y-3 pt-2">
+                  <span className="block text-[10px] font-bold text-text-secondary uppercase">Key takeaways:</span>
+                  {[
+                    "You acknowledged their concern",
+                    "You reinforced value",
+                    "You offered options",
+                    "You maintained your rate"
+                  ].map((takeaway, idx) => (
+                    <div key={idx} className="flex gap-2.5 items-center text-xs font-semibold text-text-dark">
+                      <div className="w-5 h-5 rounded-full bg-green-50 text-[#10B981] flex items-center justify-center"><Check size={12} /></div>
+                      <span>{takeaway}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="border-t border-border-light pt-6 mt-6 flex justify-between items-center text-xs font-bold text-text-secondary">
+                  <span>How was this conversation?</span>
+                  <div className="flex gap-2">
+                    <button className="bg-slate-50 border border-border-light hover:bg-slate-100 p-2 rounded-lg text-text-dark transition-colors">👍</button>
+                    <button className="bg-slate-50 border border-border-light hover:bg-slate-100 p-2 rounded-lg text-text-dark transition-colors">👎</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right sidebar */}
+            <div className="space-y-6">
+              
+              {/* Context Summary card */}
+              <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm space-y-4">
+                <span className="block text-xs font-bold text-text-secondary uppercase border-b border-border-light pb-2 font-display">Context Summary</span>
+                <div className="space-y-3 text-xs font-semibold text-text-dark">
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Project</span>
+                    <span>{selectedNeg.scope}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Scope Value</span>
+                    <span>₦500,000</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Client Type</span>
+                    <span>SME</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Relationship</span>
+                    <span>New Client</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Stage</span>
+                    <span className="text-[#10B981] font-bold">Negotiation Won</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Analytics card */}
+              <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm space-y-3">
+                <span className="block text-xs font-bold text-text-secondary uppercase border-b border-border-light pb-2 font-display">Conversation Analytics</span>
+                <div className="space-y-2.5 text-xs font-semibold text-text-dark">
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Duration</span>
+                    <span>10 minutes</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Messages</span>
+                    <span>6</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Outcome</span>
+                    <span className="bg-green-50 text-[#10B981] px-2 py-0.5 rounded-full text-[10px] font-bold">Won</span>
+                  </div>
+                </div>
+                
+                <button 
+                  onClick={() => setView("list")}
+                  className="w-full bg-primary hover:bg-primary-hover text-white text-xs font-bold py-2.5 rounded-xl transition-colors shadow-blue mt-4"
+                >
+                  Start a New Conversation
                 </button>
               </div>
             </div>
+
           </div>
         </div>
-      </div>
-    </>
+      )}
+    </div>
   );
 }

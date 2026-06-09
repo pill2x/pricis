@@ -4,305 +4,366 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { 
-  Bell, ChevronRight, Download, Target, MessageSquare, Plus, 
-  FileText, Loader2, X, Trash2, CheckCircle2, Clock, RefreshCw, XCircle 
+  Bell, ChevronDown, Plus, Target, FileText, Receipt, UserPlus,
+  Eye, CheckCircle2, MessageSquare, Calendar, Flag, Sparkles
 } from "lucide-react";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import { supabase } from "@/lib/supabase";
-import ScopePDF from "@/components/ScopePDF";
-
-interface Quote {
-  id: string;
-  industry: string;
-  experience_level: string;
-  project_description: string;
-  project_title: string;
-  deliverables: string[];
-  timeline: string;
-  revision_policy: string;
-  out_of_scope: string[];
-  price_conservative: number;
-  price_standard: number;
-  price_premium: number;
-  pricing_rationale: string;
-  selected_tier: string;
-  created_at: string;
-}
+import { supabaseAuth } from "@/lib/auth";
 
 export default function DashboardPage() {
-  const [quotes, setQuotes] = useState<Quote[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
   const [user, setUser] = useState<any>(null);
   const router = useRouter();
 
   useEffect(() => {
-    fetchUserAndQuotes();
+    fetchUser();
   }, []);
 
-  const fetchUserAndQuotes = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+  const fetchUser = async () => {
+    const { data: { user } } = await supabaseAuth.auth.getUser();
     setUser(user);
-    
-    try {
-      const { data, error } = await supabase
-        .from("quotes")
-        .select("*")
-        .order("created_at", { ascending: false });
+  };
 
-      if (error) {
-        console.error("Error fetching quotes:", error);
-      } else {
-        setQuotes(data || []);
-      }
-    } catch (err) {
-      console.error("Error:", err);
-    } finally {
-      setIsLoading(false);
+  const getChevronStyle = (index: number) => {
+    if (index === 0) {
+      return {
+        clipPath: "polygon(0% 0%, 90% 0%, 100% 50%, 90% 100%, 0% 100%)"
+      };
     }
-  };
-
-  const deleteQuote = async (quoteId: string) => {
-    try {
-      await supabase.from("quotes").delete().eq("id", quoteId);
-      setQuotes(prev => prev.filter(q => q.id !== quoteId));
-      if (selectedQuote?.id === quoteId) setSelectedQuote(null);
-    } catch (err) {
-      console.error("Error:", err);
-    }
-  };
-
-  const getTierPrice = (quote: Quote) => {
-    switch (quote.selected_tier) {
-      case "conservative": return quote.price_conservative;
-      case "standard": return quote.price_standard;
-      case "premium": return quote.price_premium;
-      default: return quote.price_standard;
-    }
-  };
-
-  const getStatus = (index: number) => {
-    const statuses = [
-      { text: "Viewed", bgClass: "bg-success/10", textClass: "text-success" },
-      { text: "Draft", bgClass: "bg-gray-100", textClass: "text-text-secondary" },
-      { text: "Sent", bgClass: "bg-primary-light", textClass: "text-primary" }
-    ];
-    return statuses[index % statuses.length];
-  };
-
-  const getIndustryLabel = (industry: string) => {
-    const labels: Record<string, string> = {
-      ui_ux_design: "UI/UX Design",
-      web_development: "Web Development",
-      graphic_design: "Graphic Design",
-      copywriting: "Copywriting",
-      video_editing: "Video Editing",
-      social_media: "Social Media",
-      photography: "Photography",
+    return {
+      clipPath: "polygon(0% 0%, 90% 0%, 100% 50%, 90% 100%, 0% 100%, 10% 50%)"
     };
-    return labels[industry] || industry;
   };
 
   return (
     <>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8 sm:mb-10 pt-12 sm:pt-0">
+      <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8 pt-12 sm:pt-0">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-text-dark mb-1 font-display">
-            Welcome back, {user?.user_metadata?.first_name || user?.email?.split('@')[0] || 'User'} 👋
+          <h1 className="text-3xl font-bold text-text-dark mb-1 font-display">
+            Good morning, {user?.user_metadata?.first_name || user?.email?.split('@')[0] || 'Alex'}! 👋
           </h1>
-          <p className="text-text-secondary text-sm font-body">Let&apos;s create a scope or continue where you left off.</p>
+          <p className="text-text-secondary text-sm font-body">Here&apos;s what&apos;s happening with your business today.</p>
         </div>
         <div className="flex items-center gap-4">
           <button className="text-text-muted hover:text-text-dark transition-colors">
             <Bell size={22} />
           </button>
-          <Link href="/generate" className="hidden sm:flex bg-primary hover:bg-primary-hover text-white px-5 py-2.5 rounded-full text-sm font-semibold items-center gap-2 transition-colors shadow-blue font-body">
-            <Plus size={18} /> New Scope
-          </Link>
+          <div className="relative group">
+            <button className="hidden sm:flex bg-primary hover:bg-primary-hover text-white px-5 py-2.5 rounded-full text-sm font-semibold items-center gap-2 transition-colors shadow-blue font-body">
+              <Plus size={18} /> New Scope <ChevronDown size={16} />
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Quick Action Cards */}
-      <div className="grid md:grid-cols-2 gap-6 mb-10">
-        <div className="bg-surface border border-border-light rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col items-start group">
-          <div className="w-12 h-12 rounded-xl bg-primary-light flex items-center justify-center mb-5 group-hover:bg-primary group-hover:text-white transition-colors">
-            <Target className="text-primary group-hover:text-white" size={24} />
-          </div>
-          <h3 className="font-bold text-text-dark mb-1.5 text-lg font-display">Scope Generator</h3>
-          <p className="text-sm text-text-secondary mb-6 font-body">Create accurate scopes, pricing and timelines.</p>
-          <Link href="/generate" className="bg-primary hover:bg-primary-hover text-white w-full py-3 rounded-full text-sm font-semibold transition-colors text-center shadow-sm font-body">
-            Start New
-          </Link>
-        </div>
-        
-        <div className="bg-surface border border-border-light rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col items-start group">
-          <div className="w-12 h-12 rounded-xl bg-primary-light flex items-center justify-center mb-5 group-hover:bg-primary group-hover:text-white transition-colors">
-            <MessageSquare className="text-primary group-hover:text-white" size={24} />
-          </div>
-          <h3 className="font-bold text-text-dark mb-1.5 text-lg font-display">Negotiation Assistant</h3>
-          <p className="text-sm text-text-secondary mb-6 font-body">Get help with strategy, messages and practice.</p>
-          <button className="bg-transparent border-[1.5px] border-border-light text-text-dark hover:bg-gray-50 w-full py-3 rounded-full text-sm font-semibold transition-colors font-body">
-            Open Assistant
-          </button>
-        </div>
-      </div>
-
-      {/* Recent Scopes Table */}
-      <div>
-        <div className="flex justify-between items-center mb-4 px-1">
-          <h3 className="font-semibold text-text-dark text-lg font-display">Recent Scopes</h3>
-          <Link href="/dashboard/scopes" className="text-primary text-sm font-semibold hover:text-primary-hover font-body">View all →</Link>
-        </div>
-        
-        {isLoading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        ) : quotes.length === 0 ? (
-          <div className="text-center py-20 bg-surface border border-border-light rounded-lg shadow-sm">
-            <FileText className="h-10 w-10 mx-auto mb-3 text-text-muted" />
-            <h2 className="text-lg font-bold text-text-dark mb-1 font-display">No scopes yet</h2>
-            <p className="text-sm text-text-secondary mb-6 font-body">Generate your first scope to see it here.</p>
-            <Link href="/generate" className="bg-primary hover:bg-primary-hover text-white text-sm font-semibold px-6 py-2.5 rounded-full shadow-blue font-body">
-              Create Scope
-            </Link>
-          </div>
-        ) : (
-          <div className="bg-surface border border-border-light rounded-lg overflow-hidden shadow-sm">
-            <div className="divide-y divide-border-light">
-              {quotes.map((quote, index) => {
-                const status = getStatus(index);
-                return (
-                  <div 
-                    key={quote.id} 
-                    onClick={() => setSelectedQuote(quote)}
-                    className="flex items-center justify-between p-3 sm:p-4 hover:bg-surface-secondary cursor-pointer transition-colors group"
-                  >
-                    <div className="text-xs sm:text-sm font-bold text-text-dark truncate pr-2 sm:pr-4 flex-1 font-body">
-                      {quote.project_title}
-                    </div>
-                    <div className="flex items-center gap-2 sm:gap-6 md:gap-10 flex-shrink-0">
-                      <div className="text-xs sm:text-sm font-semibold text-text-dark text-right font-body">
-                        ₦{getTierPrice(quote).toLocaleString()}
-                      </div>
-                      <div className={`hidden sm:block text-xs font-semibold px-3 py-1 rounded-full w-16 text-center font-body ${status.bgClass} ${status.textClass}`}>
-                        {status.text}
-                      </div>
-                      <ChevronRight size={18} className="text-text-muted group-hover:text-primary transition-colors" />
-                    </div>
-                  </div>
-                );
-              })}
+      {/* Quick Actions */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        {[
+          { icon: Target, label: "New Scope", href: "/generate", color: "text-primary" },
+          { icon: FileText, label: "New Proposal", href: "/dashboard/proposals/new", color: "text-primary" },
+          { icon: Receipt, label: "New Invoice", href: "/dashboard/invoices/new", color: "text-primary" },
+          { icon: UserPlus, label: "Add Client", href: "/dashboard/clients/new", color: "text-primary" }
+        ].map((action, i) => (
+          <Link key={i} href={action.href} className="bg-white border border-border-light rounded-xl p-4 flex items-center justify-center gap-3 hover:shadow-md transition-shadow">
+            <div className={`rounded-full flex items-center justify-center ${action.color}`}>
+              <action.icon size={20} />
             </div>
-          </div>
-        )}
+            <span className="font-semibold text-text-dark text-sm">{action.label}</span>
+          </Link>
+        ))}
       </div>
 
-      {/* Detail Modal */}
-      {selectedQuote && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="relative bg-surface rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-lg border border-border-light">
-            {/* Header */}
-            <div className="flex items-start justify-between gap-4 p-6 border-b border-border-light sticky top-0 bg-surface z-10 rounded-t-xl">
-              <h2 className="font-bold text-xl text-text-dark pr-8 font-display">{selectedQuote.project_title}</h2>
-              <button
-                onClick={() => setSelectedQuote(null)}
-                className="p-2 rounded-full hover:bg-surface-secondary text-text-muted transition-colors absolute right-4 top-4"
-              >
-                <X className="h-5 w-5" />
-              </button>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        {/* Revenue Summary */}
+        <div className="bg-white border border-border-light rounded-2xl p-6 lg:col-span-1 shadow-sm flex flex-col justify-between">
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="font-bold text-text-dark text-lg font-display">Revenue Summary</h3>
+              <select className="bg-surface-secondary border border-border-light text-text-secondary text-xs rounded-lg px-2.5 py-1.5 outline-none font-semibold cursor-pointer">
+                <option>This Month</option>
+              </select>
             </div>
-
-            {/* Content */}
-            <div className="p-6">
-              <div className="flex gap-2 mb-6">
-                <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-surface-secondary text-text-secondary font-body">
-                  {getIndustryLabel(selectedQuote.industry)}
+            
+            <div className="grid grid-cols-2 gap-4">
+              {/* Left Side: Total Earnings */}
+              <div>
+                <p className="text-text-secondary text-xs font-semibold mb-1">Total Earnings</p>
+                <h2 className="text-2xl font-bold text-text-dark font-display">₦2,450,000</h2>
+                <p className="text-xs font-semibold mt-1.5">
+                  <span className="text-[#28C76F]">↑ 28%</span> <span className="text-text-muted font-normal">vs last month</span>
+                </p>
+              </div>
+              
+              {/* Right Side: Outstanding & Overdue */}
+              <div className="flex flex-col justify-between pl-4 border-l border-border-light space-y-4">
+                <div>
+                  <p className="text-text-secondary text-xs font-semibold mb-1">Outstanding</p>
+                  <p className="text-[#FF9F43] text-lg font-bold font-display">₦1,250,000</p>
                 </div>
-                <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-primary-light text-primary font-body">
-                  {selectedQuote.selected_tier} selected
+                <div>
+                  <p className="text-text-secondary text-xs font-semibold mb-1">Overdue</p>
+                  <p className="text-[#EA5455] text-lg font-bold font-display">₦350,000</p>
                 </div>
               </div>
+            </div>
+          </div>
+          
+          {/* Sparkline at the bottom of the card */}
+          <div className="h-16 w-full mt-6 relative overflow-hidden rounded-lg">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#28C76F]/10 to-transparent"></div>
+            <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
+              <path d="M 0 75 C 30 75, 45 85, 60 55 C 75 25, 90 45, 100 25 L 100 100 L 0 100 Z" fill="rgba(40,199,111,0.08)" />
+              <path d="M 0 75 C 30 75, 45 85, 60 55 C 75 25, 90 45, 100 25" fill="none" stroke="#28C76F" strokeWidth="2.5" vectorEffect="non-scaling-stroke" />
+            </svg>
+          </div>
+        </div>
 
-              {/* Pricing */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-8">
-                {(['conservative', 'standard', 'premium'] as const).map((tier) => (
-                  <div
-                    key={tier}
-                    className={`rounded-lg p-3 sm:p-4 border flex sm:flex-col items-center sm:items-start justify-between sm:justify-start ${selectedQuote.selected_tier === tier ? 'border-primary bg-primary-light' : 'border-border-light bg-surface'}`}
-                  >
-                    <p className="text-xs font-semibold uppercase text-text-secondary sm:mb-1 font-body">{tier}</p>
-                    <p className={`font-extrabold text-lg font-display ${selectedQuote.selected_tier === tier ? 'text-primary' : 'text-text-dark'}`}>
-                      ₦{(selectedQuote[`price_${tier}` as keyof Quote] as number)?.toLocaleString()}
-                    </p>
+        {/* Proposal Pipeline */}
+        <div className="bg-white border border-border-light rounded-2xl p-6 lg:col-span-2 shadow-sm flex flex-col justify-between">
+          <div>
+            <div className="flex justify-between items-center mb-8">
+              <h3 className="font-bold text-text-dark text-lg font-display">Proposal Pipeline</h3>
+              <select className="bg-surface-secondary border border-border-light text-text-secondary text-xs rounded-lg px-2.5 py-1.5 outline-none font-semibold cursor-pointer">
+                <option>This Month</option>
+              </select>
+            </div>
+            
+            <div className="flex w-full items-stretch relative gap-1 md:gap-2">
+              {[
+                { label: "Scopes\nGenerated", count: 24 },
+                { label: "Proposals\nSent", count: 16 },
+                { label: "Opened", count: 9 },
+                { label: "Signed", count: 5 },
+                { label: "Paid", count: 4 },
+              ].map((step, i) => (
+                <div 
+                  key={i} 
+                  style={getChevronStyle(i)}
+                  className="flex-1 bg-surface-secondary h-28 flex flex-col justify-center items-center shadow-sm select-none"
+                >
+                  <p className="text-text-secondary text-[10px] md:text-xs font-semibold text-center px-1 mb-2 leading-tight whitespace-pre-line">
+                    {step.label}
+                  </p>
+                  <p className="text-xl md:text-2xl font-bold text-text-dark font-display">
+                    {step.count}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Dotted Arrow indicators below the Chevrons */}
+            <div className="flex justify-between items-center mt-6 px-4">
+              {[
+                { percent: "66.7%" },
+                { percent: "56.3%" },
+                { percent: "55.6%" },
+                { percent: "80.0%" },
+              ].map((arrow, i) => (
+                <div key={i} className="flex-1 flex items-center justify-center gap-1 mx-2">
+                  <div className="flex-grow border-t border-dashed border-border-light"></div>
+                  <span className="text-[10px] md:text-xs font-bold text-text-muted select-none">
+                    {arrow.percent}
+                  </span>
+                  <div className="w-1.5 h-1.5 border-t border-r border-border-light rotate-45 flex-shrink-0 -ml-1"></div>
+                  <div className="flex-grow border-t border-dashed border-border-light"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+        {/* Active Projects */}
+        <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="font-bold text-text-dark text-lg font-display">Active Projects</h3>
+              <Link href="/dashboard/projects" className="text-primary text-xs font-semibold hover:text-primary-hover">View all →</Link>
+            </div>
+            
+            <div className="flex items-center justify-between gap-4">
+              <div className="space-y-3 flex-grow">
+                {[
+                  { label: "In Progress", count: 8, color: "bg-blue-500" },
+                  { label: "Under Review", count: 4, color: "bg-yellow-500" },
+                  { label: "Pending Client", count: 3, color: "bg-purple-500" },
+                  { label: "Completed", count: 12, color: "bg-green-500" },
+                  { label: "Overdue", count: 2, color: "bg-red-500" },
+                ].map((stat, i) => (
+                  <div key={i} className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className={`w-2.5 h-2.5 rounded-full ${stat.color}`}></div>
+                      <span className="text-text-secondary font-medium">{stat.label}</span>
+                    </div>
+                    <span className="font-bold text-text-dark">{stat.count}</span>
                   </div>
                 ))}
               </div>
-
-              {/* Scope sections */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div className="rounded-lg p-5 border border-border-light bg-surface-secondary">
-                  <div className="text-xs font-semibold uppercase text-text-secondary mb-4 flex items-center gap-2 tracking-wide font-body">
-                    <CheckCircle2 className="h-4 w-4 text-primary" /> Deliverables
-                  </div>
-                  {selectedQuote.deliverables.map((item, idx) => (
-                    <div key={idx} className="flex items-start gap-2 py-1.5">
-                      <div className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0 bg-primary" />
-                      <span className="text-sm font-medium text-text-dark font-body">{item}</span>
-                    </div>
-                  ))}
+              
+              <div className="relative w-32 h-32 flex-shrink-0 flex items-center justify-center">
+                <svg viewBox="0 0 36 36" className="w-full h-full transform -rotate-90">
+                  <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#F1F5F9" strokeWidth="3.5" />
+                  
+                  {/* Completed (Green): 12/29 */}
+                  <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#10B981" strokeWidth="3.5" 
+                          strokeDasharray="38.3 61.7" strokeDashoffset="0" />
+                  
+                  {/* In Progress (Blue): 8/29 */}
+                  <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#3B82F6" strokeWidth="3.5" 
+                          strokeDasharray="25.5 74.5" strokeDashoffset="-39.8" />
+                  
+                  {/* Under Review (Yellow): 4/29 */}
+                  <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#F59E0B" strokeWidth="3.5" 
+                          strokeDasharray="12.8 87.2" strokeDashoffset="-66.8" />
+                  
+                  {/* Pending Client (Purple): 3/29 */}
+                  <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#8B5CF6" strokeWidth="3.5" 
+                          strokeDasharray="9.5 90.5" strokeDashoffset="-81.1" />
+                  
+                  {/* Overdue (Red): 2/29 */}
+                  <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#EF4444" strokeWidth="3.5" 
+                          strokeDasharray="6.4 93.6" strokeDashoffset="-92.1" />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-2xl font-bold text-text-dark font-display leading-none">29</span>
+                  <span className="text-[10px] text-text-secondary font-semibold mt-1">Total Projects</span>
                 </div>
-
-                <div className="rounded-lg p-5 border border-border-light bg-surface-secondary">
-                  <div className="text-xs font-semibold uppercase text-text-secondary mb-4 flex items-center gap-2 tracking-wide font-body">
-                    <XCircle className="h-4 w-4 text-danger" /> Out of Scope
-                  </div>
-                  {selectedQuote.out_of_scope.map((item, idx) => (
-                    <div key={idx} className="flex items-start gap-2 py-1.5">
-                      <div className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0 bg-danger" />
-                      <span className="text-sm font-medium text-text-dark font-body">{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end pt-6 border-t border-border-light">
-                <button
-                  onClick={() => deleteQuote(selectedQuote.id)}
-                  className="text-sm font-semibold text-danger hover:bg-danger/10 px-4 py-2 rounded-full transition-colors font-body text-center"
-                >
-                  Delete Scope
-                </button>
-                
-                <PDFDownloadLink
-                  document={<ScopePDF scope={selectedQuote} selectedTier={selectedQuote.selected_tier as any} />}
-                  fileName={`pricis-scope-${Date.now()}.pdf`}
-                >
-                  {({ loading }) => (
-                    <button
-                      type="button"
-                      className="bg-primary hover:bg-primary-hover text-white font-semibold text-sm px-6 py-2.5 rounded-full transition-colors flex items-center justify-center gap-2 shadow-blue font-body w-full sm:w-auto"
-                    >
-                      <Download className="h-4 w-4" />
-                      {loading ? "Preparing PDF..." : "Export PDF"}
-                    </button>
-                  )}
-                </PDFDownloadLink>
               </div>
             </div>
           </div>
         </div>
-      )}
 
-      {/* Mobile FAB for New Scope */}
-      <Link 
-        href="/generate" 
-        className="sm:hidden fixed bottom-6 right-6 z-40 bg-primary hover:bg-primary-hover text-white w-14 h-14 rounded-full shadow-lg shadow-primary/30 flex items-center justify-center transition-all active:scale-95"
-      >
-        <Plus size={24} />
-      </Link>
+        {/* Recent Activity */}
+        <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="font-bold text-text-dark text-lg font-display">Recent Activity</h3>
+              <Link href="/dashboard/activity" className="text-primary text-xs font-semibold hover:text-primary-hover">View all →</Link>
+            </div>
+            <div className="space-y-5">
+              {[
+                { icon: Eye, title: "Acme Corp proposal was opened", desc: "Website Redesign Proposal", time: "2h ago", color: "text-blue-500", bg: "bg-blue-50" },
+                { icon: CheckCircle2, title: "Invoice INV-2024-0012 was paid", desc: "Acme Corp", time: "5h ago", color: "text-green-500", bg: "bg-green-50" },
+                { icon: FileText, title: "New scope created", desc: "Mobile App Design for TechNova", time: "1d ago", color: "text-blue-500", bg: "bg-blue-50" },
+                { icon: CheckCircle2, title: "Milestone approved", desc: "Landing Page Design - TechNova", time: "1d ago", color: "text-green-500", bg: "bg-green-50" },
+                { icon: MessageSquare, title: "Kova negotiation session completed", desc: "Project: E-commerce Website", time: "2d ago", color: "text-purple-500", bg: "bg-purple-50" }
+              ].map((activity, i) => (
+                 <div key={i} className="flex gap-4 items-start">
+                   <div className={`w-8 h-8 rounded-full ${activity.bg} flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                     <activity.icon size={14} className={activity.color} />
+                   </div>
+                   <div className="flex-grow">
+                     <p className="text-sm font-semibold text-text-dark leading-tight">{activity.title}</p>
+                     <p className="text-xs text-text-secondary mt-0.5">{activity.desc}</p>
+                   </div>
+                   <div className="text-xs text-text-muted font-medium pt-0.5 flex-shrink-0">{activity.time}</div>
+                 </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* WhatsApp Copilot */}
+        <div className="bg-white border border-border-light rounded-2xl p-6 relative overflow-hidden flex flex-col shadow-sm">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="font-bold text-text-dark text-lg font-display flex items-center gap-2">
+              WhatsApp Copilot
+            </h3>
+            <span className="bg-[#E8F8F0] text-[#28C76F] text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">Coming Soon</span>
+          </div>
+          
+          <div className="flex-grow flex flex-col items-center justify-center text-center mt-2 mb-6">
+            <div className="relative mb-4">
+              <div className="w-14 h-14 bg-[#E8F8F0] rounded-2xl flex items-center justify-center">
+                <span className="text-3xl">🤖</span>
+              </div>
+              <Sparkles size={16} className="text-[#FF9F43] absolute -top-1 -right-1 animate-pulse" />
+            </div>
+            <h4 className="font-bold text-text-dark text-sm mb-1">AI negotiations that close more deals.</h4>
+            <p className="text-xs text-text-secondary max-w-[200px] leading-relaxed">Get real-time negotiation support, smart replies, and objection handling.</p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="bg-white border border-border-light rounded-xl py-3 px-2 flex flex-col items-center shadow-sm">
+              <span className="font-bold text-2xl text-text-dark font-display">0</span>
+              <span className="text-[10px] text-text-secondary font-semibold uppercase tracking-wider mt-1 text-center leading-tight">Active<br/>Negotiations</span>
+            </div>
+            <div className="bg-white border border-border-light rounded-xl py-3 px-2 flex flex-col items-center shadow-sm">
+              <span className="font-bold text-2xl text-text-dark font-display">0</span>
+              <span className="text-[10px] text-text-secondary font-semibold uppercase tracking-wider mt-1 text-center leading-tight">Pending<br/>Approvals</span>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between border-t border-border-light pt-4 mt-auto">
+             <span className="text-xs font-semibold text-text-secondary">Be the first to try it out.</span>
+             <button className="bg-primary hover:bg-primary-hover text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors shadow-sm border border-transparent">
+               Join Waitlist
+             </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+         {/* Top Clients */}
+         <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="font-bold text-text-dark text-lg font-display">Top Clients by Value</h3>
+            <Link href="/dashboard/clients" className="text-primary text-xs font-semibold hover:text-primary-hover">View all →</Link>
+          </div>
+          <div className="space-y-4">
+             {[
+               { name: "Acme Corp", value: "₦1,200,000", width: "100%" },
+               { name: "TechNova Ltd.", value: "₦950,000", width: "79%" },
+               { name: "Greenlife NG", value: "₦750,000", width: "62.5%" },
+               { name: "StartupX", value: "₦500,000", width: "41.6%" },
+               { name: "StoreHub", value: "₦300,000", width: "25%" },
+             ].map((client, i) => (
+               <div key={i} className="flex items-center gap-4">
+                 <span className="text-sm font-bold text-text-muted w-4">{i + 1}</span>
+                 <span className="text-sm font-semibold text-text-dark w-28 truncate">{client.name}</span>
+                 <div className="flex-grow h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                   <div className="h-full bg-[#10B981] rounded-full transition-all duration-500" style={{ width: client.width }}></div>
+                 </div>
+                 <span className="text-sm font-bold text-text-dark w-24 text-right">{client.value}</span>
+               </div>
+             ))}
+          </div>
+         </div>
+
+         {/* Upcoming Reminders */}
+         <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="font-bold text-text-dark text-lg font-display">Upcoming Reminders</h3>
+            <Link href="/dashboard/reminders" className="text-primary text-xs font-semibold hover:text-primary-hover">View all →</Link>
+          </div>
+          <div className="space-y-4">
+            {[
+              { date: "30 May", title: "Invoice INV-2024-0014 due in 3 days", desc: "TechNova Ltd.", type: "Due Soon", icon: Calendar, badge: "bg-amber-50 text-amber-600 border border-amber-100" },
+              { date: "02 Jun", title: "Project deadline in 6 days", desc: "E-commerce Website - StoreHub", type: "Upcoming", icon: Flag, badge: "bg-blue-50 text-blue-600 border border-blue-100" },
+              { date: "05 Jun", title: "Milestone review in 9 days", desc: "Mobile App Design - Acme Corp", type: "Upcoming", icon: Target, badge: "bg-blue-50 text-blue-600 border border-blue-100" },
+            ].map((reminder, i) => (
+              <div key={i} className="flex gap-4 items-start pb-4 border-b border-border-light last:border-0 last:pb-0">
+                <div className="bg-[#EFF6FF] rounded-xl w-14 h-16 flex flex-col items-center justify-center text-[#2563EB] flex-shrink-0 border border-blue-50 shadow-sm">
+                  <reminder.icon size={16} className="mb-1 text-primary" />
+                  <div className="flex flex-col items-center leading-none">
+                    <span className="text-xs font-bold text-[#1E3A8A]">{reminder.date.split(' ')[0]}</span>
+                    <span className="text-[9px] font-semibold text-[#3B82F6] uppercase mt-0.5">{reminder.date.split(' ')[1]}</span>
+                  </div>
+                </div>
+                <div className="flex-grow pt-1">
+                  <p className="text-sm font-semibold text-text-dark">{reminder.title}</p>
+                  <p className="text-xs text-text-secondary mt-1">{reminder.desc}</p>
+                </div>
+                <div className="pt-1 flex-shrink-0">
+                  <span className={`text-[10px] font-bold px-2.5 py-1 rounded-md ${reminder.badge}`}>
+                    {reminder.type}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+         </div>
+      </div>
     </>
   );
 }

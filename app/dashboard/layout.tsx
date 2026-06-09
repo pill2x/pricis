@@ -5,9 +5,10 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { 
   FileText, MessageSquare, Settings, LogOut, Menu, X, 
-  LayoutDashboard, Bookmark, Receipt, Star, Crown
+  LayoutDashboard, Bookmark, Receipt, Star, Crown,
+  FileCheck, Briefcase, Users, BarChart2, Puzzle
 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { supabaseAuth } from "@/lib/auth";
 import Logo from "@/components/Logo";
 
 export default function DashboardLayout({
@@ -26,7 +27,7 @@ export default function DashboardLayout({
   }, []);
 
   const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabaseAuth.auth.getUser();
     if (!user) {
       router.push("/login");
       return;
@@ -36,7 +37,7 @@ export default function DashboardLayout({
   };
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    await supabaseAuth.auth.signOut();
     router.push("/");
   };
 
@@ -54,9 +55,13 @@ export default function DashboardLayout({
   const navItems = [
     { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
     { icon: FileText, label: "Scopes", href: "/dashboard/scopes" },
-    { icon: MessageSquare, label: "Negotiations", href: "/dashboard/negotiate" },
-    { icon: Bookmark, label: "Templates", href: "/dashboard/templates" },
+    { icon: FileCheck, label: "Proposals", href: "/dashboard/proposals" },
+    { icon: MessageSquare, label: "Negotiate", href: "/dashboard/negotiate" },
+    { icon: Briefcase, label: "Projects", href: "/dashboard/projects" },
+    { icon: Users, label: "Clients", href: "/dashboard/clients" },
     { icon: Receipt, label: "Invoices", href: "/dashboard/invoices" },
+    { icon: BarChart2, label: "Analytics", href: "/dashboard/analytics" },
+    { icon: Puzzle, label: "Integrations", href: "/dashboard/integrations" },
     { icon: Settings, label: "Settings", href: "/dashboard/settings" },
   ];
 
@@ -114,22 +119,18 @@ export default function DashboardLayout({
         </div>
       </div>
 
-      {/* Mobile Menu Button */}
-      <div className="md:hidden fixed top-4 left-4 z-50">
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="bg-surface text-text-dark p-2.5 rounded-xl shadow-md border border-border-light"
-        >
-          {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
-      </div>
-
       {/* Mobile Sidebar Overlay */}
       {mobileMenuOpen && (
         <div className="md:hidden fixed inset-0 bg-black/60 z-40 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}>
           <div className="fixed left-0 top-0 h-full w-[280px] bg-surface border-r border-border-light flex flex-col py-6 px-4" onClick={(e) => e.stopPropagation()}>
             <div className="mb-10 px-2 flex justify-between items-center">
               <Logo variant="dark" />
+              <button 
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-text-secondary hover:text-text-dark p-2 rounded-lg hover:bg-surface-secondary transition-colors"
+              >
+                <X size={20} />
+              </button>
             </div>
             
             <nav className="flex-1 space-y-1">
@@ -177,8 +178,20 @@ export default function DashboardLayout({
       )}
 
       {/* Main Content Area */}
-      <div className="flex-1 md:ml-[220px]">
-        <main className="w-full max-w-[1000px] mx-auto p-6 md:p-10 pb-24">
+      <div className="flex-1 flex flex-col md:ml-[220px] min-h-screen">
+        {/* Mobile Sticky Top Header */}
+        <div className="md:hidden sticky top-0 w-full h-14 bg-surface border-b border-border-light flex items-center justify-between px-4 z-30">
+          <button
+            onClick={() => setMobileMenuOpen(true)}
+            className="text-text-dark p-2 hover:bg-surface-secondary rounded-lg transition-colors"
+          >
+            <Menu size={22} />
+          </button>
+          <Logo variant="dark" />
+          <div className="w-9"></div> {/* Balancer spacer */}
+        </div>
+
+        <main className="w-full p-4 sm:p-6 md:p-10 pb-24 flex-1">
           {children}
         </main>
       </div>

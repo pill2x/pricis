@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Loader2, AlertCircle } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { supabaseAuth } from "@/lib/auth";
 import Logo from "@/components/Logo";
 
 export default function LoginPage() {
@@ -16,12 +16,19 @@ export default function LoginPage() {
 
   useEffect(() => {
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
+      const { data: { session } } = await supabaseAuth.auth.getSession()
       if (session) {
         router.push('/dashboard')
       }
     }
     checkSession()
+
+    document.body.style.backgroundColor = "#F8FAFC";
+    document.documentElement.style.backgroundColor = "#F8FAFC";
+    return () => {
+      document.body.style.backgroundColor = "";
+      document.documentElement.style.backgroundColor = "";
+    };
   }, [router])
 
   const handleSignIn = async (e: React.FormEvent) => {
@@ -30,7 +37,7 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabaseAuth.auth.signInWithPassword({
         email,
         password,
       });
@@ -40,7 +47,7 @@ export default function LoginPage() {
       } else {
         router.push("/dashboard");
       }
-    } catch (err) {
+    } catch {
       setError("An unexpected error occurred");
     } finally {
       setIsLoading(false);
@@ -48,15 +55,23 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-surface-secondary font-body text-text-dark">
+    <div className="min-h-screen w-full relative flex flex-col items-center justify-center px-4 py-12 bg-[#F8FAFC] overflow-hidden font-body text-text-dark selection:bg-primary-light">
       
+      {/* Scoping Blueprint Grid Pattern Background (Resonates with design, pricing, and structure) */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(37,99,235,0.025)_1px,transparent_1px),linear-gradient(to_bottom,rgba(37,99,235,0.025)_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_60%_at_50%_50%,transparent_10%,#F8FAFC_85%)] pointer-events-none" />
+      
+      {/* Subtle Glowing Blur Blobs */}
+      <div className="absolute top-[-10%] left-[-10%] w-[300px] md:w-[600px] h-[300px] md:h-[600px] rounded-full bg-primary/5 blur-[80px] md:blur-[130px] pointer-events-none animate-pulse duration-[8000ms]"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[300px] md:w-[600px] h-[300px] md:h-[600px] rounded-full bg-purple-500/5 blur-[80px] md:blur-[130px] pointer-events-none animate-pulse duration-[10000ms]"></div>
+
       {/* Logo */}
-      <Link href="/" className="mb-8">
+      <Link href="/" className="mb-8 block z-10 transition-transform duration-300 hover:scale-105">
         <Logo variant="dark" />
       </Link>
 
       {/* Card */}
-      <div className="w-full max-w-md bg-surface border border-border-light rounded-lg p-8 shadow-md">
+      <div className="w-full max-w-md bg-white border border-border-light rounded-[24px] p-8 md:p-10 shadow-[0_12px_40px_rgba(0,0,0,0.03)] relative z-10">
         
         <div className="mb-8">
           <h1 className="font-extrabold tracking-tight text-3xl text-text-dark font-display">

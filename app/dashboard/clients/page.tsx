@@ -1,0 +1,1228 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { 
+  Plus, ArrowLeft, ArrowRight, Check, Trash2, ChevronRight, 
+  Settings, Key, RefreshCw, AlertCircle, Link2, CheckCircle2, ShieldAlert, Sparkles,
+  Users, Mail, Phone, ExternalLink, Briefcase, FileText, Receipt, Landmark, Eye, MoreHorizontal
+} from "lucide-react";
+
+// Client Avatar Mock matching the provided mockup designs
+const getClientAvatar = (name: string, size: "sm" | "md" = "sm") => {
+  const sizeClasses = size === "sm" ? "w-8 h-8 rounded-lg" : "w-12 h-12 rounded-xl";
+  const acmeTextClass = size === "sm" ? "text-[6px] tracking-tighter" : "text-[9px] tracking-tight";
+  
+  if (name === "Acme Corp") {
+    return (
+      <div className={`${sizeClasses} bg-black text-white flex flex-col items-center justify-center font-display uppercase leading-none select-none font-black ${acmeTextClass} p-0.5`}>
+        <span>ACME</span>
+        <span>CORP</span>
+      </div>
+    );
+  }
+  if (name === "TechNova Ltd.") {
+    return (
+      <div className={`${sizeClasses} bg-[#00A896] text-white flex items-center justify-center font-bold select-none font-display ${size === "sm" ? "text-xs" : "text-lg"}`}>
+        TN
+      </div>
+    );
+  }
+  if (name === "Greenlife NG") {
+    return (
+      <div className={`${sizeClasses} bg-[#1B5E20] text-white flex items-center justify-center font-bold select-none font-display ${size === "sm" ? "text-xs" : "text-lg"}`}>
+        G
+      </div>
+    );
+  }
+  if (name === "StartupX") {
+    return (
+      <div className={`${sizeClasses} bg-[#0D47A1] text-white flex items-center justify-center font-bold select-none font-display ${size === "sm" ? "text-xs" : "text-lg"}`}>
+        SX
+      </div>
+    );
+  }
+  if (name === "StoreHub") {
+    return (
+      <div className={`${sizeClasses} bg-[#E65100] text-white flex items-center justify-center font-bold select-none font-display ${size === "sm" ? "text-xs" : "text-lg"}`}>
+        SH
+      </div>
+    );
+  }
+  // Default fallback
+  return (
+    <div className={`${sizeClasses} bg-primary/10 text-primary flex items-center justify-center font-bold select-none font-display ${size === "sm" ? "text-xs" : "text-lg"}`}>
+      {name.split(' ').map(n => n[0]).join('')}
+    </div>
+  );
+};
+
+interface ClientData {
+  id: string;
+  name: string;
+  industry: string;
+  projectsCount: number;
+  totalRevenue: number;
+  outstanding: number;
+  lastActivity: string;
+  status: "Active" | "Inactive" | "Prospect";
+  contactPerson: string;
+  email: string;
+  phone: string;
+  companySize: string;
+  website: string;
+  linkedin: string;
+  clientSince: string;
+  notes: string;
+}
+
+export default function ClientsPage() {
+  const [view, setView] = useState<"list" | "wizard" | "details" | "edit" | "delete">("list");
+  
+  // Wizard States
+  const [wizardStep, setWizardStep] = useState(1);
+  const [clientName, setClientName] = useState("KudaTech");
+  const [industry, setIndustry] = useState("Technology");
+  const [contactPerson, setContactPerson] = useState("Tola Adeyemi");
+  const [email, setEmail] = useState("tola@kudatech.com");
+  const [phone, setPhone] = useState("+234 805 789 0123");
+  const [companySize, setCompanySize] = useState("10 - 50 employees");
+  const [website, setWebsite] = useState("www.kudatech.com");
+  const [clientStatus, setClientStatus] = useState<"Active" | "Inactive">("Active");
+
+  // Additional info states
+  const [billingEmail, setBillingEmail] = useState("billing@kudatech.com");
+  const [billingPhone, setBillingPhone] = useState("+234 805 789 0123");
+  const [taxId, setTaxId] = useState("12345678-0001");
+  const [currency, setCurrency] = useState("NGN - Nigerian Naira (₦)");
+  const [addressStreet, setAddressStreet] = useState("12 Adeola Odeku Street");
+  const [addressCity, setAddressCity] = useState("Victoria Island");
+  const [addressState, setAddressState] = useState("Lagos");
+  const [addressCountry, setAddressCountry] = useState("Nigeria");
+
+  // Details States
+  const [selectedClient, setSelectedClient] = useState<ClientData | null>(null);
+  const [activeDetailTab, setActiveDetailTab] = useState<"Overview" | "Projects" | "Proposals" | "Invoices" | "Activity">("Overview");
+  
+  // Success Alert banner
+  const [showSuccessBanner, setShowSuccessBanner] = useState(false);
+  
+  // Edit Client modal tab state
+  const [editTab, setEditTab] = useState<"info" | "billing" | "address" | "notes">("info");
+
+  const [clientsList, setClientsList] = useState<ClientData[]>([
+    {
+      id: "client-1",
+      name: "Acme Corp",
+      industry: "Technology",
+      projectsCount: 3,
+      totalRevenue: 5200000,
+      outstanding: 5100000,
+      lastActivity: "2 hours ago",
+      status: "Active",
+      contactPerson: "Alex Johnson",
+      email: "alex@acmecorp.com",
+      phone: "+234 801 234 5678",
+      companySize: "50 - 100 employees",
+      website: "www.acmecorp.com",
+      linkedin: "linkedin.com/company/acme",
+      clientSince: "May 12, 2024",
+      notes: "Key client for web and mobile product development."
+    },
+    {
+      id: "client-2",
+      name: "TechNova Ltd.",
+      industry: "Technology",
+      projectsCount: 4,
+      totalRevenue: 3750000,
+      outstanding: 0,
+      lastActivity: "1 day ago",
+      status: "Active",
+      contactPerson: "Sarah Davies",
+      email: "sarah@technova.com",
+      phone: "+234 802 345 6789",
+      companySize: "10 - 50 employees",
+      website: "www.technova.com",
+      linkedin: "linkedin.com/company/technova",
+      clientSince: "Mar 10, 2024",
+      notes: "Ongoing project contract."
+    },
+    {
+      id: "client-3",
+      name: "Greenlife NG",
+      industry: "Non-profit",
+      projectsCount: 2,
+      totalRevenue: 2300000,
+      outstanding: 2500000,
+      lastActivity: "3 days ago",
+      status: "Active",
+      contactPerson: "Efe Okoro",
+      email: "efe@greenlife.org",
+      phone: "+234 803 456 7890",
+      companySize: "1 - 10 employees",
+      website: "www.greenlife.org",
+      linkedin: "linkedin.com/company/greenlifeng",
+      clientSince: "Jan 15, 2024",
+      notes: "Brand identity assets and redesign scope."
+    },
+    {
+      id: "client-4",
+      name: "StartupX",
+      industry: "Technology",
+      projectsCount: 1,
+      totalRevenue: 1200000,
+      outstanding: 0,
+      lastActivity: "5 days ago",
+      status: "Active",
+      contactPerson: "Tunde Bakare",
+      email: "tunde@startupx.com",
+      phone: "+234 804 567 8901",
+      companySize: "10 - 50 employees",
+      website: "www.startupx.com",
+      linkedin: "linkedin.com/company/startupx",
+      clientSince: "Apr 5, 2024",
+      notes: "MVP development client."
+    },
+    {
+      id: "client-5",
+      name: "StoreHub",
+      industry: "E-commerce",
+      projectsCount: 2,
+      totalRevenue: 1000000,
+      outstanding: 500000,
+      lastActivity: "1 week ago",
+      status: "Inactive",
+      contactPerson: "Nkechi Obi",
+      email: "nkechi@storehub.ng",
+      phone: "+234 805 678 9012",
+      companySize: "10 - 50 employees",
+      website: "www.storehub.ng",
+      linkedin: "linkedin.com/company/storehubng",
+      clientSince: "Feb 20, 2024",
+      notes: "Payment processing contract paused."
+    }
+  ]);
+
+  const handleAddClient = () => {
+    const newClient: ClientData = {
+      id: `client-${Date.now()}`,
+      name: clientName,
+      industry: industry,
+      projectsCount: 0,
+      totalRevenue: 0,
+      outstanding: 0,
+      lastActivity: "Just now",
+      status: clientStatus === "Active" ? "Active" : "Inactive",
+      contactPerson: contactPerson,
+      email: email,
+      phone: phone,
+      companySize: companySize,
+      website: website,
+      linkedin: `linkedin.com/company/${clientName.toLowerCase().replace(" ", "")}`,
+      clientSince: "Today",
+      notes: "Newly connected client."
+    };
+    setClientsList([newClient, ...clientsList]);
+    setShowSuccessBanner(true);
+    setView("list");
+  };
+
+  const handleDeleteClient = () => {
+    if (selectedClient) {
+      setClientsList(clientsList.filter(c => c.id !== selectedClient.id));
+      setSelectedClient(null);
+      setView("list");
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Success Banner */}
+      {showSuccessBanner && (
+        <div className="bg-green-50 border border-green-100 rounded-xl p-4 flex justify-between items-center text-xs font-bold text-[#10B981] shadow-sm">
+          <div className="flex gap-2 items-center">
+            <CheckCircle2 size={16} />
+            <span>Client added successfully! KudaTech has been added to your clients.</span>
+          </div>
+          <button onClick={() => setShowSuccessBanner(false)} className="text-[#10B981] hover:text-green-800">
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* ----------------- LIST VIEW ----------------- */}
+      {view === "list" && (
+        <>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-text-dark font-display">Clients</h1>
+              <p className="text-text-secondary text-sm font-body">Manage your clients and relationships in one place.</p>
+            </div>
+            <button 
+              onClick={() => { setView("wizard"); setWizardStep(1); }}
+              className="bg-primary hover:bg-primary-hover text-white px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 shadow-blue transition-colors animate-pulse"
+            >
+              <Plus size={18} /> Add Client
+            </button>
+          </div>
+
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { label: "Total Clients", count: "28", desc: "↑ 27% vs last month" },
+              { label: "Active Clients", count: "18", desc: "↑ 30% vs last month", color: "text-[#10B981]" },
+              { label: "Total Revenue", count: "₦18,450,000", desc: "↑ 32% vs last month", color: "text-primary" },
+              { label: "Outstanding", count: "₦2,450,000", desc: "↑ 15% vs last month", color: "text-warning" },
+            ].map((stat, i) => (
+              <div key={i} className="bg-white border border-border-light rounded-xl p-5 shadow-sm">
+                <span className={`text-2xl font-bold font-display ${stat.color}`}>{stat.count}</span>
+                <p className="text-sm font-semibold text-text-dark mt-1">{stat.label}</p>
+                <p className="text-xs text-text-secondary mt-0.5">{stat.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Table list */}
+          <div className="bg-white border border-border-light rounded-2xl overflow-hidden shadow-sm">
+            <div className="p-4 border-b border-border-light flex justify-between items-center gap-4 bg-surface-secondary/50">
+              <input 
+                type="text" 
+                placeholder="Search clients..." 
+                className="bg-white border border-border-light text-text-dark text-sm rounded-xl px-4 py-2 outline-none w-64 shadow-sm"
+              />
+              <div className="flex gap-2 text-xs font-semibold">
+                {["All Clients (28)", "Active (18)", "Inactive (6)", "Prospects (4)"].map((cat) => (
+                  <button key={cat} className={`px-3.5 py-1.5 rounded-xl border transition-colors ${
+                    cat.startsWith("All") ? "bg-primary text-white border-transparent" : "bg-white border-border-light text-text-secondary hover:bg-surface-secondary"
+                  }`}>
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-surface-secondary border-b border-border-light text-text-secondary text-xs uppercase tracking-wider font-semibold">
+                    <th className="p-4">Client</th>
+                    <th className="p-4">Industry</th>
+                    <th className="p-4">Total Projects</th>
+                    <th className="p-4">Total Revenue</th>
+                    <th className="p-4">Outstanding</th>
+                    <th className="p-4">Last Activity</th>
+                    <th className="p-4">Status</th>
+                    <th className="p-4">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border-light text-sm font-medium">
+                  {clientsList.map((client) => (
+                    <tr key={client.id} className="hover:bg-surface-secondary/50 cursor-pointer" onClick={() => {
+                      setSelectedClient(client);
+                      setView("details");
+                      setActiveDetailTab("Overview");
+                    }}>
+                      <td className="p-4 flex items-center gap-3">
+                        {getClientAvatar(client.name, "sm")}
+                        <span className="font-bold text-text-dark">{client.name}</span>
+                      </td>
+                      <td className="p-4 text-text-secondary">{client.industry}</td>
+                      <td className="p-4 text-text-dark font-bold">{client.projectsCount}</td>
+                      <td className="p-4 text-text-dark font-bold">₦{client.totalRevenue.toLocaleString()}</td>
+                      <td className="p-4 text-danger font-bold">
+                        {client.outstanding > 0 ? `₦${client.outstanding.toLocaleString()}` : "₦0"}
+                      </td>
+                      <td className="p-4 text-text-muted">{client.lastActivity}</td>
+                      <td className="p-4">
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
+                          client.status === "Active" ? "bg-green-50 text-[#10B981]" :
+                          client.status === "Prospect" ? "bg-blue-50 text-primary" :
+                          "bg-slate-100 text-text-secondary"
+                        }`}>{client.status}</span>
+                      </td>
+                      <td className="p-4 text-text-muted hover:text-primary transition-colors">
+                        <ChevronRight size={18} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ----------------- WIZARD FLOW ----------------- */}
+      {view === "wizard" && (
+        <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm max-w-2xl mx-auto">
+          {/* Stepper Header */}
+          <div className="flex justify-between items-center mb-8 border-b border-border-light pb-4">
+            <span className="font-bold text-text-dark font-display text-lg font-semibold">Add New Client</span>
+            <div className="flex gap-2">
+              {[1, 2, 3].map((step) => (
+                <div key={step} className="flex items-center gap-1.5">
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
+                    wizardStep === step 
+                      ? "bg-primary text-white" 
+                      : wizardStep > step 
+                      ? "bg-primary/10 text-primary" 
+                      : "bg-surface-secondary text-text-muted border border-border-light"
+                  }`}>
+                    {wizardStep > step ? <Check size={14} /> : step}
+                  </div>
+                  <span className={`text-xs font-semibold hidden md:inline ${
+                    wizardStep === step ? "text-primary" : "text-text-muted"
+                  }`}>
+                    {step === 1 ? "Client Info" : step === 2 ? "Additional Info" : "Review"}
+                  </span>
+                  {step < 3 && <div className="w-4 border-t border-border-light hidden md:block"></div>}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* STEP 1: Client Info */}
+          {wizardStep === 1 && (
+            <div className="space-y-6">
+              <div>
+                <h3 className="font-bold text-text-dark text-lg font-display mb-1">Tell us about your client</h3>
+                <p className="text-text-secondary text-sm font-semibold">Add the basic information to get started.</p>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Client Name *</label>
+                  <input 
+                    type="text" 
+                    value={clientName}
+                    onChange={(e) => setClientName(e.target.value)}
+                    className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Industry</label>
+                  <select 
+                    value={industry}
+                    onChange={(e) => setIndustry(e.target.value)}
+                    className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-semibold cursor-pointer"
+                  >
+                    <option>Technology</option>
+                    <option>Finance</option>
+                    <option>E-commerce</option>
+                    <option>Marketing</option>
+                    <option>Design</option>
+                    <option>Non-profit</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Contact Person *</label>
+                  <input 
+                    type="text" 
+                    value={contactPerson}
+                    onChange={(e) => setContactPerson(e.target.value)}
+                    className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Email *</label>
+                  <input 
+                    type="email" 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Phone Number</label>
+                  <input 
+                    type="text" 
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Business Size</label>
+                  <select 
+                    value={companySize}
+                    onChange={(e) => setCompanySize(e.target.value)}
+                    className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-semibold cursor-pointer"
+                  >
+                    <option>1 - 10 employees</option>
+                    <option>10 - 50 employees</option>
+                    <option>50 - 100 employees</option>
+                    <option>100+ employees</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Website</label>
+                  <input 
+                    type="text" 
+                    value={website}
+                    onChange={(e) => setWebsite(e.target.value)}
+                    className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Client Status</label>
+                  <select 
+                    value={clientStatus}
+                    onChange={(e) => setClientStatus(e.target.value as any)}
+                    className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-semibold cursor-pointer"
+                  >
+                    <option>Active</option>
+                    <option>Inactive</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex justify-between border-t border-border-light pt-6">
+                <button onClick={() => setView("list")} className="px-5 py-2.5 rounded-full border border-border-light text-text-secondary text-sm font-semibold hover:bg-surface-secondary">
+                  Cancel
+                </button>
+                <button onClick={() => setWizardStep(2)} className="bg-primary hover:bg-primary-hover text-white px-6 py-2.5 rounded-full text-sm font-semibold shadow-blue">
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 2: Additional Info */}
+          {wizardStep === 2 && (
+            <div className="space-y-6">
+              <div>
+                <h3 className="font-bold text-text-dark text-lg font-display mb-1">Additional information <span className="text-text-muted font-normal">(Optional)</span></h3>
+                <p className="text-text-secondary text-sm font-semibold">Add more details to help you manage this client better.</p>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Billing Email</label>
+                    <input 
+                      type="email" 
+                      value={billingEmail}
+                      onChange={(e) => setBillingEmail(e.target.value)}
+                      className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Billing Phone</label>
+                    <input 
+                      type="text" 
+                      value={billingPhone}
+                      onChange={(e) => setBillingPhone(e.target.value)}
+                      className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Tax ID</label>
+                    <input 
+                      type="text" 
+                      value={taxId}
+                      onChange={(e) => setTaxId(e.target.value)}
+                      className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Payment Currency</label>
+                    <select 
+                      value={currency}
+                      onChange={(e) => setCurrency(e.target.value)}
+                      className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-semibold cursor-pointer"
+                    >
+                      <option>NGN - Nigerian Naira (₦)</option>
+                      <option>USD - US Dollar ($)</option>
+                      <option>GBP - Great Britain Pound (£)</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Address Details */}
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Street Address</label>
+                    <input 
+                      type="text" 
+                      value={addressStreet}
+                      onChange={(e) => setAddressStreet(e.target.value)}
+                      className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">City</label>
+                      <input 
+                        type="text" 
+                        value={addressCity}
+                        onChange={(e) => setAddressCity(e.target.value)}
+                        className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">State</label>
+                      <input 
+                        type="text" 
+                        value={addressState}
+                        onChange={(e) => setAddressState(e.target.value)}
+                        className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Country</label>
+                    <input 
+                      type="text" 
+                      value={addressCountry}
+                      onChange={(e) => setAddressCountry(e.target.value)}
+                      className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-between border-t border-border-light pt-6">
+                <button onClick={() => setWizardStep(1)} className="px-5 py-2.5 rounded-full border border-border-light text-text-secondary text-sm font-semibold hover:bg-surface-secondary">
+                  Back
+                </button>
+                <button onClick={() => setWizardStep(3)} className="bg-primary hover:bg-primary-hover text-white px-6 py-2.5 rounded-full text-sm font-semibold shadow-blue">
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 3: Review */}
+          {wizardStep === 3 && (
+            <div className="space-y-6">
+              <div>
+                <h3 className="font-bold text-text-dark text-lg font-display mb-1">Review client details</h3>
+                <p className="text-text-secondary text-sm font-semibold">Confirm the information before adding this client.</p>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="bg-surface-secondary border border-border-light rounded-xl p-5 space-y-3 text-xs font-semibold text-text-dark">
+                  <span className="block text-[10px] font-bold text-text-secondary uppercase tracking-wider border-b border-border-light pb-2 mb-2">Client Information</span>
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Client Name</span>
+                    <span>{clientName}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Industry</span>
+                    <span>{industry}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Contact Person</span>
+                    <span>{contactPerson}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Email</span>
+                    <span>{email}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Phone</span>
+                    <span>{phone}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Business Size</span>
+                    <span>{companySize}</span>
+                  </div>
+                </div>
+
+                <div className="bg-surface-secondary border border-border-light rounded-xl p-5 space-y-3 text-xs font-semibold text-text-dark">
+                  <span className="block text-[10px] font-bold text-text-secondary uppercase tracking-wider border-b border-border-light pb-2 mb-2">Additional Information</span>
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Billing Email</span>
+                    <span>{billingEmail}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Billing Phone</span>
+                    <span>{billingPhone}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Tax ID</span>
+                    <span>{taxId}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Address</span>
+                    <span className="text-right">{addressStreet}, {addressCity}, {addressState}, {addressCountry}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-text-secondary">Currency</span>
+                    <span>{currency}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-between border-t border-border-light pt-6">
+                <button onClick={() => setWizardStep(2)} className="px-5 py-2.5 rounded-full border border-border-light text-text-secondary text-sm font-semibold hover:bg-surface-secondary">
+                  Back
+                </button>
+                <button onClick={handleAddClient} className="bg-primary hover:bg-primary-hover text-white px-6 py-2.5 rounded-full text-sm font-semibold shadow-blue">
+                  Add Client
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ----------------- DETAILS VIEW ----------------- */}
+      {view === "details" && selectedClient && (
+        <div className="space-y-6 max-w-5xl mx-auto">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-4 pb-4 border-b border-border-light">
+            <button onClick={() => setView("list")} className="flex items-center gap-2 text-text-secondary hover:text-text-dark transition-colors text-sm font-semibold">
+              <ArrowLeft size={16} /> Back to Clients
+            </button>
+            
+            <div className="flex gap-2 w-full sm:w-auto">
+              <button 
+                onClick={() => setView("edit")}
+                className="bg-white border border-border-light text-text-dark hover:bg-slate-50 px-4 py-2 rounded-xl text-xs font-semibold transition-colors flex-1 sm:flex-none"
+              >
+                Edit Client
+              </button>
+              <button 
+                onClick={() => setView("delete")}
+                className="bg-red-50 hover:bg-red-100 text-danger border border-red-100 px-4 py-2 rounded-xl text-xs font-semibold transition-colors flex-1 sm:flex-none"
+              >
+                Delete Client
+              </button>
+            </div>
+          </div>
+
+          <div className="flex justify-between items-center bg-white border border-border-light rounded-2xl p-6 shadow-sm">
+            <div className="flex gap-4 items-center">
+              {getClientAvatar(selectedClient.name, "md")}
+              <div>
+                <h2 className="text-xl font-bold text-text-dark font-display">{selectedClient.name}</h2>
+                <p className="text-xs text-text-secondary mt-1">{selectedClient.industry} • {addressCity}, {addressCountry}</p>
+              </div>
+            </div>
+            <span className="bg-green-50 text-[#10B981] text-xs font-bold px-3 py-1 rounded-full uppercase border border-green-100">
+              {selectedClient.status}
+            </span>
+          </div>
+
+          {/* Details Navigation */}
+          <div className="flex border-b border-border-light">
+            {(["Overview", "Projects", "Proposals", "Invoices", "Activity"] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveDetailTab(tab)}
+                className={`px-6 py-3 text-xs font-bold border-b-2 transition-colors ${
+                  activeDetailTab === tab 
+                    ? "border-primary text-primary" 
+                    : "border-transparent text-text-secondary hover:text-text-dark"
+                }`}
+              >
+                {tab === "Overview" ? "Overview" : tab === "Projects" ? "Projects (3)" : tab === "Proposals" ? "Proposals (5)" : tab === "Invoices" ? "Invoices (7)" : "Activity"}
+              </button>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              
+              {/* Tab: Overview */}
+              {activeDetailTab === "Overview" && (
+                <div className="space-y-6">
+                  {/* Client Information card */}
+                  <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm space-y-4">
+                    <h3 className="font-bold text-text-dark text-sm font-display border-b border-border-light pb-3">Client Information</h3>
+                    <div className="grid grid-cols-2 gap-4 text-xs font-semibold text-text-dark">
+                      <div>
+                        <span className="text-[10px] text-text-secondary uppercase block mb-1">Contact Person</span>
+                        <span>{selectedClient.contactPerson}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-text-secondary uppercase block mb-1">Email</span>
+                        <div className="flex items-center gap-1.5">
+                          <Mail size={12} className="text-text-muted" />
+                          <span>{selectedClient.email}</span>
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-text-secondary uppercase block mb-1">Phone</span>
+                        <div className="flex items-center gap-1.5">
+                          <Phone size={12} className="text-text-muted" />
+                          <span>{selectedClient.phone}</span>
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-text-secondary uppercase block mb-1">Company Size</span>
+                        <span>{selectedClient.companySize}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-text-secondary uppercase block mb-1">Website</span>
+                        <div className="flex items-center gap-1">
+                          <Link href="#" className="text-primary hover:underline">{selectedClient.website}</Link>
+                          <ExternalLink size={10} className="text-primary" />
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-text-secondary uppercase block mb-1">Linkedin</span>
+                        <div className="flex items-center gap-1">
+                          <Link href="#" className="text-primary hover:underline">{selectedClient.linkedin}</Link>
+                          <ExternalLink size={10} className="text-primary" />
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-text-secondary uppercase block mb-1">Client Since</span>
+                        <span>{selectedClient.clientSince}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="border-t border-border-light pt-4 space-y-1">
+                      <span className="text-[10px] text-text-secondary font-bold uppercase block">Notes</span>
+                      <p className="text-xs text-text-secondary leading-relaxed">{selectedClient.notes}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Tab: Projects */}
+              {activeDetailTab === "Projects" && (
+                <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm space-y-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="font-bold text-text-dark text-sm font-display">Projects</h3>
+                    <button className="bg-primary hover:bg-primary-hover text-white px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors">
+                      <Plus size={14} /> New Project
+                    </button>
+                  </div>
+                  
+                  <div className="space-y-3.5">
+                    {[
+                      { name: "Website Redesign", status: "In Progress", progress: 60, dueDate: "May 30, 2024", value: 1200000 },
+                      { name: "Mobile App Design", status: "Under Review", progress: 85, dueDate: "Jun 15, 2024", value: 850000 },
+                      { name: "Brand Identity Design", status: "Completed", progress: 100, dueDate: "Apr 20, 2024", value: 450000 }
+                    ].map((p, i) => (
+                      <div key={i} className="flex justify-between items-center p-3.5 border border-border-light rounded-xl hover:bg-surface-secondary/50 cursor-pointer">
+                        <div className="space-y-1">
+                          <span className="text-xs font-bold text-text-dark block">{p.name}</span>
+                          <span className={`inline-block px-2 py-0.5 rounded text-[9px] font-bold ${
+                            p.status === "Completed" ? "bg-green-50 text-[#10B981]" :
+                            p.status === "In Progress" ? "bg-blue-50 text-primary" :
+                            "bg-amber-50 text-amber-600"
+                          }`}>{p.status}</span>
+                        </div>
+                        <div className="w-1/3 flex items-center gap-2">
+                          <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                            <div className="h-full bg-primary rounded-full" style={{ width: `${p.progress}%` }}></div>
+                          </div>
+                          <span className="text-[10px] font-bold text-text-dark">{p.progress}%</span>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-xs font-bold text-text-dark block">₦{p.value.toLocaleString()}</span>
+                          <span className="text-[10px] text-text-muted font-normal">Due: {p.dueDate}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Tab: Proposals */}
+              {activeDetailTab === "Proposals" && (
+                <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm space-y-4">
+                  <h3 className="font-bold text-text-dark text-sm font-display mb-4">Proposals</h3>
+                  <div className="space-y-3.5">
+                    {[
+                      { name: "Website Redesign Proposal", status: "Opened", date: "May 15, 2024", value: 1200000 },
+                      { name: "Mobile App Contract Proposal", status: "Sent", date: "May 10, 2024", value: 850000 },
+                      { name: "Brand Identity Design Agreement", status: "Signed", date: "May 8, 2024", value: 450000 }
+                    ].map((p, i) => (
+                      <div key={i} className="flex justify-between items-center p-3.5 border border-border-light rounded-xl hover:bg-surface-secondary/50 cursor-pointer">
+                        <div>
+                          <span className="text-xs font-bold text-text-dark block">{p.name}</span>
+                          <span className="text-[10px] text-text-secondary block mt-0.5">Created on {p.date}</span>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <span className="text-xs font-bold text-text-dark">₦{p.value.toLocaleString()}</span>
+                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                            p.status === "Signed" ? "bg-emerald-50 text-emerald-600" :
+                            p.status === "Opened" ? "bg-green-50 text-[#10B981]" :
+                            "bg-blue-50 text-primary"
+                          }`}>{p.status}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Tab: Invoices */}
+              {activeDetailTab === "Invoices" && (
+                <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm space-y-4">
+                  <h3 className="font-bold text-text-dark text-sm font-display mb-4">Invoices</h3>
+                  <div className="space-y-3.5">
+                    {[
+                      { num: "INV-2024-0012", date: "May 12, 2024", amount: 600000, status: "Paid", dueDate: "May 26, 2024" },
+                      { num: "INV-2024-0011", date: "Apr 28, 2024", amount: 450000, status: "Paid", dueDate: "May 12, 2024" },
+                      { num: "INV-2024-0010", date: "Apr 10, 2024", amount: 1200000, status: "Paid", dueDate: "Apr 24, 2024" },
+                      { num: "INV-2024-0009", date: "Mar 20, 2024", amount: 1200000, status: "Paid", dueDate: "Apr 3, 2024" }
+                    ].map((inv, i) => (
+                      <div key={i} className="flex justify-between items-center p-3.5 border border-border-light rounded-xl hover:bg-surface-secondary/50 cursor-pointer">
+                        <div>
+                          <span className="text-xs font-bold text-text-dark block">{inv.num}</span>
+                          <span className="text-[10px] text-text-secondary block mt-0.5">Invoice date: {inv.date}</span>
+                        </div>
+                        <div className="flex items-center gap-6 text-xs font-semibold">
+                          <span className="text-text-dark font-bold">₦{inv.amount.toLocaleString()}</span>
+                          <span className="bg-green-50 text-[#10B981] px-2.5 py-0.5 rounded-full font-bold">
+                            {inv.status}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Tab: Activity */}
+              {activeDetailTab === "Activity" && (
+                <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm space-y-6">
+                  <h3 className="font-bold text-text-dark text-sm font-display mb-4">Recent Activity</h3>
+                  <div className="space-y-4">
+                    {[
+                      { desc: "Invoice INV-2024-0012 was paid", time: "2h ago", icon: Receipt, color: "text-[#10B981]", bg: "bg-green-50" },
+                      { desc: "Website redesign proposal opened", time: "5h ago", icon: Eye, color: "text-primary", bg: "bg-blue-50" },
+                      { desc: "Project milestone approved", time: "1d ago", icon: CheckCircle2, color: "text-primary", bg: "bg-blue-50" },
+                      { desc: "New project 'Mobile App Design' created", time: "3d ago", icon: Briefcase, color: "text-purple-500", bg: "bg-purple-50" }
+                    ].map((act, i) => (
+                      <div key={i} className="flex gap-4 items-start">
+                        <div className={`w-8 h-8 rounded-full ${act.bg} flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                          <act.icon size={14} className={act.color} />
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-text-dark leading-tight">{act.desc}</p>
+                          <span className="text-[10px] text-text-muted mt-0.5 block">{act.time}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            </div>
+
+            {/* Right Details Financial Summary Sidebar */}
+            <div className="space-y-6">
+              <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm space-y-6">
+                <span className="block text-xs font-bold text-text-secondary uppercase tracking-wider">Financial Summary</span>
+                <div className="space-y-3.5 border-b border-border-light pb-4">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="font-semibold text-text-secondary">Total Revenue</span>
+                    <span className="font-bold text-text-dark">₦5,200,000</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="font-semibold text-text-secondary">Paid</span>
+                    <span className="font-bold text-[#10B981]">₦4,550,000</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="font-semibold text-text-secondary">Outstanding</span>
+                    <span className="font-bold text-warning">₦650,000</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="font-semibold text-text-secondary">Overdue</span>
+                    <span className="font-bold text-danger">₦250,000</span>
+                  </div>
+                </div>
+
+                <div className="space-y-2 text-[10px] text-text-muted leading-relaxed">
+                  Financial indicators display overall payments, unpaid billings, and active transaction history for this client.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ----------------- EDIT VIEW ----------------- */}
+      {view === "edit" && selectedClient && (
+        <div className="bg-white border border-border-light rounded-2xl overflow-hidden shadow-sm max-w-3xl mx-auto flex flex-col md:flex-row min-h-[500px]">
+          {/* Tabs Sidebar */}
+          <div className="w-full md:w-60 bg-surface-secondary border-r border-border-light p-4 space-y-1">
+            <span className="block text-[10px] font-bold text-text-secondary uppercase tracking-wider mb-4 px-3">Edit Sections</span>
+            {[
+              { id: "info", label: "Client Info" },
+              { id: "billing", label: "Billing Info" },
+              { id: "address", label: "Address" },
+              { id: "notes", label: "Notes" }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setEditTab(tab.id as any)}
+                className={`w-full text-left px-3 py-2.5 rounded-lg text-xs font-bold transition-all ${
+                  editTab === tab.id 
+                    ? "bg-primary-light text-primary" 
+                    : "text-text-secondary hover:text-text-dark hover:bg-slate-100"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+            <div className="pt-8 px-3">
+              <button 
+                onClick={() => setView("details")}
+                className="text-xs font-semibold text-text-muted hover:text-text-dark flex items-center gap-1"
+              >
+                <ArrowLeft size={12} /> Back to Details
+              </button>
+            </div>
+          </div>
+
+          {/* Form Content */}
+          <div className="flex-grow p-6 flex flex-col justify-between">
+            <div>
+              <div className="flex justify-between items-center border-b border-border-light pb-4 mb-6">
+                <h3 className="font-bold text-text-dark text-lg font-display">
+                  {editTab === "info" && "Client Information"}
+                  {editTab === "billing" && "Billing Information"}
+                  {editTab === "address" && "Address Details"}
+                  {editTab === "notes" && "Client Notes"}
+                </h3>
+                <button onClick={() => setView("details")} className="text-text-muted hover:text-text-dark">✕</button>
+              </div>
+
+              {/* Tab: Client Info */}
+              {editTab === "info" && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Client Name *</label>
+                    <input 
+                      type="text" 
+                      value={selectedClient.name}
+                      onChange={(e) => setSelectedClient({ ...selectedClient, name: e.target.value })}
+                      className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Industry</label>
+                    <select 
+                      value={selectedClient.industry}
+                      onChange={(e) => setSelectedClient({ ...selectedClient, industry: e.target.value })}
+                      className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-semibold cursor-pointer"
+                    >
+                      <option>Technology</option>
+                      <option>Finance</option>
+                      <option>E-commerce</option>
+                      <option>Marketing</option>
+                      <option>Design</option>
+                      <option>Non-profit</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Contact Person *</label>
+                    <input 
+                      type="text" 
+                      value={selectedClient.contactPerson}
+                      onChange={(e) => setSelectedClient({ ...selectedClient, contactPerson: e.target.value })}
+                      className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Email *</label>
+                    <input 
+                      type="email" 
+                      value={selectedClient.email}
+                      onChange={(e) => setSelectedClient({ ...selectedClient, email: e.target.value })}
+                      className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Phone Number</label>
+                    <input 
+                      type="text" 
+                      value={selectedClient.phone}
+                      onChange={(e) => setSelectedClient({ ...selectedClient, phone: e.target.value })}
+                      className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Company Size</label>
+                    <select 
+                      value={selectedClient.companySize}
+                      onChange={(e) => setSelectedClient({ ...selectedClient, companySize: e.target.value })}
+                      className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-semibold cursor-pointer"
+                    >
+                      <option>1 - 10 employees</option>
+                      <option>10 - 50 employees</option>
+                      <option>50 - 100 employees</option>
+                      <option>100+ employees</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-2">Website</label>
+                    <input 
+                      type="text" 
+                      value={selectedClient.website}
+                      onChange={(e) => setSelectedClient({ ...selectedClient, website: e.target.value })}
+                      className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-[#64748B] uppercase tracking-wider mb-2">Status</label>
+                    <select 
+                      value={selectedClient.status}
+                      onChange={(e) => setSelectedClient({ ...selectedClient, status: e.target.value as any })}
+                      className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-semibold cursor-pointer"
+                    >
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                      <option value="Prospect">Prospect</option>
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              {/* Tab: Billing Info */}
+              {editTab === "billing" && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Billing Email</label>
+                    <input 
+                      type="email" 
+                      value={billingEmail}
+                      onChange={(e) => setBillingEmail(e.target.value)}
+                      className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Billing Phone</label>
+                    <input 
+                      type="text" 
+                      value={billingPhone}
+                      onChange={(e) => setBillingPhone(e.target.value)}
+                      className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Tax ID</label>
+                    <input 
+                      type="text" 
+                      value={taxId}
+                      onChange={(e) => setTaxId(e.target.value)}
+                      className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Currency</label>
+                    <select 
+                      value={currency}
+                      onChange={(e) => setCurrency(e.target.value)}
+                      className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-semibold cursor-pointer"
+                    >
+                      <option>NGN - Nigerian Naira (₦)</option>
+                      <option>USD - US Dollar ($)</option>
+                      <option>GBP - Great Britain Pound (£)</option>
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              {/* Tab: Address */}
+              {editTab === "address" && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Street Address</label>
+                    <input 
+                      type="text" 
+                      value={addressStreet}
+                      onChange={(e) => setAddressStreet(e.target.value)}
+                      className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">City</label>
+                    <input 
+                      type="text" 
+                      value={addressCity}
+                      onChange={(e) => setAddressCity(e.target.value)}
+                      className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">State</label>
+                    <input 
+                      type="text" 
+                      value={addressState}
+                      onChange={(e) => setAddressState(e.target.value)}
+                      className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Country</label>
+                    <input 
+                      type="text" 
+                      value={addressCountry}
+                      onChange={(e) => setAddressCountry(e.target.value)}
+                      className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Tab: Notes */}
+              {editTab === "notes" && (
+                <div>
+                  <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Notes & Additional Details</label>
+                  <textarea 
+                    rows={6}
+                    value={selectedClient.notes}
+                    onChange={(e) => setSelectedClient({ ...selectedClient, notes: e.target.value })}
+                    className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium resize-none leading-relaxed"
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="flex justify-between border-t border-border-light pt-6 mt-8">
+              <button onClick={() => setView("details")} className="px-5 py-2.5 rounded-full border border-border-light text-text-secondary text-sm font-semibold hover:bg-surface-secondary">
+                Cancel
+              </button>
+              <button 
+                onClick={() => {
+                  setClientsList(clientsList.map(c => c.id === selectedClient.id ? selectedClient : c));
+                  setView("details");
+                }}
+                className="bg-primary hover:bg-primary-hover text-white px-6 py-2.5 rounded-full text-sm font-semibold shadow-blue"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ----------------- DELETE VIEW ----------------- */}
+      {view === "delete" && selectedClient && (
+        <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm max-w-sm mx-auto text-center space-y-4">
+          <ShieldAlert size={40} className="text-danger mx-auto" />
+          <div>
+            <h3 className="font-bold text-text-dark text-lg font-display">Delete Client</h3>
+            <p className="text-text-secondary text-xs mt-1.5 leading-relaxed">
+              Are you sure you want to delete <span className="font-bold text-text-dark">{selectedClient.name}</span>? All client data, projects, proposals, and invoices will be permanently removed. This action cannot be undone.
+            </p>
+          </div>
+          
+          <div className="flex gap-3 pt-2">
+            <button 
+              onClick={() => setView("details")}
+              className="flex-1 bg-white border border-border-light hover:bg-surface-secondary text-text-dark py-2.5 rounded-xl text-xs font-bold transition-colors"
+            >
+              Cancel
+            </button>
+            <button 
+              onClick={handleDeleteClient}
+              className="flex-1 bg-danger hover:bg-red-600 text-white py-2.5 rounded-xl text-xs font-bold transition-colors"
+            >
+              Delete Client
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

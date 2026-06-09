@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Check, ChevronRight, ChevronDown, ChevronUp, CheckCircle, Info } from "lucide-react";
+import { Check, ChevronRight, ChevronDown, ChevronUp, CheckCircle } from "lucide-react";
 
 export default function PricingPage() {
   const [isYearly, setIsYearly] = useState(false);

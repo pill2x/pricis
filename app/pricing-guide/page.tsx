@@ -16,10 +16,10 @@ export default function PricingGuidePage() {
             15 min read
           </div>
           <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-6 font-display leading-tight">
-            The Nigerian Freelancer's Pricing Guide
+            The Nigerian Freelancer&apos;s Pricing Guide
           </h1>
           <p className="text-lg text-text-muted mb-10 leading-relaxed font-body max-w-2xl mx-auto">
-            Everything you need to know about setting your rates, structuring your pricing, and charging what you're worth in the Nigerian market.
+            Everything you need to know about setting your rates, structuring your pricing, and charging what you&apos;re worth in the Nigerian market.
           </p>
         </div>
       </section>
@@ -49,13 +49,13 @@ export default function PricingGuidePage() {
               
               <h2 id="section-1" className="font-display font-bold text-text-dark text-3xl mt-12 mb-6 scroll-mt-24">1. Why Pricing is Hard for Nigerian Freelancers</h2>
               <p className="mb-4">
-                Pricing is inherently difficult for freelancers anywhere, but doing it in Nigeria introduces unique complexities. We're dealing with extreme currency fluctuations, a wide disparity in client budgets, and a cultural expectation of haggling.
+                Pricing is inherently difficult for freelancers anywhere, but doing it in Nigeria introduces unique complexities. We&apos;re dealing with extreme currency fluctuations, a wide disparity in client budgets, and a cultural expectation of haggling.
               </p>
               <ul className="list-disc pl-6 mb-8 space-y-2">
-                <li><strong>The Western tool problem:</strong> Most pricing calculators assume you're charging in dollars for a US-based client.</li>
+                <li><strong>The Western tool problem:</strong> Most pricing calculators assume you&apos;re charging in dollars for a US-based client.</li>
                 <li><strong>Market rate confusion:</strong> Rates are highly opaque. You rarely know what your peers are charging.</li>
                 <li><strong>The confidence gap:</strong> Many freelancers undervalue themselves out of fear of losing the gig entirely.</li>
-                <li><strong>Social pressure:</strong> "Please do it for me, I'll recommend you to others." (Also known as: exposure).</li>
+                <li><strong>Social pressure:</strong> &quot;Please do it for me, I&apos;ll recommend you to others.&quot; (Also known as: exposure).</li>
               </ul>
 
               <h2 id="section-2" className="font-display font-bold text-text-dark text-3xl mt-12 mb-6 scroll-mt-24">2. How to Set Your Base Rate</h2>
@@ -68,24 +68,24 @@ export default function PricingGuidePage() {
               <p className="mb-4">Find out what peers with your exact skill level are charging. Match it. This is safe, but it makes you a commodity.</p>
 
               <h3 className="font-display font-bold text-text-dark text-xl mt-6 mb-3">The Value-Based Pricing Method (The goal)</h3>
-              <p className="mb-8">Don't price based on hours. Price based on the value the work creates for the client. If your branding helps a startup raise $100k, a $5k fee is a bargain. This requires deep understanding of the client's business.</p>
+              <p className="mb-8">Don&apos;t price based on hours. Price based on the value the work creates for the client. If your branding helps a startup raise $100k, a $5k fee is a bargain. This requires deep understanding of the client&apos;s business.</p>
 
               <blockquote className="border-l-4 border-primary pl-6 py-2 my-8 text-2xl font-display font-bold text-primary leading-snug bg-primary/5 rounded-r-xl">
-                "Never let a client dictate your worth. Your rate is your rate. If they can't afford it, they are not your client right now."
+                &quot;Never let a client dictate your worth. Your rate is your rate. If they can&apos;t afford it, they are not your client right now.&quot;
               </blockquote>
 
               <h2 id="section-3" className="font-display font-bold text-text-dark text-3xl mt-12 mb-6 scroll-mt-24">3. Understanding Client Types</h2>
               <p className="mb-4">In the African market, who the client is matters just as much as what the project is.</p>
               <ul className="list-disc pl-6 mb-8 space-y-2">
                 <li><strong>SME clients:</strong> Often have lower budgets but expect higher involvement and faster turnaround. Price with a clear boundary on revisions.</li>
-                <li><strong>Corporate clients:</strong> Higher budgets, but excruciatingly slow payment processes (net-30 or net-60). Build a "waiting buffer" into your price.</li>
-                <li><strong>Diaspora clients:</strong> Usually paying in foreign currency. They expect global standards. Price accordingly, but don't just multiply your Naira rate by the exchange rate—charge market rate for their locale.</li>
+                <li><strong>Corporate clients:</strong> Higher budgets, but excruciatingly slow payment processes (net-30 or net-60). Build a &quot;waiting buffer&quot; into your price.</li>
+                <li><strong>Diaspora clients:</strong> Usually paying in foreign currency. They expect global standards. Price accordingly, but don&apos;t just multiply your Naira rate by the exchange rate—charge market rate for their locale.</li>
               </ul>
 
               <h2 id="section-4" className="font-display font-bold text-text-dark text-3xl mt-12 mb-6 scroll-mt-24">4. Common Pricing Mistakes</h2>
               <div className="space-y-4 mb-8">
                 <p>❌ <strong>Charging per hour for creative work:</strong> As you get faster, you get paid less. That makes no sense. Switch to project-based pricing.</p>
-                <p>❌ <strong>Not including revision limits:</strong> "Unlimited revisions" is the quickest path to burnout. State explicitly: "Includes 2 rounds of revisions. Additional rounds billed at ₦X."</p>
+                <p>❌ <strong>Not including revision limits:</strong> &quot;Unlimited revisions&quot; is the quickest path to burnout. State explicitly: &quot;Includes 2 rounds of revisions. Additional rounds billed at ₦X.&quot;</p>
                 <p>❌ <strong>Discounting before they ask:</strong> Never negotiate with yourself. State your price confidently and stop talking.</p>
               </div>
 
@@ -140,7 +140,7 @@ export default function PricingGuidePage() {
               <div id="section-6" className="bg-primary-light border-2 border-primary/20 rounded-2xl p-8 mt-16 scroll-mt-24">
                 <h2 className="font-display font-bold text-text-dark text-2xl mb-4">Stop guessing. Start using Pricis.</h2>
                 <p className="mb-6 text-text-dark">
-                  Memorizing benchmarks is hard. Figuring out exactly where your client fits on the scale is harder. Pricis takes your service, reads your client's context, and generates a calibrated price instantly.
+                  Memorizing benchmarks is hard. Figuring out exactly where your client fits on the scale is harder. Pricis takes your service, reads your client&apos;s context, and generates a calibrated price instantly.
                 </p>
                 <Link href="/signup" className="inline-flex bg-primary hover:bg-primary-hover shadow-blue text-white font-semibold px-6 py-3 rounded-full transition-all font-body text-sm">
                   Generate your first scope free →

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Send, Brain, Search, PenTool, Users } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { supabaseAuth } from "@/lib/auth";
 
 interface Message {
   role: "user" | "assistant";
@@ -97,7 +97,7 @@ export default function NegotiatePage() {
       }
     };
 
-    lines.forEach((line, lineIndex) => {
+    lines.forEach((line) => {
       const trimmedLine = line.trim();
       
       // Empty line
@@ -153,17 +153,15 @@ export default function NegotiatePage() {
   };
 
   useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabaseAuth.auth.getUser();
+      if (user) {
+        router.push("/dashboard/negotiate");
+      }
+    };
     checkUser();
     scrollToBottom();
-  }, []);
-
-  const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      router.push("/dashboard/negotiate");
-      return;
-    }
-  };
+  }, [router]);
 
   const handleModeChange = (modeId: string) => {
     setCurrentMode(modeId);

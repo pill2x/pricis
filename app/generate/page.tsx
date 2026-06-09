@@ -7,7 +7,8 @@ import { PDFDownloadLink } from "@react-pdf/renderer";
 
 import type { ExperienceLevel, GeneratedScope, Industry } from "@/types";
 import ScopePDF from "@/components/ScopePDF";
-import { supabase } from "@/lib/supabase";
+import { supabaseAuth } from "@/lib/auth";
+import { query, queryOne } from "@/lib/db";
 
 type Step = 1 | 2 | 3;
 
@@ -172,44 +173,45 @@ export default function GeneratePage() {
   }, []);
 
   const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabaseAuth.auth.getUser();
     setUser(user);
   };
 
   const fetchAutoSaveSetting = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabaseAuth.auth.getUser();
     if (user) {
-      const { data } = await supabase
-        .from("profiles")
-        .select("auto_save_quotes")
-        .eq("id", user.id)
-        .single();
-      
-      if (data?.auto_save_quotes !== undefined) {
-        setAutoSaveQuotes(data.auto_save_quotes);
-      }
+      try {
+        const data: any = await queryOne("SELECT auto_save_quotes FROM profiles WHERE id = $1", [user.id]);
+        if (data?.auto_save_quotes !== undefined) {
+          setAutoSaveQuotes(data.auto_save_quotes);
+        }
+      } catch (e) {}
     }
   };
 
   const saveQuote = async (scope: GeneratedScope) => {
     if (!user) return;
 
-    const { error } = await supabase.from("quotes").insert({
-      user_id: user.id,
-      industry: selectedIndustry,
-      experience_level: selectedExperience,
-      project_description: projectDescription,
-      project_title: scope.project_title,
-      deliverables: scope.deliverables,
-      timeline: scope.timeline,
-      revision_policy: scope.revision_policy,
-      out_of_scope: scope.out_of_scope,
-      price_conservative: scope.price_conservative,
-      price_standard: scope.price_standard,
-      price_premium: scope.price_premium,
-      pricing_rationale: scope.pricing_rationale,
-      selected_tier: selectedTier,
-    });
+    let error = null;
+    try {
+      await queryOne(
+        `INSERT INTO quotes (
+          user_id, industry, experience_level, project_description, project_title,
+          deliverables, timeline, revision_policy, out_of_scope, price_conservative,
+          price_standard, price_premium, pricing_rationale, selected_tier
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
+        ) RETURNING *`,
+        [
+          user.id, selectedIndustry, selectedExperience, projectDescription,
+          scope.project_title, scope.deliverables, scope.timeline, scope.revision_policy,
+          scope.out_of_scope, scope.price_conservative, scope.price_standard,
+          scope.price_premium, scope.pricing_rationale, selectedTier
+        ]
+      );
+    } catch (e: any) {
+      error = e;
+    }
 
     if (error) {
       console.error("Save error:", error.message, error.details);

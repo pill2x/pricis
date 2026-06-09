@@ -2,17 +2,17 @@
 
 import Link from "next/link";
 import { 
-  Target, FileText, Share2, Download, MessageSquare, Play, CheckCircle2,
-  ChevronRight, LayoutDashboard, Settings, Receipt, Link as LinkIcon, 
-  LayoutTemplate, PenTool, ChevronDown, Check,
-  Twitter, Linkedin, Instagram, ArrowRight, Code, FileSignature, Users,
+  Target, FileText, Download, MessageSquare, Play, CheckCircle2,
+  ChevronRight, Settings, Receipt, Link as LinkIcon, 
+  PenTool, ChevronDown, Check,
+  ArrowRight, Code, FileSignature, Users,
   Grid, UserCheck, FileText as FileTextIcon, Star, DownloadCloud, Bookmark, TrendingUp,
-  ChevronUp, Mail, Send, Menu
+  ChevronUp, Menu
 } from "lucide-react";
 import Logo from "@/components/Logo";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 
 
@@ -292,10 +292,10 @@ const DashboardMockup = () => (
 );
 
 const Hero = () => (
-  <section className="pt-20 lg:pt-28 pb-32 lg:pb-28 px-6 w-full bg-bg-dark relative z-10 min-h-[calc(100vh-64px)] flex items-center border-b border-border overflow-x-clip">
-    <div className="max-w-[1400px] w-full mx-auto flex flex-col lg:flex-row items-center gap-16 lg:gap-8">
+  <section className="pt-12 lg:pt-16 pb-16 lg:pb-16 px-6 w-full bg-bg-dark relative z-10 min-h-[calc(100vh-64px)] flex items-center border-b border-border overflow-x-clip">
+    <div className="max-w-[1400px] w-full mx-auto flex flex-col lg:flex-row items-center justify-between gap-16 lg:gap-10">
       {/* Left Column */}
-      <div className="w-full lg:w-[45%] text-left z-20 flex-shrink-0 lg:pl-10 xl:pl-16">
+      <div className="w-full lg:w-[44%] text-left z-20 flex-shrink-0 lg:pl-6 xl:pl-12">
         <div className="inline-flex items-center gap-2 bg-bg-dark-3 border border-border rounded-full px-4 py-1.5 mb-8">
           <div className="w-2 h-2 rounded-full bg-success"></div>
           <span className="text-sm text-text-muted font-medium font-body">Built for African freelancers & service providers</span>
@@ -354,7 +354,7 @@ const Hero = () => (
 
       {/* Right Column */}
       <div className="lg:flex-1 w-full relative min-h-[440px] lg:min-h-[600px] mt-8 lg:mt-0 flex justify-center lg:block pr-4 lg:pr-0 pl-0 sm:pl-4 lg:pl-0">
-        <div className="w-full max-w-[600px] sm:max-w-[700px] lg:max-w-none lg:absolute lg:left-8 xl:left-12 lg:top-1/2 lg:-translate-y-1/2">
+        <div className="w-full max-w-[600px] sm:max-w-[700px] lg:max-w-none lg:absolute lg:left-6 xl:left-12 lg:top-1/2 lg:-translate-y-1/2">
           <DashboardMockup />
         </div>
       </div>
@@ -697,6 +697,15 @@ const FAQ = () => {
 };
 
 export default function Home() {
+  useEffect(() => {
+    document.body.style.backgroundColor = "#080D1A";
+    document.documentElement.style.backgroundColor = "#080D1A";
+    return () => {
+      document.body.style.backgroundColor = "";
+      document.documentElement.style.backgroundColor = "";
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-bg-dark text-white font-sans selection:bg-primary-light">
       <Navbar />
