@@ -151,7 +151,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <p className="mt-8 text-xs text-center text-text-muted font-body">
+      <p className="mt-8 text-xs text-center text-slate-600 font-body">
         By signing in, you agree to our terms.
       </p>
     </div>
