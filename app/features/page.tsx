@@ -47,11 +47,11 @@ export default function FeaturesPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-bg-dark text-text-dark font-body selection:bg-primary selection:text-white">
+    <div className="min-h-screen bg-[#080D1A] text-white font-body selection:bg-primary selection:text-white">
       <Navbar />
       
       {/* Hero Section */}
-      <section className="relative pt-32 pb-24 md:pt-40 md:pb-32 overflow-hidden bg-bg-dark text-white">
+      <section className="relative pt-32 pb-24 md:pt-40 md:pb-32 overflow-hidden bg-[#080D1A] text-white">
         {/* Background Effects */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-gradient-to-b from-primary/10 via-primary/5 to-transparent rounded-full blur-[120px] opacity-80 pointer-events-none"></div>
@@ -60,9 +60,9 @@ export default function FeaturesPage() {
         </div>
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 mb-8 backdrop-blur-md shadow-inner">
-              <span className="text-xs font-semibold tracking-wider text-primary-light uppercase text-blue-400">Everything you need</span>
+          <div className="max-w-4xl mx-auto text-center animate-fade-in-up">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#2563EB]/10 border border-[#2563EB]/25 mb-8 backdrop-blur-md shadow-inner">
+              <span className="text-xs font-semibold tracking-wider text-blue-400 uppercase">Everything you need</span>
             </div>
             
             <h1 className="text-5xl md:text-7xl font-display font-bold tracking-tight mb-8 leading-tight text-white">
@@ -85,11 +85,18 @@ export default function FeaturesPage() {
             </div>
 
             {/* Sub-nav pills */}
-            <div className="flex flex-wrap items-center justify-center gap-3 max-w-4xl mx-auto bg-bg-dark-2/60 p-2 rounded-2xl border border-white/5 backdrop-blur-md">
+            <div className="flex flex-wrap items-center justify-center gap-3 max-w-4xl mx-auto bg-[#0D1526]/75 p-2 rounded-2xl border border-white/10 backdrop-blur-md">
               {features.map((item, i) => (
                 <button 
                   key={i} 
-                  onClick={() => setActiveTab(item.label)}
+                  onClick={() => {
+                    setActiveTab(item.label);
+                    const targetId = item.label.toLowerCase().replace(/\s+/g, '-').replace('kova-ai-negotiation', 'kova-ai');
+                    const element = document.getElementById(targetId);
+                    if (element) {
+                      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                  }}
                   className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all border ${
                     activeTab === item.label 
                       ? 'bg-primary border-primary text-white shadow-md' 
@@ -106,29 +113,29 @@ export default function FeaturesPage() {
       </section>
 
       {/* Feature 01: Scope Generator */}
-      <section className="py-24 bg-surface relative overflow-hidden border-b border-border-light">
+      <section id="scope-generator" className="py-24 bg-white text-text-dark relative overflow-hidden border-b border-[#E5EAF2]">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Mockup Left */}
-            <div className="relative">
+            <div className="relative animate-fade-in-up" style={{ animationDelay: "100ms" }}>
               <div className="absolute inset-0 bg-primary/5 rounded-[2rem] transform -rotate-1 scale-105 blur-xl"></div>
-              <div className="relative bg-white border border-border-light rounded-3xl shadow-xl overflow-hidden aspect-[1.3/1] flex">
+              <div className="relative bg-white border border-[#E5EAF2] rounded-3xl shadow-xl overflow-hidden aspect-[1.3/1] flex transition-all duration-300 hover:shadow-2xl">
                 {/* Sidebar */}
-                <div className="w-[180px] border-r border-border-light p-5 flex flex-col gap-5 bg-surface-secondary">
+                <div className="w-[180px] border-r border-[#E5EAF2] p-5 flex flex-col gap-5 bg-slate-50">
                   <div className="flex items-center gap-2.5 text-primary font-bold text-xs">
                     <span className="w-5 h-5 rounded-full bg-primary text-white flex items-center justify-center text-[10px]">1</span>
                     Service Type
                   </div>
                   <div className="flex items-center gap-2.5 text-text-muted font-semibold text-xs">
-                    <span className="w-5 h-5 rounded-full border border-border-light flex items-center justify-center text-[10px]">2</span>
+                    <span className="w-5 h-5 rounded-full border border-[#E5EAF2] flex items-center justify-center text-[10px]">2</span>
                     Client Read
                   </div>
                   <div className="flex items-center gap-2.5 text-text-muted font-semibold text-xs">
-                    <span className="w-5 h-5 rounded-full border border-border-light flex items-center justify-center text-[10px]">3</span>
+                    <span className="w-5 h-5 rounded-full border border-[#E5EAF2] flex items-center justify-center text-[10px]">3</span>
                     Project Details
                   </div>
                   <div className="flex items-center gap-2.5 text-text-muted font-semibold text-xs">
-                    <span className="w-5 h-5 rounded-full border border-border-light flex items-center justify-center text-[10px]">4</span>
+                    <span className="w-5 h-5 rounded-full border border-[#E5EAF2] flex items-center justify-center text-[10px]">4</span>
                     Scope Statement
                   </div>
                 </div>
@@ -143,8 +150,9 @@ export default function FeaturesPage() {
                       <input 
                         type="text" 
                         placeholder="Search services..." 
-                        className="w-full bg-surface-secondary border border-border-light rounded-xl pl-10 pr-4 py-2.5 text-xs text-text-dark focus:outline-none focus:border-primary"
+                        className="w-full bg-slate-50 border border-[#E5EAF2] rounded-xl pl-10 pr-4 py-2.5 text-xs text-text-dark focus:outline-none focus:border-primary"
                         defaultValue="Branding"
+                        disabled
                       />
                     </div>
                     
@@ -156,18 +164,11 @@ export default function FeaturesPage() {
                         <div className="text-xs font-bold text-text-dark">Branding & Identity</div>
                       </div>
                       
-                      <div className="border border-border-light bg-white rounded-xl p-3.5 flex items-center gap-3 cursor-pointer hover:border-primary/40 transition-colors">
-                        <div className="w-8 h-8 rounded-lg bg-surface-secondary flex items-center justify-center text-text-secondary flex-shrink-0">
+                      <div className="border border-[#E5EAF2] bg-white rounded-xl p-3.5 flex items-center gap-3 cursor-pointer hover:border-primary/40 transition-colors">
+                        <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-text-secondary flex-shrink-0">
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                         </div>
                         <div className="text-xs font-bold text-text-secondary">Website Design</div>
-                      </div>
-
-                      <div className="border border-border-light bg-white rounded-xl p-3.5 flex items-center gap-3 cursor-pointer hover:border-primary/40 transition-colors">
-                        <div className="w-8 h-8 rounded-lg bg-surface-secondary flex items-center justify-center text-text-secondary flex-shrink-0">
-                          <Target className="w-4 h-4" />
-                        </div>
-                        <div className="text-xs font-bold text-text-secondary">Mobile App Design</div>
                       </div>
                     </div>
                   </div>
@@ -180,7 +181,7 @@ export default function FeaturesPage() {
             </div>
 
             {/* Text Right */}
-            <div className="lg:pl-10">
+            <div className="lg:pl-10 animate-fade-in-up">
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 rounded-xl bg-primary-light flex items-center justify-center text-primary">
                   <Target className="w-6 h-6" />
@@ -200,7 +201,7 @@ export default function FeaturesPage() {
                   "Fully editable before sending"
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5.5 h-5.5 text-success flex-shrink-0 mt-0.5" />
+                    <div className="w-5.5 h-5.5 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center flex-shrink-0 mt-0.5"><Check className="w-3.5 h-3.5 stroke-[3]" /></div>
                     <span className="text-text-dark font-medium">{item}</span>
                   </li>
                 ))}
@@ -211,17 +212,17 @@ export default function FeaturesPage() {
       </section>
 
       {/* Feature 02: Kova AI */}
-      <section className="py-24 bg-surface-secondary relative overflow-hidden border-b border-border-light">
+      <section id="kova-ai" className="py-24 bg-[#F7F9FC] text-text-dark relative overflow-hidden border-b border-[#E5EAF2]">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Text Left */}
-            <div className="lg:pr-10 order-2 lg:order-1">
+            <div className="lg:pr-10 order-2 lg:order-1 animate-fade-in-up">
               <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center text-success">
+                <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
                   <MessageSquare className="w-6 h-6" />
                 </div>
-                <span className="text-2xl font-display font-bold text-success">02</span>
-                <span className="bg-success/10 text-success text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Powered by Kova™</span>
+                <span className="text-2xl font-display font-bold text-emerald-500">02</span>
+                <span className="bg-emerald-500/10 text-emerald-500 text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Powered by Kova™</span>
               </div>
               <h2 className="text-3xl md:text-4xl font-display font-bold mb-6 text-text-dark leading-tight">
                 Meet Kova. Your AI negotiation co-pilot.
@@ -236,7 +237,7 @@ export default function FeaturesPage() {
                   "Trained on real freelance negotiation scenarios"
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5.5 h-5.5 text-success flex-shrink-0 mt-0.5" />
+                    <div className="w-5.5 h-5.5 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center flex-shrink-0 mt-0.5"><Check className="w-3.5 h-3.5 stroke-[3]" /></div>
                     <span className="text-text-dark font-medium">{item}</span>
                   </li>
                 ))}
@@ -244,9 +245,9 @@ export default function FeaturesPage() {
             </div>
 
             {/* Mockup Right */}
-            <div className="relative order-1 lg:order-2">
-              <div className="absolute inset-0 bg-success/5 rounded-[2rem] transform rotate-1 scale-105 blur-xl"></div>
-              <div className="relative bg-[#0F172A] rounded-3xl shadow-xl overflow-hidden aspect-[1.3/1] border border-slate-800 flex flex-col">
+            <div className="relative order-1 lg:order-2 animate-fade-in-up" style={{ animationDelay: "200ms" }}>
+              <div className="absolute inset-0 bg-emerald-500/5 rounded-[2rem] transform rotate-1 scale-105 blur-xl"></div>
+              <div className="relative bg-[#0F172A] rounded-3xl shadow-xl overflow-hidden aspect-[1.3/1] border border-slate-800 flex flex-col transition-all duration-300 hover:shadow-2xl">
                 {/* Chat Header */}
                 <div className="bg-slate-900 border-b border-slate-800 px-6 py-4 flex items-center gap-3">
                   <div className="w-3 h-3 rounded-full bg-danger"></div>
@@ -255,7 +256,7 @@ export default function FeaturesPage() {
                   <span className="text-xs font-bold text-slate-400 ml-2 font-display">Kova Negotiation Assistant</span>
                 </div>
                 {/* Chat Body */}
-                <div className="flex-1 p-6 overflow-y-auto space-y-4 font-body text-xs leading-relaxed">
+                <div className="flex-1 p-6 overflow-y-auto space-y-4 font-body text-xs leading-relaxed text-left">
                   <div className="flex flex-col items-end">
                     <div className="bg-slate-800 text-white rounded-2xl rounded-tr-none px-4 py-3 max-w-[85%]">
                       <p className="font-semibold text-[10px] text-slate-400 mb-1">CLIENT MESSAGE</p>
@@ -266,11 +267,11 @@ export default function FeaturesPage() {
                   <div className="flex flex-col items-start">
                     <div className="bg-primary/20 border border-primary/30 text-white rounded-2xl rounded-tl-none px-4 py-3 max-w-[90%] space-y-3">
                       <div>
-                        <p className="font-semibold text-[10px] text-primary-light mb-1">KOVA STRATEGY</p>
+                        <p className="font-semibold text-[10px] text-primary-light mb-1 text-blue-400">KOVA STRATEGY</p>
                         <p className="text-slate-300">Refocus on value and impact first, then address budget constraints constructively without immediately offering a discount.</p>
                       </div>
                       <div className="border-t border-slate-700/50 pt-2">
-                        <p className="font-semibold text-[10px] text-success mb-1">DRAFT RESPONSE</p>
+                        <p className="font-semibold text-[10px] text-success mb-1 text-emerald-400">DRAFT RESPONSE</p>
                         <p className="text-slate-200">"Thanks for being upfront about the budget. I want to make sure we deliver the best results for your project. If pricing is a blocker, we can adjust the scope by focusing on the core deliverables first, or..."</p>
                       </div>
                     </div>
@@ -281,7 +282,7 @@ export default function FeaturesPage() {
                   <input 
                     type="text" 
                     placeholder="Ask Kova anything..." 
-                    className="flex-1 bg-slate-850 border border-slate-800 rounded-full px-4 py-2 text-xs text-white focus:outline-none focus:border-primary placeholder:text-slate-500"
+                    className="flex-1 bg-slate-800 border border-slate-750 rounded-full px-4 py-2 text-xs text-white focus:outline-none focus:border-primary placeholder:text-slate-500"
                     disabled
                   />
                   <button className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white cursor-not-allowed">
@@ -295,39 +296,34 @@ export default function FeaturesPage() {
       </section>
 
       {/* Feature 03: Professional Proposals */}
-      <section className="py-24 bg-surface relative overflow-hidden border-b border-border-light">
+      <section id="pdf-export" className="py-24 bg-white text-text-dark relative overflow-hidden border-b border-[#E5EAF2]">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Mockup Left */}
-            <div className="relative">
+            <div className="relative animate-fade-in-up" style={{ animationDelay: "100ms" }}>
               <div className="absolute inset-0 bg-primary/5 rounded-[2rem] transform -rotate-1 scale-105 blur-xl"></div>
-              <div className="relative bg-[#F8FAFC] border border-border-light rounded-3xl shadow-xl overflow-hidden aspect-[1.3/1] flex p-6 gap-6">
+              <div className="relative bg-[#F8FAFC] border border-[#E5EAF2] rounded-3xl shadow-xl overflow-hidden aspect-[1.3/1] flex p-6 gap-6 transition-all duration-300 hover:shadow-2xl">
                 {/* Tool bar */}
                 <div className="w-[120px] flex flex-col gap-2">
-                  <button className="bg-white border border-border-light text-text-dark text-[11px] font-bold py-2.5 px-3 rounded-lg shadow-sm flex items-center gap-1.5">
+                  <button className="bg-white border border-[#E5EAF2] text-text-dark text-[11px] font-bold py-2.5 px-3 rounded-lg shadow-sm flex items-center gap-1.5 hover:bg-slate-50">
                     <FileText className="w-3.5 h-3.5 text-primary" /> Download PDF
                   </button>
-                  <button className="bg-white border border-border-light text-text-dark text-[11px] font-bold py-2.5 px-3 rounded-lg shadow-sm flex items-center gap-1.5">
+                  <button className="bg-white border border-[#E5EAF2] text-text-dark text-[11px] font-bold py-2.5 px-3 rounded-lg shadow-sm flex items-center gap-1.5 hover:bg-slate-50">
                     <LinkIcon className="w-3.5 h-3.5 text-success" /> Share Link
-                  </button>
-                  <button className="bg-[#EEF2F6] border border-slate-200 text-text-secondary text-[10px] font-medium py-2 px-3 rounded-lg flex items-center gap-1">
-                    Copy URL
                   </button>
                 </div>
                 {/* Document Body */}
-                <div className="flex-1 bg-white border border-border-light shadow-sm rounded-xl p-6 flex flex-col justify-between font-body text-[10px]">
+                <div className="flex-1 bg-white border border-[#E5EAF2] shadow-sm rounded-xl p-6 flex flex-col justify-between font-body text-[10px] text-left">
                   <div>
-                    <div className="flex justify-between items-center border-b border-border-light pb-4 mb-4">
-                      <div className="flex items-center gap-1">
-                        <Logo variant="dark" />
-                      </div>
+                    <div className="flex justify-between items-center border-b border-[#E5EAF2] pb-4 mb-4">
+                      <Logo variant="dark" />
                       <span className="text-[9px] text-text-secondary font-medium">May 20, 2024</span>
                     </div>
                     
                     <h5 className="font-bold text-text-dark text-xs uppercase tracking-wider mb-1">Project Scope</h5>
                     <p className="text-text-secondary font-semibold text-xs mb-4">Brand Identity Design for Acme Ltd</p>
                     
-                    <div className="grid grid-cols-2 gap-4 mb-4 bg-surface-secondary p-3 rounded-lg">
+                    <div className="grid grid-cols-2 gap-4 mb-4 bg-slate-50 p-3 rounded-lg">
                       <div>
                         <p className="text-[8px] text-text-muted font-bold uppercase">Final Price</p>
                         <p className="font-bold text-text-dark text-xs mt-0.5">₦650,000</p>
@@ -341,7 +337,7 @@ export default function FeaturesPage() {
                     <h6 className="font-bold text-text-dark uppercase mb-1">Project Overview</h6>
                     <p className="text-text-secondary leading-relaxed">This project covers the full visual redesign and strategic positioning for Acme Ltd's fintech startup, focusing on building user trust.</p>
                   </div>
-                  <div className="border-t border-border-light pt-3 text-right">
+                  <div className="border-t border-[#E5EAF2] pt-3 text-right">
                     <span className="text-[9px] text-text-muted">Generated with Pricis</span>
                   </div>
                 </div>
@@ -349,7 +345,7 @@ export default function FeaturesPage() {
             </div>
 
             {/* Text Right */}
-            <div className="lg:pl-10">
+            <div className="lg:pl-10 animate-fade-in-up">
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 rounded-xl bg-primary-light flex items-center justify-center text-primary">
                   <FileText className="w-6 h-6" />
@@ -369,7 +365,7 @@ export default function FeaturesPage() {
                   "Client-ready in seconds"
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5.5 h-5.5 text-success flex-shrink-0 mt-0.5" />
+                    <div className="w-5.5 h-5.5 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center flex-shrink-0 mt-0.5"><Check className="w-3.5 h-3.5 stroke-[3]" /></div>
                     <span className="text-text-dark font-medium">{item}</span>
                   </li>
                 ))}
@@ -380,11 +376,11 @@ export default function FeaturesPage() {
       </section>
 
       {/* Feature 04: Client Tracking */}
-      <section className="py-24 bg-surface-secondary relative overflow-hidden border-b border-border-light">
+      <section id="client-share-links" className="py-24 bg-[#F7F9FC] text-text-dark relative overflow-hidden border-b border-[#E5EAF2]">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Text Left */}
-            <div className="lg:pr-10 order-2 lg:order-1">
+            <div className="lg:pr-10 order-2 lg:order-1 animate-fade-in-up">
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 rounded-xl bg-primary-light flex items-center justify-center text-primary">
                   <LinkIcon className="w-6 h-6" />
@@ -404,7 +400,7 @@ export default function FeaturesPage() {
                   "Dedicated scope page with your branding (Pro)"
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5.5 h-5.5 text-success flex-shrink-0 mt-0.5" />
+                    <div className="w-5.5 h-5.5 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center flex-shrink-0 mt-0.5"><Check className="w-3.5 h-3.5 stroke-[3]" /></div>
                     <span className="text-text-dark font-medium">{item}</span>
                   </li>
                 ))}
@@ -412,9 +408,9 @@ export default function FeaturesPage() {
             </div>
 
             {/* Mockup Right */}
-            <div className="relative order-1 lg:order-2">
+            <div className="relative order-1 lg:order-2 animate-fade-in-up" style={{ animationDelay: "200ms" }}>
               <div className="absolute inset-0 bg-primary/5 rounded-[2rem] transform rotate-1 scale-105 blur-xl"></div>
-              <div className="relative bg-white border border-border-light rounded-3xl shadow-xl overflow-hidden aspect-[1.3/1] p-6 flex flex-col justify-between font-body text-xs text-text-dark">
+              <div className="relative bg-white border border-[#E5EAF2] rounded-3xl shadow-xl overflow-hidden aspect-[1.3/1] p-6 flex flex-col justify-between font-body text-xs text-text-dark transition-all duration-300 hover:shadow-2xl text-left">
                 <div>
                   <div className="flex justify-between items-center mb-6">
                     <div>
@@ -425,25 +421,25 @@ export default function FeaturesPage() {
                   </div>
                   
                   <div className="grid grid-cols-4 gap-2 mb-6 text-center">
-                    <div className="bg-surface-secondary border border-border-light rounded-xl p-3">
+                    <div className="bg-slate-50 border border-[#E5EAF2] rounded-xl p-3">
                       <p className="text-[9px] text-text-muted font-bold uppercase">Views</p>
                       <p className="font-black text-lg text-text-dark mt-1">2 <span className="text-xs text-text-secondary font-medium">Times</span></p>
                     </div>
-                    <div className="bg-surface-secondary border border-border-light rounded-xl p-3">
+                    <div className="bg-slate-55 border border-[#E5EAF2] rounded-xl p-3">
                       <p className="text-[9px] text-text-muted font-bold uppercase">Last Viewed</p>
                       <p className="font-bold text-[10px] text-text-dark mt-1">Today, 1:34 PM</p>
                     </div>
-                    <div className="bg-surface-secondary border border-border-light rounded-xl p-3">
+                    <div className="bg-slate-55 border border-[#E5EAF2] rounded-xl p-3">
                       <p className="text-[9px] text-text-muted font-bold uppercase">First Viewed</p>
                       <p className="font-bold text-[10px] text-text-dark mt-1">Today, 11:45 AM</p>
                     </div>
-                    <div className="bg-surface-secondary border border-border-light rounded-xl p-3">
+                    <div className="bg-slate-55 border border-[#E5EAF2] rounded-xl p-3">
                       <p className="text-[9px] text-text-muted font-bold uppercase">Avg Time</p>
                       <p className="font-black text-sm text-text-dark mt-1">3m 45s</p>
                     </div>
                   </div>
                   
-                  <h6 className="font-bold text-[10px] text-text-dark uppercase mb-3">Recent Activity</h6>
+                  <h6 className="font-bold text-[10px] text-[#0F172A] uppercase mb-3">Recent Activity</h6>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-[10px] bg-slate-50 border border-slate-100 p-2.5 rounded-lg">
                       <span className="text-text-dark font-semibold">● Today, 1:34 PM · Viewed on Mobile</span>
@@ -465,13 +461,13 @@ export default function FeaturesPage() {
       </section>
 
       {/* Feature 05: Templates */}
-      <section className="py-24 bg-surface relative overflow-hidden border-b border-border-light">
+      <section id="templates" className="py-24 bg-white text-text-dark relative overflow-hidden border-b border-[#E5EAF2]">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Mockup Left */}
-            <div className="relative">
+            <div className="relative animate-fade-in-up" style={{ animationDelay: "100ms" }}>
               <div className="absolute inset-0 bg-primary/5 rounded-[2rem] transform -rotate-1 scale-105 blur-xl"></div>
-              <div className="relative bg-white border border-border-light rounded-3xl shadow-xl overflow-hidden aspect-[1.3/1] p-6 flex flex-col justify-between font-body text-xs text-text-dark">
+              <div className="relative bg-white border border-[#E5EAF2] rounded-3xl shadow-xl overflow-hidden aspect-[1.3/1] p-6 flex flex-col justify-between font-body text-xs text-text-dark transition-all duration-300 hover:shadow-2xl text-left">
                 <div>
                   <div className="flex justify-between items-center mb-5">
                     <h5 className="font-bold text-sm">Templates Library</h5>
@@ -489,34 +485,34 @@ export default function FeaturesPage() {
                   </div>
                   
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="border border-border-light rounded-xl p-3 hover:border-primary/55 cursor-pointer bg-white flex flex-col justify-between h-[85px]">
+                    <div className="border border-[#E5EAF2] rounded-xl p-3 hover:border-primary/55 cursor-pointer bg-white flex flex-col justify-between h-[85px] transition-colors">
                       <div>
-                        <h6 className="font-bold text-[11px] text-text-dark">Logo Design Scope</h6>
+                        <h6 className="font-bold text-[11px] text-[#0F172A]">Logo Design Scope</h6>
                         <span className="text-[9px] text-primary font-semibold mt-1 inline-block">Design</span>
                       </div>
                       <span className="text-[9px] text-text-muted">Used by 1.2k users</span>
                     </div>
                     
-                    <div className="border border-border-light rounded-xl p-3 hover:border-primary/55 cursor-pointer bg-white flex flex-col justify-between h-[85px]">
+                    <div className="border border-[#E5EAF2] rounded-xl p-3 hover:border-primary/55 cursor-pointer bg-white flex flex-col justify-between h-[85px] transition-colors">
                       <div>
-                        <h6 className="font-bold text-[11px] text-text-dark">Website Redesign Scope</h6>
+                        <h6 className="font-bold text-[11px] text-[#0F172A]">Website Redesign Scope</h6>
                         <span className="text-[9px] text-primary font-semibold mt-1 inline-block">Design</span>
                       </div>
                       <span className="text-[9px] text-text-muted">Used by 880 users</span>
                     </div>
 
-                    <div className="border border-border-light rounded-xl p-3 hover:border-primary/55 cursor-pointer bg-white flex flex-col justify-between h-[85px]">
+                    <div className="border border-[#E5EAF2] rounded-xl p-3 hover:border-primary/55 cursor-pointer bg-white flex flex-col justify-between h-[85px] transition-colors">
                       <div>
-                        <h6 className="font-bold text-[11px] text-text-dark">Brand Identity Package</h6>
+                        <h6 className="font-bold text-[11px] text-[#0F172A]">Brand Identity Package</h6>
                         <span className="text-[9px] text-primary font-semibold mt-1 inline-block">Design</span>
                       </div>
                       <span className="text-[9px] text-text-muted">Used by 650 users</span>
                     </div>
 
-                    <div className="border border-border-light rounded-xl p-3 hover:border-primary/55 cursor-pointer bg-slate-50 flex flex-col justify-between h-[85px]">
+                    <div className="border border-[#E5EAF2] rounded-xl p-3 hover:border-primary/55 cursor-pointer bg-slate-50 flex flex-col justify-between h-[85px] transition-colors">
                       <div className="flex justify-between items-start">
                         <div>
-                          <h6 className="font-bold text-[11px] text-text-muted">Mobile App UI Design</h6>
+                          <h6 className="font-bold text-[11px] text-text-muted font-display">Mobile App UI Design</h6>
                           <span className="text-[9px] text-text-muted font-semibold mt-1 inline-block">Design</span>
                         </div>
                         <Lock className="w-3 h-3 text-text-muted mt-0.5" />
@@ -529,7 +525,7 @@ export default function FeaturesPage() {
             </div>
 
             {/* Text Right */}
-            <div className="lg:pl-10">
+            <div className="lg:pl-10 animate-fade-in-up">
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 rounded-xl bg-primary-light flex items-center justify-center text-primary">
                   <Folder className="w-6 h-6" />
@@ -549,7 +545,7 @@ export default function FeaturesPage() {
                   "Templates learn from your past scopes"
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5.5 h-5.5 text-success flex-shrink-0 mt-0.5" />
+                    <div className="w-5.5 h-5.5 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center flex-shrink-0 mt-0.5"><Check className="w-3.5 h-3.5 stroke-[3]" /></div>
                     <span className="text-text-dark font-medium">{item}</span>
                   </li>
                 ))}
@@ -560,11 +556,11 @@ export default function FeaturesPage() {
       </section>
 
       {/* Feature 06: Invoicing */}
-      <section className="py-24 bg-surface-secondary relative overflow-hidden border-b border-border-light">
+      <section id="invoicing" className="py-24 bg-[#F7F9FC] text-text-dark relative overflow-hidden border-b border-[#E5EAF2]">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Text Left */}
-            <div className="lg:pr-10 order-2 lg:order-1">
+            <div className="lg:pr-10 order-2 lg:order-1 animate-fade-in-up">
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 rounded-xl bg-primary-light flex items-center justify-center text-primary">
                   <Receipt className="w-6 h-6" />
@@ -584,7 +580,7 @@ export default function FeaturesPage() {
                   "Track: Draft -> Sent -> Viewed -> Paid"
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5.5 h-5.5 text-success flex-shrink-0 mt-0.5" />
+                    <div className="w-5.5 h-5.5 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center flex-shrink-0 mt-0.5"><Check className="w-3.5 h-3.5 stroke-[3]" /></div>
                     <span className="text-text-dark font-medium">{item}</span>
                   </li>
                 ))}
@@ -592,16 +588,16 @@ export default function FeaturesPage() {
             </div>
 
             {/* Mockup Right */}
-            <div className="relative order-1 lg:order-2">
+            <div className="relative order-1 lg:order-2 animate-fade-in-up" style={{ animationDelay: "200ms" }}>
               <div className="absolute inset-0 bg-primary/5 rounded-[2rem] transform rotate-1 scale-105 blur-xl"></div>
-              <div className="relative bg-white border border-border-light rounded-3xl shadow-xl overflow-hidden aspect-[1.3/1] p-6 flex flex-col justify-between font-body text-[10px] text-text-dark">
+              <div className="relative bg-white border border-[#E5EAF2] rounded-3xl shadow-xl overflow-hidden aspect-[1.3/1] p-6 flex flex-col justify-between font-body text-[10px] text-text-dark transition-all duration-300 hover:shadow-2xl text-left">
                 <div>
-                  <div className="flex justify-between items-center mb-5 border-b border-border-light pb-3">
+                  <div className="flex justify-between items-center mb-5 border-b border-[#E5EAF2] pb-3">
                     <div>
                       <h5 className="font-bold text-xs">Invoice #INV-1034</h5>
                       <p className="text-[8px] text-text-secondary mt-0.5">May 20, 2024</p>
                     </div>
-                    <span className="bg-success/15 text-success text-[10px] font-bold px-3 py-1 rounded-full flex items-center gap-1">
+                    <span className="bg-emerald-500/15 text-emerald-600 text-[10px] font-bold px-3 py-1 rounded-full flex items-center gap-1">
                       ● Paid
                     </span>
                   </div>
@@ -622,7 +618,7 @@ export default function FeaturesPage() {
                     <span className="text-sm font-black text-text-dark">₦650,000</span>
                   </div>
                   
-                  <div className="border border-border-light rounded-xl overflow-hidden text-[9px] font-medium divide-y divide-border-light">
+                  <div className="border border-[#E5EAF2] rounded-xl overflow-hidden text-[9px] font-medium divide-y divide-[#E5EAF2]">
                     <div className="bg-slate-50 grid grid-cols-3 p-2 font-bold text-text-secondary text-[8px] uppercase">
                       <span>Item</span>
                       <span>Description</span>
@@ -657,25 +653,25 @@ export default function FeaturesPage() {
       </section>
 
       {/* Comparison Section */}
-      <section className="py-24 bg-surface text-text-dark border-b border-border-light">
+      <section className="py-24 bg-white text-text-dark border-b border-[#E5EAF2]">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-display font-black tracking-tight mb-4">How Pricis compares.</h2>
+          <div className="text-center mb-16 animate-fade-in-up">
+            <h2 className="text-3xl md:text-4xl font-display font-black tracking-tight mb-4 text-[#0F172A]">How Pricis compares.</h2>
             <p className="text-lg text-text-secondary">Built for African freelancers. Not retrofitted from a US tool.</p>
           </div>
           
-          <div className="overflow-x-auto rounded-2xl border border-border-light shadow-sm">
+          <div className="overflow-x-auto rounded-2xl border border-[#E5EAF2] shadow-sm animate-fade-in-up">
             <table className="w-full text-left font-body text-xs border-collapse">
               <thead>
-                <tr className="bg-slate-50 border-b border-border-light text-[10px] uppercase font-bold text-text-secondary tracking-wider">
-                  <th className="p-5 font-semibold">Feature</th>
+                <tr className="bg-slate-50 border-b border-[#E5EAF2] text-[10px] uppercase font-bold text-text-secondary tracking-wider">
+                  <th className="p-5 font-semibold text-text-dark">Feature</th>
                   <th className="p-5 font-bold text-primary">Pricis</th>
                   <th className="p-5 font-semibold text-text-muted">Bonsai</th>
                   <th className="p-5 font-semibold text-text-muted">HoneyBook</th>
                   <th className="p-5 font-semibold text-text-muted">Excel / Manual</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border-light font-medium text-text-dark">
+              <tbody className="divide-y divide-[#E5EAF2] font-medium text-text-dark">
                 {[
                   { name: "African market pricing calibration", pricis: true, bonsai: false, honeybook: false, excel: false },
                   { name: "AI negotiation assistant", pricis: true, bonsai: false, honeybook: false, excel: false },
@@ -685,18 +681,18 @@ export default function FeaturesPage() {
                   { name: "Free tier available", pricis: true, bonsai: false, honeybook: false, excel: true },
                 ].map((row, i) => (
                   <tr key={i} className="hover:bg-slate-50 transition-colors">
-                    <td className="p-5 font-semibold text-sm">{row.name}</td>
-                    <td className="p-5 text-success font-black text-sm">
-                      {row.pricis ? <Check className="w-5 h-5" /> : "—"}
+                    <td className="p-5 font-semibold text-sm text-[#0F172A]">{row.name}</td>
+                    <td className="p-5 text-emerald-600 font-black text-sm">
+                      {row.pricis ? <div className="inline-flex w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 items-center justify-center"><Check className="w-3.5 h-3.5 stroke-[3]" /></div> : "—"}
                     </td>
                     <td className="p-5 text-text-muted">
-                      {row.bonsai ? <Check className="w-4 h-4 text-slate-450" /> : <span className="text-slate-300">✗</span>}
+                      {row.bonsai ? <div className="inline-flex w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 items-center justify-center"><Check className="w-3.5 h-3.5 stroke-[3]" /></div> : <span className="text-slate-300">✕</span>}
                     </td>
                     <td className="p-5 text-text-muted">
-                      {row.honeybook ? <Check className="w-4 h-4 text-slate-450" /> : <span className="text-slate-300">✗</span>}
+                      {row.honeybook ? <div className="inline-flex w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 items-center justify-center"><Check className="w-3.5 h-3.5 stroke-[3]" /></div> : <span className="text-slate-300">✕</span>}
                     </td>
                     <td className="p-5 text-text-muted">
-                      {row.excel ? <Check className="w-4 h-4 text-slate-450" /> : <span className="text-slate-300">✗</span>}
+                      {row.excel ? <div className="inline-flex w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 items-center justify-center"><Check className="w-3.5 h-3.5 stroke-[3]" /></div> : <span className="text-slate-300">✕</span>}
                     </td>
                   </tr>
                 ))}
@@ -708,11 +704,11 @@ export default function FeaturesPage() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-24 bg-surface text-text-dark border-b border-border-light">
+      <section className="py-24 bg-white text-text-dark border-b border-[#E5EAF2]">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-display font-black tracking-tight mb-4">Trust free. Upbalancers when you need more.</h2>
-            <p className="text-lg text-text-secondary">Loved by freelancers and service providers across Africa</p>
+          <div className="text-center mb-16 animate-fade-in-up">
+            <h2 className="text-3xl md:text-4xl font-display font-black tracking-tight mb-4 text-[#0F172A]">Loved by freelancers across Africa</h2>
+            <p className="text-lg text-text-secondary">Freelancers trust Pricis to protect their rates.</p>
           </div>
           
           <div className="grid md:grid-cols-3 gap-8">
@@ -721,27 +717,27 @@ export default function FeaturesPage() {
                 quote: "Pricis helped me increase my proposal close rate by 40%. Clients take my prices more seriously now.",
                 name: "Tayo A.",
                 role: "Product Designer, Lagos",
-                img: "https://i.pravatar.cc/100?img=11"
+                img: "/images/tayo_a.png"
               },
               {
                 quote: "The Negotiation Assistant is a game changer. I don't panic anymore when clients push back.",
                 name: "Mary I.",
                 role: "Copywriter, Abuja",
-                img: "https://i.pravatar.cc/100?img=12"
+                img: "/images/mary_i.png"
               },
               {
                 quote: "Finally, a tool that understands our market. The pricing is realistic and the scopes look so professional.",
                 name: "Emeka P.",
                 role: "Web Developer, Enugu",
-                img: "https://i.pravatar.cc/105?img=13"
+                img: "/images/emeka_p.png"
               }
             ].map((t, i) => (
-              <div key={i} className="bg-surface-secondary border border-border-light p-8 rounded-2xl flex flex-col justify-between hover:shadow-md transition-shadow">
-                <p className="text-sm font-semibold leading-relaxed mb-6 italic text-text-dark">"{t.quote}"</p>
+              <div key={i} className="bg-[#F7F9FC] border border-[#E5EAF2] p-8 rounded-2xl flex flex-col justify-between hover:shadow-md transition-all duration-300 hover:-translate-y-1 animate-fade-in-up" style={{ animationDelay: `${i * 100}ms` }}>
+                <p className="text-sm font-semibold leading-relaxed mb-6 italic text-[#0F172A]">"{t.quote}"</p>
                 <div className="flex items-center gap-3">
-                  <img src={t.img} alt={t.name} className="w-10 h-10 rounded-full bg-slate-200 border-2 border-white object-cover" />
+                  <img src={t.img} alt={t.name} className="w-10 h-10 rounded-full bg-slate-200 border-2 border-white object-cover animate-fade-in" />
                   <div>
-                    <h5 className="font-bold text-xs text-text-dark font-display">{t.name}</h5>
+                    <h5 className="font-bold text-xs text-[#0F172A] font-display">{t.name}</h5>
                     <p className="text-[10px] text-text-secondary font-medium mt-0.5">{t.role}</p>
                   </div>
                 </div>
@@ -752,25 +748,25 @@ export default function FeaturesPage() {
       </section>
 
       {/* Brands & Newsletter Section */}
-      <section className="py-24 px-6 bg-surface-secondary text-text-dark" data-section="newsletter">
+      <section className="py-24 px-6 bg-[#F7F9FC] text-text-dark border-b border-[#E5EAF2]" data-section="newsletter">
         <div className="max-w-7xl mx-auto">
           {/* Logo prove */}
-          <div className="flex flex-wrap items-center justify-center gap-10 md:gap-16 opacity-75 grayscale hover:grayscale-0 transition-all duration-300 mb-20 border-b border-border-light pb-16">
+          <div className="flex flex-wrap items-center justify-center gap-10 md:gap-16 opacity-75 grayscale hover:grayscale-0 transition-all duration-300 mb-20 border-b border-[#E5EAF2] pb-16">
             <div className="font-bold text-lg tracking-tighter text-slate-700 font-display">● Techpoint</div>
             <div className="font-black text-lg tracking-widest text-slate-800 font-display">TECHCABAL</div>
             <div className="font-bold text-base text-slate-700 font-display">VENTURES PLATFORM</div>
             <div className="font-serif font-bold text-lg text-slate-800"><span className="bg-slate-800 text-white px-1">BUSINESS</span>DAY</div>
             <div className="font-bold text-xl tracking-tighter text-slate-800 font-display" style={{ fontStyle: 'italic' }}>YNaija</div>
             <div className="flex items-center gap-2">
-              <span className="font-bold text-[10px] leading-tight text-slate-750 uppercase tracking-wider font-display">African<br/>Freelancers</span>
+              <span className="font-bold text-[10px] leading-tight text-slate-700 uppercase tracking-wider font-display">African<br/>Freelancers</span>
             </div>
-            <div className="flex items-center gap-2 border-l border-border-light pl-6">
+            <div className="flex items-center gap-2 border-l border-[#E5EAF2] pl-6">
               <span className="text-xs font-bold text-success font-display">+2,500</span>
               <span className="text-[9px] text-text-secondary font-bold font-display uppercase tracking-wider">Freelancers trust Pricis</span>
             </div>
           </div>
 
-          <div className="max-w-2xl mx-auto text-center">
+          <div className="max-w-2xl mx-auto text-center animate-fade-in-up">
             <div className="w-12 h-12 rounded-xl bg-primary-light text-primary flex items-center justify-center mx-auto mb-6">
               <Mail size={24} />
             </div>
@@ -791,7 +787,7 @@ export default function FeaturesPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email address"
-                  className="flex-1 w-full bg-white border border-border-light rounded-full px-5 py-3 text-sm text-text-dark placeholder:text-text-muted focus:outline-none focus:border-primary transition-colors shadow-sm"
+                  className="flex-1 w-full bg-white border border-[#E5EAF2] rounded-full px-5 py-3 text-sm text-text-dark placeholder:text-text-muted focus:outline-none focus:border-primary transition-colors shadow-sm"
                   required
                 />
                 <button

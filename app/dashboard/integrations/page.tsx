@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { 
   Plus, ArrowLeft, ArrowRight, Check, Trash2, ChevronRight, 
-  Settings, Key, RefreshCw, AlertCircle, Link2, CheckCircle2, ShieldAlert, Sparkles
+  Settings, Key, RefreshCw, AlertCircle, Link2, CheckCircle2, ShieldAlert, Sparkles, Search
 } from "lucide-react";
 
 interface IntegrationData {
@@ -90,51 +90,54 @@ export default function IntegrationsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-fade-in-up">
       {/* ----------------- LIST VIEW ----------------- */}
       {view === "list" && (
         <>
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-text-dark font-display">Integrations</h1>
+              <h1 className="text-3xl font-extrabold text-[#0F172A] font-display">Integrations</h1>
               <p className="text-text-secondary text-sm font-body">Connect your favorite tools and automate your workflows.</p>
             </div>
             <button 
               onClick={() => { setView("wizard"); setWizardStep(1); }}
-              className="bg-primary hover:bg-primary-hover text-white px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 shadow-blue transition-colors"
+              className="bg-primary hover:bg-primary-hover text-white px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 shadow-blue transition-all"
             >
-              <Plus size={18} /> New Integration
+              <Plus size={16} /> New Integration
             </button>
           </div>
 
           {/* Stats Grid */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { label: "Total Integrations", count: "12", desc: "↑ 20% vs last month" },
-              { label: "Connected", count: "8", desc: "↑ 14% vs last month", color: "text-[#10B981]" },
-              { label: "Available", count: "24", desc: "—" },
+              { label: "Total Integrations", count: "12", desc: "↑ 20% vs last month", color: "text-[#0F172A]" },
+              { label: "Connected", count: "8", desc: "↑ 14% vs last month", color: "text-emerald-600" },
+              { label: "Available", count: "24", desc: "—", color: "text-primary" },
               { label: "Errors", count: "2", desc: "↓ 2 vs last month", color: "text-danger" },
             ].map((stat, i) => (
-              <div key={i} className="bg-white border border-border-light rounded-xl p-5 shadow-sm">
-                <span className={`text-2xl font-bold font-display ${stat.color}`}>{stat.count}</span>
-                <p className="text-sm font-semibold text-text-dark mt-1">{stat.label}</p>
-                <p className="text-xs text-text-secondary mt-0.5">{stat.desc}</p>
+              <div key={i} className="bg-white border border-[#E5EAF2] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                <span className={`text-2xl font-black font-display ${stat.color}`}>{stat.count}</span>
+                <p className="text-xs font-bold text-text-secondary uppercase tracking-wider mt-2">{stat.label}</p>
+                <p className="text-[10px] text-text-muted mt-1 font-semibold">{stat.desc}</p>
               </div>
             ))}
           </div>
 
           {/* Table list */}
-          <div className="bg-white border border-border-light rounded-2xl overflow-hidden shadow-sm">
-            <div className="p-4 border-b border-border-light flex justify-between items-center gap-4 bg-surface-secondary/50">
-              <input 
-                type="text" 
-                placeholder="Search integrations..." 
-                className="bg-white border border-border-light text-text-dark text-sm rounded-xl px-4 py-2 outline-none w-64 shadow-sm"
-              />
-              <div className="flex gap-2 text-xs font-semibold">
+          <div className="bg-white border border-[#E5EAF2] rounded-2xl overflow-hidden shadow-sm">
+            <div className="p-4 border-b border-[#E5EAF2] flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 bg-[#F8FAFC]">
+              <div className="relative max-w-xs w-full">
+                <Search className="absolute left-3.5 top-2.5 w-4 h-4 text-text-muted" />
+                <input 
+                  type="text" 
+                  placeholder="Search integrations..." 
+                  className="bg-white border border-[#E5EAF2] text-text-dark text-xs rounded-xl pl-9 pr-4 py-2 outline-none w-full shadow-sm focus:border-primary transition-colors font-semibold"
+                />
+              </div>
+              <div className="flex gap-2 text-[10px] font-bold overflow-x-auto pb-1 sm:pb-0">
                 {["All", "Popular", "Storage", "Accounting", "CRM", "Marketing"].map((cat) => (
-                  <button key={cat} className={`px-3.5 py-1.5 rounded-xl border transition-colors ${
-                    cat === "All" ? "bg-primary text-white border-transparent" : "bg-white border-border-light text-text-secondary hover:bg-surface-secondary"
+                  <button key={cat} className={`px-3.5 py-1.5 rounded-xl border transition-colors whitespace-nowrap ${
+                    cat === "All" ? "bg-primary text-white border-transparent" : "bg-white border-[#E5EAF2] text-text-secondary hover:bg-slate-50"
                   }`}>
                     {cat}
                   </button>
@@ -143,40 +146,40 @@ export default function IntegrationsPage() {
             </div>
             
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+              <table className="w-full text-left border-collapse font-body">
                 <thead>
-                  <tr className="bg-surface-secondary border-b border-border-light text-text-secondary text-xs uppercase tracking-wider font-semibold">
+                  <tr className="bg-[#F8FAFC] border-b border-[#E5EAF2] text-text-secondary text-[10px] uppercase tracking-wider font-bold">
                     <th className="p-4">Integration</th>
                     <th className="p-4">Category</th>
                     <th className="p-4">Status</th>
                     <th className="p-4">Connected By</th>
                     <th className="p-4">Connected On</th>
-                    <th className="p-4">Actions</th>
+                    <th className="p-4 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border-light text-sm font-medium">
+                <tbody className="divide-y divide-[#E5EAF2] text-xs font-semibold">
                   {integrationsList.map((app) => (
-                    <tr key={app.id} className="hover:bg-surface-secondary/50 cursor-pointer" onClick={() => {
+                    <tr key={app.id} className="hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => {
                       setSelectedApp(app);
                       setView("details");
                       setActiveDetailTab("Overview");
                     }}>
                       <td className="p-4 flex items-center gap-3">
                         <span className="text-2xl">{app.logo}</span>
-                        <span className="font-bold text-text-dark">{app.name}</span>
+                        <span className="font-bold text-[#0F172A]">{app.name}</span>
                       </td>
                       <td className="p-4 text-text-secondary">{app.category}</td>
                       <td className="p-4">
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
-                          app.status === "Connected" ? "bg-green-50 text-[#10B981]" :
-                          app.status === "Error" ? "bg-red-50 text-danger animate-pulse" :
-                          "bg-slate-100 text-text-secondary"
+                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
+                          app.status === "Connected" ? "bg-emerald-50 text-[#10B981] border-emerald-100" :
+                          app.status === "Error" ? "bg-rose-50 text-danger border-rose-100 animate-pulse" :
+                          "bg-slate-100 text-text-secondary border-slate-200"
                         }`}>{app.status}</span>
                       </td>
                       <td className="p-4 text-text-secondary">{app.connectedBy}</td>
                       <td className="p-4 text-text-muted">{app.connectedOn}</td>
-                      <td className="p-4 text-text-muted hover:text-primary transition-colors">
-                        <ChevronRight size={18} />
+                      <td className="p-4 text-text-muted hover:text-primary transition-colors text-right">
+                        <ChevronRight size={16} className="inline" />
                       </td>
                     </tr>
                   ))}
@@ -189,10 +192,10 @@ export default function IntegrationsPage() {
 
       {/* ----------------- WIZARD FLOW ----------------- */}
       {view === "wizard" && (
-        <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm max-w-2xl mx-auto">
+        <div className="bg-white border border-[#E5EAF2] rounded-2xl p-6 shadow-sm max-w-2xl mx-auto animate-fade-in">
           {/* Stepper Header */}
-          <div className="flex justify-between items-center mb-8 border-b border-border-light pb-4">
-            <span className="font-bold text-text-dark font-display text-lg font-semibold">New Integration</span>
+          <div className="flex justify-between items-center mb-8 border-b border-[#E5EAF2] pb-4">
+            <span className="font-bold text-[#0F172A] font-display text-lg font-semibold">New Integration</span>
             <div className="flex gap-2">
               {[1, 2, 3, 4].map((step) => (
                 <div key={step} className="flex items-center gap-1.5">
@@ -201,16 +204,16 @@ export default function IntegrationsPage() {
                       ? "bg-primary text-white" 
                       : wizardStep > step 
                       ? "bg-primary/10 text-primary" 
-                      : "bg-surface-secondary text-text-muted border border-border-light"
+                      : "bg-[#F8FAFC] text-text-muted border border-[#E5EAF2]"
                   }`}>
-                    {wizardStep > step ? <Check size={14} /> : step}
+                    {wizardStep > step ? <Check size={13} /> : step}
                   </div>
                   <span className={`text-xs font-semibold hidden md:inline ${
                     wizardStep === step ? "text-primary" : "text-text-muted"
                   }`}>
                     {step === 1 ? "Select App" : step === 2 ? "Connect" : step === 3 ? "Configure" : "Review"}
                   </span>
-                  {step < 4 && <div className="w-4 border-t border-border-light hidden md:block"></div>}
+                  {step < 4 && <div className="w-4 border-t border-[#E5EAF2] hidden md:block"></div>}
                 </div>
               ))}
             </div>
@@ -220,7 +223,7 @@ export default function IntegrationsPage() {
           {wizardStep === 1 && (
             <div className="space-y-6">
               <div>
-                <h3 className="font-bold text-text-dark text-lg font-display mb-1">Choose an app to integrate with Pricis</h3>
+                <h3 className="font-bold text-[#0F172A] text-lg font-display mb-1">Choose an app to integrate with Pricis</h3>
                 <p className="text-text-secondary text-sm">Select one of the popular apps below to start.</p>
               </div>
 
@@ -238,20 +241,20 @@ export default function IntegrationsPage() {
                   <button
                     key={app.name}
                     onClick={() => { setChosenApp(app.name); setConnectionName(`${app.name} - Pricis`); }}
-                    className={`border p-4 rounded-xl flex flex-col items-center justify-center gap-2 text-center transition-all ${
+                    className={`border p-4 rounded-2xl flex flex-col items-center justify-center gap-2 text-center transition-all ${
                       chosenApp === app.name 
-                        ? "border-primary bg-primary/5 shadow-sm" 
-                        : "border-border-light bg-white hover:bg-surface-secondary/50"
+                        ? "border-primary bg-[#EFF6FF] shadow-sm" 
+                        : "border-[#E5EAF2] bg-white hover:bg-slate-50"
                     }`}
                   >
                     <span className="text-3xl">{app.logo}</span>
-                    <span className="font-bold text-text-dark text-xs">{app.name}</span>
+                    <span className="font-bold text-[#0F172A] text-xs font-display">{app.name}</span>
                   </button>
                 ))}
               </div>
 
-              <div className="flex justify-between border-t border-border-light pt-6">
-                <button onClick={() => setView("list")} className="px-5 py-2.5 rounded-full border border-border-light text-text-secondary text-sm font-semibold hover:bg-surface-secondary">
+              <div className="flex justify-between border-t border-[#E5EAF2] pt-6">
+                <button onClick={() => setView("list")} className="px-5 py-2.5 rounded-full border border-[#E5EAF2] text-text-secondary text-sm font-semibold hover:bg-slate-50 transition-colors">
                   Cancel
                 </button>
                 <button onClick={() => setWizardStep(2)} className="bg-primary hover:bg-primary-hover text-white px-6 py-2.5 rounded-full text-sm font-semibold shadow-blue">
@@ -266,13 +269,13 @@ export default function IntegrationsPage() {
             <div className="space-y-6 text-center py-4">
               <span className="text-4xl">📁</span>
               <div>
-                <h3 className="font-bold text-text-dark text-lg font-display mb-2">Connect your {chosenApp} account</h3>
-                <p className="text-text-secondary text-xs max-w-md mx-auto leading-relaxed">
+                <h3 className="font-bold text-[#0F172A] text-lg font-display mb-2">Connect your {chosenApp} account</h3>
+                <p className="text-text-secondary text-xs max-w-md mx-auto leading-relaxed font-semibold">
                   Pricis requires permission to access your {chosenApp} account. This allows us to sync scopes, invoices, and folders.
                 </p>
               </div>
 
-              <div className="max-w-md mx-auto border border-border-light rounded-xl p-4 bg-surface-secondary text-left text-xs font-semibold text-text-dark space-y-2.5">
+              <div className="max-w-md mx-auto border border-[#E5EAF2] rounded-2xl p-5 bg-[#F8FAFC] text-left text-xs font-semibold text-[#0F172A] space-y-2.5">
                 <div className="flex gap-2 items-center">
                   <CheckCircle2 size={14} className="text-[#10B981]" />
                   <span>Store and manage proposal documents</span>
@@ -291,18 +294,18 @@ export default function IntegrationsPage() {
                 </div>
               </div>
 
-              <div className="pt-4 max-w-sm mx-auto">
+              <div className="pt-4 max-w-sm mx-auto space-y-3">
                 <button 
                   onClick={() => setWizardStep(3)}
                   className="w-full bg-primary hover:bg-primary-hover text-white py-3 rounded-xl text-sm font-bold shadow-blue transition-colors flex items-center justify-center gap-2"
                 >
                   Connect with Google
                 </button>
-                <span className="block text-[10px] text-text-muted mt-2">🔒 Your data is fully encrypted and secure.</span>
+                <span className="block text-[10px] text-text-muted mt-2 font-semibold">🔒 Your data is fully encrypted and secure.</span>
               </div>
 
-              <div className="flex justify-between border-t border-border-light pt-6 mt-8">
-                <button onClick={() => setWizardStep(1)} className="px-5 py-2.5 rounded-full border border-border-light text-text-secondary text-sm font-semibold hover:bg-surface-secondary">
+              <div className="flex justify-between border-t border-[#E5EAF2] pt-6 mt-8">
+                <button onClick={() => setWizardStep(1)} className="px-5 py-2.5 rounded-full border border-[#E5EAF2] text-text-secondary text-sm font-semibold hover:bg-slate-50 transition-colors">
                   Back
                 </button>
               </div>
@@ -313,7 +316,7 @@ export default function IntegrationsPage() {
           {wizardStep === 3 && (
             <div className="space-y-6">
               <div>
-                <h3 className="font-bold text-text-dark text-lg font-display mb-1">Configure {chosenApp} Integration</h3>
+                <h3 className="font-bold text-[#0F172A] text-lg font-display mb-1">Configure {chosenApp} Integration</h3>
                 <p className="text-text-secondary text-sm">Set up how this integration will work with Pricis.</p>
               </div>
 
@@ -324,12 +327,12 @@ export default function IntegrationsPage() {
                     type="text" 
                     value={connectionName}
                     onChange={(e) => setConnectionName(e.target.value)}
-                    className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium"
+                    className="w-full bg-[#F8FAFC] border border-[#E5EAF2] text-[#0F172A] text-sm rounded-xl px-4 py-2.5 outline-none font-medium focus:border-primary transition-colors"
                   />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Default Drive</label>
-                  <select className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-semibold cursor-pointer">
+                  <select className="w-full bg-[#F8FAFC] border border-[#E5EAF2] text-[#0F172A] text-sm rounded-xl px-4 py-2.5 outline-none font-semibold cursor-pointer focus:border-primary transition-colors">
                     <option>My Drive</option>
                     <option>Shared Team Drive</option>
                   </select>
@@ -340,7 +343,7 @@ export default function IntegrationsPage() {
                     type="text" 
                     value={proposalFolder}
                     onChange={(e) => setProposalFolder(e.target.value)}
-                    className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium"
+                    className="w-full bg-[#F8FAFC] border border-[#E5EAF2] text-[#0F172A] text-sm rounded-xl px-4 py-2.5 outline-none font-medium focus:border-primary transition-colors"
                   />
                 </div>
                 <div>
@@ -349,16 +352,16 @@ export default function IntegrationsPage() {
                     type="text" 
                     value={invoiceFolder}
                     onChange={(e) => setInvoiceFolder(e.target.value)}
-                    className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium"
+                    className="w-full bg-[#F8FAFC] border border-[#E5EAF2] text-[#0F172A] text-sm rounded-xl px-4 py-2.5 outline-none font-medium focus:border-primary transition-colors"
                   />
                 </div>
               </div>
 
               <div className="space-y-3 pt-2">
-                <div className="flex justify-between items-center bg-surface-secondary p-4 border border-border-light rounded-xl">
+                <div className="flex justify-between items-center bg-[#F8FAFC] p-4 border border-[#E5EAF2] rounded-xl font-semibold text-xs">
                   <div>
-                    <span className="block text-xs font-bold text-text-dark">Auto-sync new files</span>
-                    <span className="block text-[10px] text-text-secondary">Automatically sync created documents to storage</span>
+                    <span className="block font-bold text-[#0F172A]">Auto-sync new files</span>
+                    <span className="block text-[10px] text-text-secondary font-medium">Automatically sync created documents to storage</span>
                   </div>
                   <div 
                     onClick={() => setAutoSync(!autoSync)}
@@ -368,10 +371,10 @@ export default function IntegrationsPage() {
                   </div>
                 </div>
 
-                <div className="flex justify-between items-center bg-surface-secondary p-4 border border-border-light rounded-xl">
+                <div className="flex justify-between items-center bg-[#F8FAFC] p-4 border border-[#E5EAF2] rounded-xl font-semibold text-xs">
                   <div>
-                    <span className="block text-xs font-bold text-text-dark">Share files with team</span>
-                    <span className="block text-[10px] text-text-secondary">Enable viewing permissions for team members</span>
+                    <span className="block font-bold text-[#0F172A]">Share files with team</span>
+                    <span className="block text-[10px] text-text-secondary font-medium">Enable viewing permissions for team members</span>
                   </div>
                   <div 
                     onClick={() => setShareFiles(!shareFiles)}
@@ -382,8 +385,8 @@ export default function IntegrationsPage() {
                 </div>
               </div>
 
-              <div className="flex justify-between border-t border-border-light pt-6">
-                <button onClick={() => setWizardStep(2)} className="px-5 py-2.5 rounded-full border border-border-light text-text-secondary text-sm font-semibold hover:bg-surface-secondary">
+              <div className="flex justify-between border-t border-[#E5EAF2] pt-6">
+                <button onClick={() => setWizardStep(2)} className="px-5 py-2.5 rounded-full border border-[#E5EAF2] text-text-secondary text-sm font-semibold hover:bg-slate-50 transition-colors">
                   Back
                 </button>
                 <button onClick={() => setWizardStep(4)} className="bg-primary hover:bg-primary-hover text-white px-6 py-2.5 rounded-full text-sm font-semibold shadow-blue">
@@ -397,45 +400,45 @@ export default function IntegrationsPage() {
           {wizardStep === 4 && (
             <div className="space-y-6">
               <div>
-                <h3 className="font-bold text-text-dark text-lg font-display mb-1">Review and Connect</h3>
-                <p className="text-text-secondary text-sm">Please review your integration settings before completing.</p>
+                <h3 className="font-bold text-[#0F172A] text-lg font-display mb-1">Review and Connect</h3>
+                <p className="text-text-secondary text-sm font-semibold">Please review your integration settings before completing.</p>
               </div>
 
-              <div className="bg-surface-secondary border border-border-light rounded-2xl p-6 space-y-4">
-                <div className="flex gap-4 items-center border-b border-border-light/60 pb-4">
+              <div className="bg-[#F8FAFC] border border-[#E5EAF2] rounded-2xl p-6 space-y-4 text-left">
+                <div className="flex gap-4 items-center border-b border-[#E5EAF2] pb-4">
                   <span className="text-4xl">📁</span>
                   <div>
-                    <span className="font-bold text-text-dark text-sm block">{chosenApp} Connection</span>
+                    <span className="font-bold text-[#0F172A] text-sm block">{chosenApp} Connection</span>
                     <span className="text-[10px] text-text-secondary font-semibold">Active Drive: My Drive</span>
                   </div>
                 </div>
                 
-                <div className="space-y-3 text-xs font-semibold text-text-dark">
+                <div className="space-y-3 text-xs font-semibold text-[#0F172A]">
                   <div className="flex justify-between">
-                    <span className="text-text-secondary">Connection Name</span>
+                    <span className="text-text-secondary font-display">Connection Name</span>
                     <span>{connectionName}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-text-secondary">Proposals Folder</span>
+                    <span className="text-text-secondary font-display">Proposals Folder</span>
                     <span>{proposalFolder}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-text-secondary">Invoices Folder</span>
+                    <span className="text-text-secondary font-display">Invoices Folder</span>
                     <span>{invoiceFolder}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-text-secondary">Auto-sync New Files</span>
+                    <span className="text-text-secondary font-display">Auto-sync New Files</span>
                     <span>{autoSync ? "Yes" : "No"}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-text-secondary">Share with Team</span>
+                    <span className="text-text-secondary font-display">Share with Team</span>
                     <span>{shareFiles ? "Yes" : "No"}</span>
                   </div>
                 </div>
               </div>
 
-              <div className="flex justify-between border-t border-border-light pt-6">
-                <button onClick={() => setWizardStep(3)} className="px-5 py-2.5 rounded-full border border-border-light text-text-secondary text-sm font-semibold hover:bg-surface-secondary">
+              <div className="flex justify-between border-t border-[#E5EAF2] pt-6">
+                <button onClick={() => setWizardStep(3)} className="px-5 py-2.5 rounded-full border border-[#E5EAF2] text-text-secondary text-sm font-semibold hover:bg-slate-50 transition-colors">
                   Back
                 </button>
                 <button onClick={handleConnectIntegration} className="bg-primary hover:bg-primary-hover text-white px-6 py-2.5 rounded-full text-sm font-semibold shadow-blue">
@@ -451,46 +454,46 @@ export default function IntegrationsPage() {
       {view === "details" && selectedApp && (
         <div className="space-y-6 max-w-5xl mx-auto">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row justify-between items-start gap-4 pb-4 border-b border-border-light">
-            <button onClick={() => setView("list")} className="flex items-center gap-2 text-text-secondary hover:text-text-dark transition-colors text-sm font-semibold">
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-4 pb-4 border-b border-[#E5EAF2]">
+            <button onClick={() => setView("list")} className="flex items-center gap-2 text-text-secondary hover:text-[#0F172A] transition-colors text-sm font-bold">
               <ArrowLeft size={16} /> Back to Integrations
             </button>
             
-            <div className="flex gap-2">
+            <div className="flex gap-2 w-full sm:w-auto">
               <button 
                 onClick={() => setIsTestConnectionModalOpen(true)}
-                className="bg-white border border-border-light text-text-dark hover:bg-slate-50 px-4 py-2 rounded-xl text-xs font-semibold transition-colors"
+                className="bg-white border border-[#E5EAF2] text-[#0F172A] hover:bg-slate-50 px-4 py-2 rounded-xl text-xs font-bold transition-colors flex-1 sm:flex-none"
               >
                 Test Connection
               </button>
               <button 
                 onClick={() => setIsReauthorizeModalOpen(true)}
-                className="bg-white border border-border-light text-text-dark hover:bg-slate-50 px-4 py-2 rounded-xl text-xs font-semibold transition-colors"
+                className="bg-white border border-[#E5EAF2] text-[#0F172A] hover:bg-slate-50 px-4 py-2 rounded-xl text-xs font-bold transition-colors flex-1 sm:flex-none"
               >
                 Reauthorize
               </button>
               <button 
                 onClick={() => setIsDisconnectModalOpen(true)}
-                className="bg-red-50 hover:bg-red-100 text-danger border border-red-100 px-4 py-2 rounded-xl text-xs font-semibold transition-colors"
+                className="bg-red-50 hover:bg-red-100 text-danger border border-red-100 px-4 py-2 rounded-xl text-xs font-bold transition-colors flex-1 sm:flex-none"
               >
                 Disconnect
               </button>
             </div>
           </div>
 
-          <div className="flex items-center gap-4 bg-white border border-border-light rounded-2xl p-6 shadow-sm">
+          <div className="flex items-center gap-4 bg-white border border-[#E5EAF2] rounded-2xl p-6 shadow-sm">
             <span className="text-4xl">{selectedApp.logo}</span>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-xl font-bold text-text-dark font-display">{selectedApp.name}</h2>
-                <span className="bg-green-50 text-[#10B981] text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Connected</span>
+                <h2 className="text-xl font-bold text-[#0F172A] font-display">{selectedApp.name}</h2>
+                <span className="bg-emerald-50 text-[#10B981] border border-emerald-100 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Connected</span>
               </div>
-              <p className="text-xs text-text-secondary mt-1">Connected by {selectedApp.connectedBy} • {selectedApp.connectedOn}</p>
+              <p className="text-xs text-text-secondary mt-1 font-semibold">Connected by {selectedApp.connectedBy} • {selectedApp.connectedOn}</p>
             </div>
           </div>
 
           {/* Tabs Navigation */}
-          <div className="flex border-b border-border-light">
+          <div className="flex border-b border-[#E5EAF2]">
             {(["Overview", "Configuration", "Activity", "Webhooks"] as const).map((tab) => (
               <button
                 key={tab}
@@ -498,7 +501,7 @@ export default function IntegrationsPage() {
                 className={`px-6 py-3 text-xs font-bold border-b-2 transition-colors ${
                   activeDetailTab === tab 
                     ? "border-primary text-primary" 
-                    : "border-transparent text-text-secondary hover:text-text-dark"
+                    : "border-transparent text-text-secondary hover:text-[#0F172A]"
                 }`}
               >
                 {tab}
@@ -520,7 +523,7 @@ export default function IntegrationsPage() {
                       { label: "Last Sync", count: "2 min ago" },
                       { label: "Status", count: "Healthy", color: "text-[#10B981]" }
                     ].map((stat, i) => (
-                      <div key={i} className="bg-white border border-border-light rounded-xl p-4 shadow-sm text-center">
+                      <div key={i} className="bg-white border border-[#E5EAF2] rounded-xl p-4 shadow-sm text-center">
                         <span className={`text-xl font-bold font-display ${stat.color}`}>{stat.count}</span>
                         <p className="text-[10px] text-text-secondary font-bold uppercase mt-1">{stat.label}</p>
                       </div>
@@ -528,19 +531,19 @@ export default function IntegrationsPage() {
                   </div>
 
                   {/* Overview details */}
-                  <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm space-y-4">
-                    <h3 className="font-bold text-text-dark text-sm font-display">Overview</h3>
-                    <p className="text-xs text-text-secondary leading-relaxed">
+                  <div className="bg-white border border-[#E5EAF2] rounded-2xl p-6 shadow-sm space-y-4">
+                    <h3 className="font-bold text-[#0F172A] text-sm font-display">Overview</h3>
+                    <p className="text-xs text-text-secondary leading-relaxed font-semibold">
                       Google Drive integration allows you to store and manage files seamlessly. All generated proposals, contracts and invoices are automatically uploaded and organized.
                     </p>
-                    <div className="border-t border-border-light pt-4 space-y-3">
+                    <div className="border-t border-[#E5EAF2] pt-4 space-y-3">
                       <span className="block text-xs font-bold text-text-secondary uppercase">Permissions Granted</span>
                       {[
                         "View and manage files in Google Drive",
                         "Create and upload files",
                         "View folders and file metadata"
                       ].map((perm, i) => (
-                        <div key={i} className="flex gap-2 items-center text-xs font-semibold text-text-dark">
+                        <div key={i} className="flex gap-2 items-center text-xs font-semibold text-[#0F172A]">
                           <CheckCircle2 size={14} className="text-[#10B981]" />
                           <span>{perm}</span>
                         </div>
@@ -552,8 +555,8 @@ export default function IntegrationsPage() {
 
               {/* Tab: Configuration */}
               {activeDetailTab === "Configuration" && (
-                <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm space-y-5">
-                  <h3 className="font-bold text-text-dark text-sm font-display mb-4">Configuration Settings</h3>
+                <div className="bg-white border border-[#E5EAF2] rounded-2xl p-6 shadow-sm space-y-5">
+                  <h3 className="font-bold text-[#0F172A] text-sm font-display mb-4">Configuration Settings</h3>
                   {[
                     { label: "Connection Name", value: connectionName },
                     { label: "Default Drive", value: "My Drive" },
@@ -561,12 +564,12 @@ export default function IntegrationsPage() {
                     { label: "Folder for Invoices", value: invoiceFolder },
                     { label: "File Upload Preference", value: "PDF & Original Formats" }
                   ].map((config, i) => (
-                    <div key={i} className="flex justify-between items-center py-3 border-b border-border-light/60 last:border-0">
+                    <div key={i} className="flex justify-between items-center py-3 border-b border-[#E5EAF2] last:border-0 font-semibold text-xs text-[#0F172A]">
                       <div>
                         <span className="text-[10px] font-bold text-text-secondary uppercase">{config.label}</span>
-                        <p className="text-xs font-bold text-text-dark mt-0.5">{config.value}</p>
+                        <p className="text-xs font-bold text-[#0F172A] mt-0.5">{config.value}</p>
                       </div>
-                      <button className="bg-white border border-border-light text-text-dark hover:bg-slate-50 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">
+                      <button className="bg-white border border-[#E5EAF2] text-[#0F172A] hover:bg-slate-50 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">
                         Edit
                       </button>
                     </div>
@@ -576,8 +579,8 @@ export default function IntegrationsPage() {
 
               {/* Tab: Activity */}
               {activeDetailTab === "Activity" && (
-                <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm space-y-4">
-                  <h3 className="font-bold text-text-dark text-sm font-display mb-4">Integration Activity</h3>
+                <div className="bg-white border border-[#E5EAF2] rounded-2xl p-6 shadow-sm space-y-4">
+                  <h3 className="font-bold text-[#0F172A] text-sm font-display mb-4">Integration Activity</h3>
                   <div className="space-y-4">
                     {[
                       { event: "File created", details: "Proposal_ABC_2024.pdf", date: "May 31, 2024 10:30 AM", status: "Success" },
@@ -586,13 +589,13 @@ export default function IntegrationsPage() {
                       { event: "Permission changed", details: "Shared with ruth.alex@gmail.com", date: "May 30, 2024 03:20 PM", status: "Success" },
                       { event: "File created", details: "Contract_ABC_2024.pdf", date: "May 30, 2024 11:05 AM", status: "Success" },
                     ].map((act, i) => (
-                      <div key={i} className="flex justify-between items-start pb-4 border-b border-border-light/60 last:border-0 last:pb-0 text-xs font-semibold">
+                      <div key={i} className="flex justify-between items-start pb-4 border-b border-[#E5EAF2] last:border-0 last:pb-0 text-xs font-semibold">
                         <div>
-                          <span className="text-text-dark block">{act.event}</span>
+                          <span className="text-[#0F172A] block">{act.event}</span>
                           <span className="text-text-secondary font-normal block mt-0.5">{act.details}</span>
                           <span className="text-[10px] text-text-muted font-normal block mt-1">{act.date}</span>
                         </div>
-                        <span className="bg-green-50 text-[#10B981] text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
+                        <span className="bg-green-50 text-[#10B981] border border-green-100 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
                           {act.status}
                         </span>
                       </div>
@@ -603,10 +606,10 @@ export default function IntegrationsPage() {
 
               {/* Tab: Webhooks */}
               {activeDetailTab === "Webhooks" && (
-                <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm space-y-6">
+                <div className="bg-white border border-[#E5EAF2] rounded-2xl p-6 shadow-sm space-y-6">
                   <div>
-                    <h3 className="font-bold text-text-dark text-sm font-display mb-1">Webhooks</h3>
-                    <p className="text-text-secondary text-xs">Get real-time updates when events happen in {selectedApp.name}.</p>
+                    <h3 className="font-bold text-[#0F172A] text-sm font-display mb-1">Webhooks</h3>
+                    <p className="text-text-secondary text-xs font-semibold">Get real-time updates when events happen in {selectedApp.name}.</p>
                   </div>
 
                   <div className="space-y-4">
@@ -617,15 +620,15 @@ export default function IntegrationsPage() {
                           type="text" 
                           readOnly
                           value="https://api.pricis.co/v1/integrations/google-drive/webhook" 
-                          className="flex-grow bg-surface-secondary border border-border-light text-text-dark text-xs font-semibold rounded-xl px-4 py-2.5 outline-none select-all"
+                          className="flex-grow bg-[#F8FAFC] border border-[#E5EAF2] text-[#0F172A] text-xs font-semibold rounded-xl px-4 py-2.5 outline-none select-all"
                         />
-                        <button className="bg-white border border-border-light text-text-dark px-4 py-2 rounded-xl text-xs font-bold transition-colors">
+                        <button className="bg-white border border-[#E5EAF2] text-[#0F172A] px-4 py-2.5 rounded-xl text-xs font-bold transition-colors">
                           Copy
                         </button>
                       </div>
                     </div>
 
-                    <div className="border-t border-border-light pt-4 space-y-3">
+                    <div className="border-t border-[#E5EAF2] pt-4 space-y-3">
                       <span className="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-1">Events Trigger</span>
                       {[
                         { name: "File created", checked: true },
@@ -640,7 +643,7 @@ export default function IntegrationsPage() {
                             onChange={() => {}}
                             className="rounded text-primary focus:ring-primary h-4 w-4"
                           />
-                          <span className="text-xs font-semibold text-text-dark">{evt.name}</span>
+                          <span className="text-xs font-semibold text-[#0F172A]">{evt.name}</span>
                         </label>
                       ))}
                     </div>
@@ -650,100 +653,99 @@ export default function IntegrationsPage() {
 
             </div>
           </div>
+        </div>
+      )}
 
-          {/* Test Connection Modal */}
-          {isTestConnectionModalOpen && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-              <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-lg border border-border-light relative animate-dropdown">
-                <h3 className="font-bold text-text-dark text-lg font-display mb-2">Test Connection</h3>
-                <p className="text-text-secondary text-xs mb-4">Verifying your integration connection...</p>
-                
-                <div className="space-y-3.5 mb-6 text-xs font-semibold text-text-dark">
-                  {[
-                    "Authentication", "Access Permissions", "Data Sync", "Webhook Delivery"
-                  ].map((test, i) => (
-                    <div key={i} className="flex justify-between items-center border-b border-border-light/60 pb-2.5">
-                      <span>{test}</span>
-                      <span className="text-[#10B981] font-bold">✓ Success</span>
-                    </div>
-                  ))}
+      {/* Test Connection Modal */}
+      {isTestConnectionModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-lg border border-[#E5EAF2] relative animate-dropdown text-left">
+            <h3 className="font-bold text-[#0F172A] text-lg font-display mb-2">Test Connection</h3>
+            <p className="text-text-secondary text-xs mb-4">Verifying your integration connection...</p>
+            
+            <div className="space-y-3.5 mb-6 text-xs font-semibold text-[#0F172A]">
+              {[
+                "Authentication", "Access Permissions", "Data Sync", "Webhook Delivery"
+              ].map((test, i) => (
+                <div key={i} className="flex justify-between items-center border-b border-[#E5EAF2] pb-2.5">
+                  <span>{test}</span>
+                  <span className="text-[#10B981] font-bold">✓ Success</span>
                 </div>
-
-                <div className="bg-green-50 border border-green-100 rounded-xl p-4 text-center mb-6">
-                  <span className="text-xs font-bold text-[#10B981] block">All tests passed successfully!</span>
-                  <span className="text-[10px] text-[#10B981]/80 block mt-0.5">Your integration is working perfectly.</span>
-                </div>
-
-                <button 
-                  onClick={() => setIsTestConnectionModalOpen(false)}
-                  className="w-full bg-primary hover:bg-primary-hover text-white py-2.5 rounded-xl text-xs font-bold transition-colors"
-                >
-                  Close
-                </button>
-              </div>
+              ))}
             </div>
-          )}
 
-          {/* Disconnect Modal */}
-          {isDisconnectModalOpen && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-              <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-lg border border-border-light relative animate-dropdown text-center space-y-4">
-                <ShieldAlert size={40} className="text-danger mx-auto" />
-                <div>
-                  <h3 className="font-bold text-text-dark text-lg font-display">Disconnect Integration</h3>
-                  <p className="text-text-secondary text-xs mt-1.5 leading-relaxed">
-                    Are you sure you want to disconnect {selectedApp.name}? This will stop automatic backups and syncing.
-                  </p>
-                </div>
-                
-                <div className="flex gap-3 pt-2">
-                  <button 
-                    onClick={() => setIsDisconnectModalOpen(false)}
-                    className="flex-1 bg-white border border-border-light hover:bg-surface-secondary text-text-dark py-2.5 rounded-xl text-xs font-bold transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    onClick={handleDisconnect}
-                    className="flex-1 bg-danger hover:bg-red-600 text-white py-2.5 rounded-xl text-xs font-bold transition-colors"
-                  >
-                    Disconnect
-                  </button>
-                </div>
-              </div>
+            <div className="bg-green-50 border border-green-100 rounded-xl p-4 text-center mb-6">
+              <span className="text-xs font-bold text-[#10B981] block font-display">All tests passed successfully!</span>
+              <span className="text-[10px] text-[#10B981]/80 block mt-0.5 font-semibold">Your integration is working perfectly.</span>
             </div>
-          )}
 
-          {/* Reauthorize Modal */}
-          {isReauthorizeModalOpen && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-              <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-lg border border-border-light relative animate-dropdown text-center space-y-4">
-                <RefreshCw size={40} className="text-primary mx-auto animate-spin" />
-                <div>
-                  <h3 className="font-bold text-text-dark text-lg font-display">Reauthorize Connection</h3>
-                  <p className="text-text-secondary text-xs mt-1.5 leading-relaxed">
-                    Your session or token may have expired. Please re-authorize to restore sync permissions.
-                  </p>
-                </div>
-                
-                <div className="flex gap-3 pt-2">
-                  <button 
-                    onClick={() => setIsReauthorizeModalOpen(false)}
-                    className="flex-1 bg-white border border-border-light hover:bg-surface-secondary text-text-dark py-2.5 rounded-xl text-xs font-bold transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    onClick={() => { setIsReauthorizeModalOpen(false); alert("Connection reauthorized successfully!"); }}
-                    className="flex-1 bg-primary hover:bg-primary-hover text-white py-2.5 rounded-xl text-xs font-bold transition-colors"
-                  >
-                    Reauthorize
-                  </button>
-                </div>
-              </div>
+            <button 
+              onClick={() => setIsTestConnectionModalOpen(false)}
+              className="w-full bg-primary hover:bg-primary-hover text-white py-2.5 rounded-xl text-xs font-bold transition-colors shadow-blue"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Disconnect Modal */}
+      {isDisconnectModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-lg border border-[#E5EAF2] relative animate-dropdown text-center space-y-4">
+            <ShieldAlert size={40} className="text-danger mx-auto" />
+            <div>
+              <h3 className="font-bold text-[#0F172A] text-lg font-display">Disconnect Integration</h3>
+              <p className="text-text-secondary text-xs mt-1.5 leading-relaxed font-semibold">
+                Are you sure you want to disconnect {selectedApp?.name}? This will stop automatic backups and syncing.
+              </p>
             </div>
-          )}
+            
+            <div className="flex gap-3 pt-2">
+              <button 
+                onClick={() => setIsDisconnectModalOpen(false)}
+                className="flex-1 bg-white border border-[#E5EAF2] hover:bg-slate-50 text-[#0F172A] py-2.5 rounded-xl text-xs font-bold transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleDisconnect}
+                className="flex-1 bg-danger hover:bg-red-600 text-white py-2.5 rounded-xl text-xs font-bold transition-colors"
+              >
+                Disconnect
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
+      {/* Reauthorize Modal */}
+      {isReauthorizeModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-lg border border-[#E5EAF2] relative animate-dropdown text-center space-y-4">
+            <RefreshCw size={40} className="text-primary mx-auto animate-spin" />
+            <div>
+              <h3 className="font-bold text-[#0F172A] text-lg font-display">Reauthorize Connection</h3>
+              <p className="text-text-secondary text-xs mt-1.5 leading-relaxed font-semibold">
+                Your session or token may have expired. Please re-authorize to restore sync permissions.
+              </p>
+            </div>
+            
+            <div className="flex gap-3 pt-2">
+              <button 
+                onClick={() => setIsReauthorizeModalOpen(false)}
+                className="flex-1 bg-white border border-[#E5EAF2] hover:bg-slate-50 text-[#0F172A] py-2.5 rounded-xl text-xs font-bold transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => { setIsReauthorizeModalOpen(false); alert("Connection reauthorized successfully!"); }}
+                className="flex-1 bg-primary hover:bg-primary-hover text-white py-2.5 rounded-xl text-xs font-bold transition-colors shadow-blue"
+              >
+                Reauthorize
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

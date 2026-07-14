@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { 
   Plus, ArrowLeft, ArrowRight, Check, ChevronRight, BarChart2, 
-  Calendar, Eye, CheckCircle2, FileText, Download, Clock, Sparkles
+  Calendar, Eye, CheckCircle2, FileText, Download, Clock, Sparkles, Search
 } from "lucide-react";
 
 interface ReportData {
@@ -59,24 +59,24 @@ export default function AnalyticsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-fade-in-up">
       {/* ----------------- DASHBOARD VIEW ----------------- */}
       {view === "dashboard" && (
         <>
-          <div className="flex justify-between items-start">
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-text-dark font-display">Analytics</h1>
+              <h1 className="text-3xl font-extrabold text-[#0F172A] font-display">Analytics</h1>
               <p className="text-text-secondary text-sm font-body">Track performance, analyze trends, and make data-driven decisions.</p>
             </div>
             <div className="flex gap-2">
               <button 
                 onClick={() => setView("reports")}
-                className="bg-white border border-border-light text-text-dark px-4 py-2 rounded-xl text-xs font-semibold hover:bg-surface-secondary transition-colors shadow-sm"
+                className="bg-white border border-[#E5EAF2] text-[#0F172A] px-4 py-2 rounded-xl text-xs font-bold hover:bg-slate-50 transition-colors shadow-sm"
               >
                 Reports List
               </button>
-              <button className="bg-white border border-border-light text-text-dark px-4 py-2 rounded-xl text-xs font-semibold hover:bg-surface-secondary transition-colors shadow-sm flex items-center gap-1.5">
-                <Calendar size={14} /> May 1 - May 31, 2024
+              <button className="bg-white border border-[#E5EAF2] text-[#0F172A] px-4 py-2 rounded-xl text-xs font-bold hover:bg-slate-50 transition-colors shadow-sm flex items-center gap-1.5">
+                <Calendar size={14} className="text-text-secondary" /> May 1 - May 31, 2024
               </button>
             </div>
           </div>
@@ -84,15 +84,15 @@ export default function AnalyticsPage() {
           {/* Stats Grid */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { label: "Total Revenue", count: "₦2,450,000", desc: "↑ 28% vs Apr 1 - Apr 30", color: "text-text-dark" },
-              { label: "Won Deals", count: "24", desc: "↑ 33% vs Apr 1 - Apr 30", color: "text-[#10B981]" },
+              { label: "Total Revenue", count: "₦2,450,000", desc: "↑ 28% vs Apr 1 - Apr 30", color: "text-[#0F172A]" },
+              { label: "Won Deals", count: "24", desc: "↑ 33% vs Apr 1 - Apr 30", color: "text-emerald-600" },
               { label: "Conversion Rate", count: "16.7%", desc: "↑ 4.2% vs Apr 1 - Apr 30", color: "text-primary" },
               { label: "Avg. Deal Value", count: "₦102,083", desc: "↓ 6% vs Apr 1 - Apr 30", color: "text-danger" },
             ].map((stat, i) => (
-              <div key={i} className="bg-white border border-border-light rounded-xl p-5 shadow-sm">
-                <span className={`text-2xl font-bold font-display ${stat.color}`}>{stat.count}</span>
-                <p className="text-sm font-semibold text-text-dark mt-1">{stat.label}</p>
-                <p className="text-xs text-text-secondary mt-0.5">{stat.desc}</p>
+              <div key={i} className="bg-white border border-[#E5EAF2] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
+                <span className={`text-2xl font-black font-display ${stat.color}`}>{stat.count}</span>
+                <p className="text-xs font-bold text-text-secondary uppercase tracking-wider mt-2">{stat.label}</p>
+                <p className="text-[10px] text-text-muted mt-1 font-semibold">{stat.desc}</p>
               </div>
             ))}
           </div>
@@ -100,10 +100,10 @@ export default function AnalyticsPage() {
           {/* Main Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Revenue Over Time Line Chart */}
-            <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm lg:col-span-2 flex flex-col justify-between">
+            <div className="bg-white border border-[#E5EAF2] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 lg:col-span-2 flex flex-col justify-between">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="font-bold text-text-dark text-base font-display">Revenue Over Time</h3>
-                <select className="bg-surface-secondary border border-border-light text-text-secondary text-xs rounded-lg px-2 py-1 outline-none font-semibold">
+                <h3 className="font-bold text-[#0F172A] text-base font-display">Revenue Over Time</h3>
+                <select className="bg-slate-50 border border-[#E5EAF2] text-text-secondary text-xs rounded-lg px-2 py-1 outline-none font-semibold">
                   <option>Daily</option>
                   <option>Weekly</option>
                 </select>
@@ -133,7 +133,7 @@ export default function AnalyticsPage() {
                   <span>May 31</span>
                 </div>
               </div>
-              <div className="flex gap-4 text-xs font-semibold mt-4">
+              <div className="flex gap-4 text-xs font-semibold mt-6">
                 <div className="flex items-center gap-1.5 text-primary">
                   <div className="w-2.5 h-2.5 rounded-full bg-primary"></div>
                   <span>Revenue (₦)</span>
@@ -146,9 +146,9 @@ export default function AnalyticsPage() {
             </div>
 
             {/* Pipeline Overview Donut Chart */}
-            <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+            <div className="bg-white border border-[#E5EAF2] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="font-bold text-text-dark text-base font-display">Pipeline Overview</h3>
+                <h3 className="font-bold text-[#0F172A] text-base font-display">Pipeline Overview</h3>
               </div>
               <div className="flex items-center justify-center relative h-36">
                 <svg viewBox="0 0 36 36" className="w-32 h-32 transform -rotate-90">
@@ -160,16 +160,16 @@ export default function AnalyticsPage() {
                   <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#ef4444" strokeWidth="3.5" strokeDasharray="5 95" strokeDashoffset="-95" />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-2xl font-bold text-text-dark font-display leading-none">54</span>
+                  <span className="text-2xl font-black text-[#0F172A] font-display leading-none">54</span>
                   <span className="text-[10px] text-text-secondary font-semibold mt-1">Total Deals</span>
                 </div>
               </div>
-              <div className="space-y-1.5 text-[11px] font-semibold text-text-secondary pt-4 border-t border-border-light/60">
-                <div className="flex justify-between"><span>Scopes Generated</span><span className="font-bold text-text-dark">35 (20.3%)</span></div>
-                <div className="flex justify-between"><span>Proposals Sent</span><span className="font-bold text-text-dark">16 (25.5%)</span></div>
-                <div className="flex justify-between"><span>Opened</span><span className="font-bold text-text-dark">10 (12.8%)</span></div>
-                <div className="flex justify-between"><span>Signed</span><span className="font-bold text-text-dark">5 (9.5%)</span></div>
-                <div className="flex justify-between"><span>Paid</span><span className="font-bold text-text-dark">4 (6.4%)</span></div>
+              <div className="space-y-2.5 text-[11px] font-bold text-text-secondary pt-4 border-t border-[#E5EAF2]">
+                <div className="flex justify-between"><span>Scopes Generated</span><span className="font-extrabold text-[#0F172A]">35 (20.3%)</span></div>
+                <div className="flex justify-between"><span>Proposals Sent</span><span className="font-extrabold text-[#0F172A]">16 (25.5%)</span></div>
+                <div className="flex justify-between"><span>Opened</span><span className="font-extrabold text-[#0F172A]">10 (12.8%)</span></div>
+                <div className="flex justify-between"><span>Signed</span><span className="font-extrabold text-[#0F172A]">5 (9.5%)</span></div>
+                <div className="flex justify-between"><span>Paid</span><span className="font-extrabold text-[#0F172A]">4 (6.4%)</span></div>
               </div>
             </div>
           </div>
@@ -177,8 +177,8 @@ export default function AnalyticsPage() {
           {/* Third Row tables */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Top Services */}
-            <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm space-y-4">
-              <h3 className="font-bold text-text-dark text-sm font-display mb-4">Top Services by Revenue</h3>
+            <div className="bg-white border border-[#E5EAF2] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 space-y-4">
+              <h3 className="font-bold text-[#0F172A] text-sm font-display mb-4">Top Services by Revenue</h3>
               <div className="space-y-3">
                 {[
                   { name: "UI/UX Design", value: "₦750,000" },
@@ -187,7 +187,7 @@ export default function AnalyticsPage() {
                   { name: "Mobile App Design", value: "₦250,000" },
                   { name: "SEO & Content", value: "₦100,000" }
                 ].map((s, i) => (
-                  <div key={i} className="flex justify-between items-center text-xs font-semibold text-text-dark">
+                  <div key={i} className="flex justify-between items-center text-xs font-bold text-[#0F172A] border-b border-[#F1F5F9] pb-2 last:border-0">
                     <span>{s.name}</span>
                     <span>{s.value}</span>
                   </div>
@@ -196,8 +196,8 @@ export default function AnalyticsPage() {
             </div>
 
             {/* Revenue by Client */}
-            <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm space-y-4">
-              <h3 className="font-bold text-text-dark text-sm font-display mb-4">Revenue by Client</h3>
+            <div className="bg-white border border-[#E5EAF2] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 space-y-4">
+              <h3 className="font-bold text-[#0F172A] text-sm font-display mb-4">Revenue by Client</h3>
               <div className="space-y-3">
                 {[
                   { name: "Acme Corp", value: "₦1,200,000" },
@@ -206,7 +206,7 @@ export default function AnalyticsPage() {
                   { name: "StoreHub", value: "₦500,000" },
                   { name: "StartupX", value: "₦300,000" }
                 ].map((c, i) => (
-                  <div key={i} className="flex justify-between items-center text-xs font-semibold text-text-dark">
+                  <div key={i} className="flex justify-between items-center text-xs font-bold text-[#0F172A] border-b border-[#F1F5F9] pb-2 last:border-0">
                     <span>{c.name}</span>
                     <span>{c.value}</span>
                   </div>
@@ -215,8 +215,8 @@ export default function AnalyticsPage() {
             </div>
 
             {/* Deals by Status */}
-            <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm space-y-4">
-              <h3 className="font-bold text-text-dark text-sm font-display mb-4">Deals by Status</h3>
+            <div className="bg-white border border-[#E5EAF2] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 space-y-4">
+              <h3 className="font-bold text-[#0F172A] text-sm font-display mb-4">Deals by Status</h3>
               <div className="space-y-3">
                 {[
                   { name: "In Progress", count: 16 },
@@ -225,7 +225,7 @@ export default function AnalyticsPage() {
                   { name: "Completed", count: 8 },
                   { name: "Overdue", count: 4 }
                 ].map((d, i) => (
-                  <div key={i} className="flex justify-between items-center text-xs font-semibold text-text-dark">
+                  <div key={i} className="flex justify-between items-center text-xs font-bold text-[#0F172A] border-b border-[#F1F5F9] pb-2 last:border-0">
                     <span>{d.name}</span>
                     <span>{d.count}</span>
                   </div>
@@ -239,59 +239,62 @@ export default function AnalyticsPage() {
       {/* ----------------- REPORTS LIST VIEW ----------------- */}
       {view === "reports" && (
         <>
-          <div className="flex justify-between items-center border-b border-border-light pb-4">
-            <button onClick={() => setView("dashboard")} className="flex items-center gap-2 text-text-secondary hover:text-text-dark transition-colors text-sm font-semibold">
+          <div className="flex justify-between items-center border-b border-[#E5EAF2] pb-6">
+            <button onClick={() => setView("dashboard")} className="flex items-center gap-2 text-text-secondary hover:text-[#0F172A] transition-colors text-sm font-bold">
               <ArrowLeft size={16} /> Back to Dashboard
             </button>
             <button 
               onClick={() => { setView("wizard"); setWizardStep(1); }}
-              className="bg-primary hover:bg-primary-hover text-white px-5 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 shadow-blue transition-colors animate-pulse"
+              className="bg-primary hover:bg-primary-hover text-white px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 shadow-blue transition-all"
             >
-              <Plus size={18} /> New Report
+              <Plus size={16} /> New Report
             </button>
           </div>
 
-          <div className="bg-white border border-border-light rounded-2xl overflow-hidden shadow-sm">
-            <div className="p-4 border-b border-border-light bg-surface-secondary/50">
-              <input 
-                type="text" 
-                placeholder="Search reports..." 
-                className="bg-white border border-border-light text-text-dark text-sm rounded-xl px-4 py-2 outline-none w-64 shadow-sm"
-              />
+          <div className="bg-white border border-[#E5EAF2] rounded-2xl overflow-hidden shadow-sm">
+            <div className="p-5 border-b border-[#E5EAF2] bg-[#F8FAFC]">
+              <div className="relative max-w-xs">
+                <Search className="absolute left-3.5 top-2.5 w-4 h-4 text-text-muted" />
+                <input 
+                  type="text" 
+                  placeholder="Search reports..." 
+                  className="bg-white border border-[#E5EAF2] text-text-dark text-xs rounded-xl pl-9 pr-4 py-2 outline-none w-full shadow-sm focus:border-primary transition-colors"
+                />
+              </div>
             </div>
             
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+              <table className="w-full text-left border-collapse font-body">
                 <thead>
-                  <tr className="bg-surface-secondary border-b border-border-light text-text-secondary text-xs uppercase tracking-wider font-semibold">
+                  <tr className="bg-[#F8FAFC] border-b border-[#E5EAF2] text-text-secondary text-[10px] uppercase tracking-wider font-bold">
                     <th className="p-4">Report Name</th>
                     <th className="p-4">Type</th>
                     <th className="p-4">Created By</th>
                     <th className="p-4">Last Run</th>
                     <th className="p-4">Schedule</th>
                     <th className="p-4">Status</th>
-                    <th className="p-4">Actions</th>
+                    <th className="p-4 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border-light text-sm font-medium">
+                <tbody className="divide-y divide-[#E5EAF2] text-xs font-semibold">
                   {reportsList.map((rep) => (
-                    <tr key={rep.id} className="hover:bg-surface-secondary/50 cursor-pointer" onClick={() => {
+                    <tr key={rep.id} className="hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => {
                       setView("report_details");
                       setReportName(rep.name);
                       setFrequency(rep.schedule);
                     }}>
-                      <td className="p-4 text-text-dark font-bold">{rep.name}</td>
+                      <td className="p-4 text-[#0F172A] font-bold">{rep.name}</td>
                       <td className="p-4 text-text-secondary">{rep.type}</td>
                       <td className="p-4 text-text-secondary">{rep.createdBy}</td>
                       <td className="p-4 text-text-muted">{rep.lastRun}</td>
                       <td className="p-4 text-text-dark font-bold">{rep.schedule}</td>
                       <td className="p-4">
-                        <span className="bg-green-50 text-[#10B981] text-[10px] font-bold px-2.5 py-1 rounded-full uppercase">
+                        <span className="bg-emerald-50 text-[#10B981] text-[10px] font-bold px-2.5 py-1 rounded-full uppercase border border-emerald-100">
                           {rep.status}
                         </span>
                       </td>
-                      <td className="p-4 text-text-muted hover:text-primary transition-colors">
-                        <ChevronRight size={18} />
+                      <td className="p-4 text-text-muted hover:text-primary transition-colors text-right">
+                        <ChevronRight size={16} className="inline" />
                       </td>
                     </tr>
                   ))}
@@ -306,30 +309,30 @@ export default function AnalyticsPage() {
       {view === "report_details" && (
         <div className="space-y-6 max-w-5xl mx-auto">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row justify-between items-start gap-4 pb-4 border-b border-border-light">
-            <button onClick={() => setView("reports")} className="flex items-center gap-2 text-text-secondary hover:text-text-dark transition-colors text-sm font-semibold">
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-4 pb-4 border-b border-[#E5EAF2]">
+            <button onClick={() => setView("reports")} className="flex items-center gap-2 text-text-secondary hover:text-[#0F172A] transition-colors text-sm font-bold">
               <ArrowLeft size={16} /> Back to Reports
             </button>
             <div className="flex gap-3">
               <button 
                 onClick={() => setIsExportModalOpen(true)}
-                className="bg-white border border-border-light text-text-dark hover:bg-slate-50 px-5 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-1.5"
+                className="bg-white border border-[#E5EAF2] text-[#0F172A] hover:bg-slate-50 px-5 py-2.5 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1.5 shadow-sm"
               >
-                <Download size={14} /> Export
+                <Download size={14} className="text-text-secondary" /> Export
               </button>
             </div>
           </div>
 
-          <div className="flex justify-between items-center bg-white border border-border-light rounded-2xl p-6 shadow-sm">
+          <div className="flex justify-between items-center bg-white border border-[#E5EAF2] rounded-2xl p-6 shadow-sm">
             <div>
-              <h2 className="text-xl font-bold text-text-dark font-display">{reportName}</h2>
-              <p className="text-xs text-[#10B981] font-semibold mt-1">✓ Scheduled {frequency}</p>
+              <h2 className="text-xl font-bold text-[#0F172A] font-display">{reportName}</h2>
+              <p className="text-xs text-emerald-600 font-bold mt-1">✓ Scheduled {frequency}</p>
             </div>
-            <span className="bg-green-50 text-[#10B981] text-[10px] font-bold px-3 py-1 rounded-full uppercase">Success</span>
+            <span className="bg-emerald-50 text-[#10B981] text-[10px] font-bold px-3 py-1 rounded-full uppercase border border-emerald-100">Success</span>
           </div>
 
           {/* Details Navigation */}
-          <div className="flex border-b border-border-light">
+          <div className="flex border-b border-[#E5EAF2]">
             {(["Overview", "Revenue", "Clients", "Services", "Activity"] as const).map((tab) => (
               <button
                 key={tab}
@@ -337,7 +340,7 @@ export default function AnalyticsPage() {
                 className={`px-6 py-3 text-xs font-bold border-b-2 transition-colors ${
                   activeReportTab === tab 
                     ? "border-primary text-primary" 
-                    : "border-transparent text-text-secondary hover:text-text-dark"
+                    : "border-transparent text-text-secondary hover:text-[#0F172A]"
                 }`}
               >
                 {tab}
@@ -354,22 +357,22 @@ export default function AnalyticsPage() {
                   {/* Mini Stats Grid */}
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     {[
-                      { label: "Total Revenue", value: "₦2,450,000", change: "↑ 28% vs Apr 1 - Apr 30", color: "text-text-dark" },
-                      { label: "Won Deals", value: "24", change: "↑ 33% vs Apr 1 - Apr 30", color: "text-[#10B981]" },
+                      { label: "Total Revenue", value: "₦2,450,000", change: "↑ 28% vs Apr 1 - Apr 30", color: "text-[#0F172A]" },
+                      { label: "Won Deals", value: "24", change: "↑ 33% vs Apr 1 - Apr 30", color: "text-emerald-600" },
                       { label: "Avg Deal Value", value: "₦102,083", change: "↓ 6% vs Apr 1 - Apr 30", color: "text-danger" },
                       { label: "Conversion Rate", value: "16.7%", change: "↑ 4.2% vs Apr 1 - Apr 30", color: "text-primary" }
                     ].map((stat, i) => (
-                      <div key={i} className="bg-white border border-border-light rounded-xl p-4 shadow-sm text-center">
+                      <div key={i} className="bg-white border border-[#E5EAF2] rounded-xl p-4 shadow-sm text-center">
                         <span className={`text-lg font-bold font-display ${stat.color}`}>{stat.value}</span>
                         <p className="text-[10px] text-text-secondary font-bold uppercase mt-1">{stat.label}</p>
-                        <p className="text-[9px] text-text-muted mt-0.5">{stat.change}</p>
+                        <p className="text-[9px] text-text-muted mt-0.5 font-semibold">{stat.change}</p>
                       </div>
                     ))}
                   </div>
 
                   {/* Revenue over time SVG mock */}
-                  <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm space-y-4">
-                    <h3 className="font-bold text-text-dark text-sm font-display">Revenue Over Time</h3>
+                  <div className="bg-white border border-[#E5EAF2] rounded-2xl p-6 shadow-sm space-y-4">
+                    <h3 className="font-bold text-[#0F172A] text-sm font-display">Revenue Over Time</h3>
                     <div className="h-40 w-full relative">
                       <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
                         <path d="M 0 85 C 20 80, 40 45, 60 70 C 80 50, 90 20, 100 15" fill="none" stroke="#2563EB" strokeWidth="3" />
@@ -380,9 +383,9 @@ export default function AnalyticsPage() {
               )}
 
               {activeReportTab !== "Overview" && (
-                <div className="bg-white border border-border-light rounded-2xl p-10 shadow-sm text-center">
+                <div className="bg-white border border-[#E5EAF2] rounded-2xl p-10 shadow-sm text-center">
                   <BarChart2 size={40} className="text-text-muted mx-auto mb-2" />
-                  <h4 className="font-bold text-sm text-text-dark mb-1">{activeReportTab} Report Section</h4>
+                  <h4 className="font-bold text-sm text-[#0F172A] mb-1">{activeReportTab} Report Section</h4>
                   <p className="text-xs text-text-secondary">Fully compiled data is ready for export.</p>
                 </div>
               )}
@@ -394,28 +397,28 @@ export default function AnalyticsPage() {
 
       {/* ----------------- WIZARD FLOW ----------------- */}
       {view === "wizard" && (
-        <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm max-w-2xl mx-auto">
+        <div className="bg-white border border-[#E5EAF2] rounded-2xl p-6 shadow-sm max-w-2xl mx-auto animate-fade-in">
           {/* Stepper Header */}
-          <div className="flex justify-between items-center mb-8 border-b border-border-light pb-4">
-            <span className="font-bold text-text-dark font-display text-lg">New Report</span>
+          <div className="flex justify-between items-center mb-8 border-b border-[#E5EAF2] pb-4">
+            <span className="font-bold text-[#0F172A] font-display text-lg">New Report</span>
             <div className="flex gap-2">
               {[1, 2, 3, 4].map((step) => (
                 <div key={step} className="flex items-center gap-1.5">
                   <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
                     wizardStep === step 
-                      ? "bg-primary text-white" 
+                      ? "bg-primary text-white animate-pulse" 
                       : wizardStep > step 
                       ? "bg-primary/10 text-primary" 
-                      : "bg-surface-secondary text-text-muted border border-border-light"
+                      : "bg-slate-50 text-text-muted border border-[#E5EAF2]"
                   }`}>
-                    {wizardStep > step ? <Check size={14} /> : step}
+                    {wizardStep > step ? <Check size={13} /> : step}
                   </div>
                   <span className={`text-xs font-semibold hidden md:inline ${
                     wizardStep === step ? "text-primary" : "text-text-muted"
                   }`}>
                     {step === 1 ? "Details" : step === 2 ? "Metrics" : step === 3 ? "Schedule" : "Preview"}
                   </span>
-                  {step < 4 && <div className="w-4 border-t border-border-light hidden md:block"></div>}
+                  {step < 4 && <div className="w-4 border-t border-[#E5EAF2] hidden md:block"></div>}
                 </div>
               ))}
             </div>
@@ -425,7 +428,7 @@ export default function AnalyticsPage() {
           {wizardStep === 1 && (
             <div className="space-y-6">
               <div>
-                <h3 className="font-bold text-text-dark text-lg font-display mb-1">Tell us about your report</h3>
+                <h3 className="font-bold text-[#0F172A] text-lg font-display mb-1">Tell us about your report</h3>
                 <p className="text-text-secondary text-sm">Add basic information to get started.</p>
               </div>
 
@@ -436,7 +439,7 @@ export default function AnalyticsPage() {
                     type="text" 
                     value={reportName}
                     onChange={(e) => setReportName(e.target.value)}
-                    className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium"
+                    className="w-full bg-[#F8FAFC] border border-[#E5EAF2] text-[#0F172A] text-sm rounded-xl px-4 py-2.5 outline-none font-medium focus:border-primary transition-colors"
                   />
                 </div>
                 <div>
@@ -445,7 +448,7 @@ export default function AnalyticsPage() {
                     rows={4}
                     value={reportDesc}
                     onChange={(e) => setReportDesc(e.target.value)}
-                    className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-medium resize-none leading-relaxed"
+                    className="w-full bg-[#F8FAFC] border border-[#E5EAF2] text-[#0F172A] text-sm rounded-xl px-4 py-2.5 outline-none font-medium resize-none leading-relaxed focus:border-primary transition-colors"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -454,7 +457,7 @@ export default function AnalyticsPage() {
                     <select 
                       value={reportType}
                       onChange={(e) => setReportType(e.target.value)}
-                      className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-semibold cursor-pointer"
+                      className="w-full bg-[#F8FAFC] border border-[#E5EAF2] text-[#0F172A] text-sm rounded-xl px-4 py-2.5 outline-none font-semibold cursor-pointer focus:border-primary transition-colors"
                     >
                       <option>Custom Report</option>
                       <option>Financial Report</option>
@@ -466,7 +469,7 @@ export default function AnalyticsPage() {
                     <select 
                       value={reportRange}
                       onChange={(e) => setReportRange(e.target.value)}
-                      className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-semibold cursor-pointer"
+                      className="w-full bg-[#F8FAFC] border border-[#E5EAF2] text-[#0F172A] text-sm rounded-xl px-4 py-2.5 outline-none font-semibold cursor-pointer focus:border-primary transition-colors"
                     >
                       <option>This Month</option>
                       <option>Last 30 Days</option>
@@ -477,8 +480,8 @@ export default function AnalyticsPage() {
                 </div>
               </div>
 
-              <div className="flex justify-between border-t border-border-light pt-6">
-                <button onClick={() => setView("reports")} className="px-5 py-2.5 rounded-full border border-border-light text-text-secondary text-sm font-semibold hover:bg-surface-secondary">
+              <div className="flex justify-between border-t border-[#E5EAF2] pt-6">
+                <button onClick={() => setView("reports")} className="px-5 py-2.5 rounded-full border border-[#E5EAF2] text-text-secondary text-sm font-semibold hover:bg-slate-50 transition-colors">
                   Cancel
                 </button>
                 <button onClick={() => setWizardStep(2)} className="bg-primary hover:bg-primary-hover text-white px-6 py-2.5 rounded-full text-sm font-semibold shadow-blue">
@@ -492,14 +495,14 @@ export default function AnalyticsPage() {
           {wizardStep === 2 && (
             <div className="space-y-6">
               <div>
-                <h3 className="font-bold text-text-dark text-lg font-display mb-1">Select metrics</h3>
+                <h3 className="font-bold text-[#0F172A] text-lg font-display mb-1">Select metrics</h3>
                 <p className="text-text-secondary text-sm">Choose the metrics you want to include in your report.</p>
               </div>
 
               <div className="grid md:grid-cols-3 gap-6">
                 {/* Revenue Metrics */}
                 <div className="space-y-3">
-                  <span className="block text-xs font-bold text-text-secondary uppercase tracking-wider border-b border-border-light pb-2">Revenue Metrics</span>
+                  <span className="block text-xs font-bold text-text-secondary uppercase tracking-wider border-b border-[#E5EAF2] pb-2">Revenue Metrics</span>
                   {[
                     "Total Revenue", "Average Deal Value", "Revenue Growth"
                   ].map((m) => (
@@ -512,7 +515,7 @@ export default function AnalyticsPage() {
 
                 {/* Deal Metrics */}
                 <div className="space-y-3">
-                  <span className="block text-xs font-bold text-text-secondary uppercase tracking-wider border-b border-border-light pb-2">Deal Metrics</span>
+                  <span className="block text-xs font-bold text-text-secondary uppercase tracking-wider border-b border-[#E5EAF2] pb-2">Deal Metrics</span>
                   {[
                     "Total Deals", "Won Deals", "Lost Deals", "Conversion Rate"
                   ].map((m) => (
@@ -525,7 +528,7 @@ export default function AnalyticsPage() {
 
                 {/* Time Metrics */}
                 <div className="space-y-3">
-                  <span className="block text-xs font-bold text-text-secondary uppercase tracking-wider border-b border-border-light pb-2">Time Metrics</span>
+                  <span className="block text-xs font-bold text-text-secondary uppercase tracking-wider border-b border-[#E5EAF2] pb-2">Time Metrics</span>
                   {[
                     "Avg. Sales Cycle", "Time to Close", "Time to First Response"
                   ].map((m) => (
@@ -537,8 +540,8 @@ export default function AnalyticsPage() {
                 </div>
               </div>
 
-              <div className="flex justify-between border-t border-border-light pt-6">
-                <button onClick={() => setWizardStep(1)} className="px-5 py-2.5 rounded-full border border-border-light text-text-secondary text-sm font-semibold hover:bg-surface-secondary">
+              <div className="flex justify-between border-t border-[#E5EAF2] pt-6">
+                <button onClick={() => setWizardStep(1)} className="px-5 py-2.5 rounded-full border border-[#E5EAF2] text-text-secondary text-sm font-semibold hover:bg-slate-50 transition-colors">
                   Back
                 </button>
                 <button onClick={() => setWizardStep(3)} className="bg-primary hover:bg-primary-hover text-white px-6 py-2.5 rounded-full text-sm font-semibold shadow-blue">
@@ -552,7 +555,7 @@ export default function AnalyticsPage() {
           {wizardStep === 3 && (
             <div className="space-y-6">
               <div>
-                <h3 className="font-bold text-text-dark text-lg font-display mb-1">Schedule report</h3>
+                <h3 className="font-bold text-[#0F172A] text-lg font-display mb-1">Schedule report</h3>
                 <p className="text-text-secondary text-sm">Automate this report to receive it on a recurring basis.</p>
               </div>
 
@@ -562,7 +565,7 @@ export default function AnalyticsPage() {
                   <select 
                     value={frequency}
                     onChange={(e) => setFrequency(e.target.value)}
-                    className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-semibold cursor-pointer"
+                    className="w-full bg-[#F8FAFC] border border-[#E5EAF2] text-[#0F172A] text-sm rounded-xl px-4 py-2.5 outline-none font-semibold cursor-pointer focus:border-primary transition-colors"
                   >
                     <option>Monthly</option>
                     <option>Weekly</option>
@@ -575,7 +578,7 @@ export default function AnalyticsPage() {
                   <select 
                     value={deliveryDay}
                     onChange={(e) => setDeliveryDay(e.target.value)}
-                    className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-semibold cursor-pointer"
+                    className="w-full bg-[#F8FAFC] border border-[#E5EAF2] text-[#0F172A] text-sm rounded-xl px-4 py-2.5 outline-none font-semibold cursor-pointer focus:border-primary transition-colors"
                   >
                     <option>1st</option>
                     <option>15th</option>
@@ -587,7 +590,7 @@ export default function AnalyticsPage() {
                   <select 
                     value={deliveryTime}
                     onChange={(e) => setDeliveryTime(e.target.value)}
-                    className="w-full bg-surface-secondary border border-border-light text-text-dark text-sm rounded-xl px-4 py-2.5 outline-none font-semibold cursor-pointer"
+                    className="w-full bg-[#F8FAFC] border border-[#E5EAF2] text-[#0F172A] text-sm rounded-xl px-4 py-2.5 outline-none font-semibold cursor-pointer focus:border-primary transition-colors"
                   >
                     <option>09:00 AM</option>
                     <option>12:00 PM</option>
@@ -596,8 +599,8 @@ export default function AnalyticsPage() {
                 </div>
               </div>
 
-              <div className="flex justify-between border-t border-border-light pt-6">
-                <button onClick={() => setWizardStep(2)} className="px-5 py-2.5 rounded-full border border-border-light text-text-secondary text-sm font-semibold hover:bg-surface-secondary">
+              <div className="flex justify-between border-t border-[#E5EAF2] pt-6">
+                <button onClick={() => setWizardStep(2)} className="px-5 py-2.5 rounded-full border border-[#E5EAF2] text-text-secondary text-sm font-semibold hover:bg-slate-50 transition-colors">
                   Back
                 </button>
                 <button onClick={() => setWizardStep(4)} className="bg-primary hover:bg-primary-hover text-white px-6 py-2.5 rounded-full text-sm font-semibold shadow-blue">
@@ -611,16 +614,16 @@ export default function AnalyticsPage() {
           {wizardStep === 4 && (
             <div className="space-y-6">
               <div>
-                <h3 className="font-bold text-text-dark text-lg font-display mb-1">Preview your report</h3>
+                <h3 className="font-bold text-[#0F172A] text-lg font-display mb-1">Preview your report</h3>
                 <p className="text-text-secondary text-sm">Review how your report will look.</p>
               </div>
 
-              <div className="bg-surface-secondary border border-border-light rounded-2xl p-6 space-y-4">
-                <div className="border-b border-border-light/60 pb-4">
-                  <h4 className="font-bold text-text-dark text-base">{reportName}</h4>
+              <div className="bg-[#F8FAFC] border border-[#E5EAF2] rounded-2xl p-6 space-y-4 text-left">
+                <div className="border-b border-[#E5EAF2] pb-4">
+                  <h4 className="font-bold text-[#0F172A] text-base">{reportName}</h4>
                   <p className="text-xs text-text-secondary mt-1">{reportDesc}</p>
                 </div>
-                <div className="grid grid-cols-2 gap-4 text-xs font-semibold text-text-dark">
+                <div className="grid grid-cols-2 gap-4 text-xs font-semibold text-[#0F172A]">
                   <div>
                     <span className="text-text-secondary block">Report Type</span>
                     <span>{reportType}</span>
@@ -632,8 +635,8 @@ export default function AnalyticsPage() {
                 </div>
               </div>
 
-              <div className="flex justify-between border-t border-border-light pt-6">
-                <button onClick={() => setWizardStep(3)} className="px-5 py-2.5 rounded-full border border-border-light text-text-secondary text-sm font-semibold hover:bg-surface-secondary">
+              <div className="flex justify-between border-t border-[#E5EAF2] pt-6">
+                <button onClick={() => setWizardStep(3)} className="px-5 py-2.5 rounded-full border border-[#E5EAF2] text-text-secondary text-sm font-semibold hover:bg-slate-50 transition-colors">
                   Back
                 </button>
                 <button onClick={handleCreateReport} className="bg-primary hover:bg-primary-hover text-white px-6 py-2.5 rounded-full text-sm font-semibold shadow-blue">
@@ -647,20 +650,20 @@ export default function AnalyticsPage() {
 
       {/* Success Modal */}
       {isSuccessModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-lg border border-border-light text-center space-y-4 animate-dropdown">
-            <div className="w-12 h-12 bg-green-50 text-[#10B981] rounded-full flex items-center justify-center mx-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-lg border border-[#E5EAF2] text-center space-y-4 animate-dropdown">
+            <div className="w-12 h-12 bg-green-50 text-[#10B981] rounded-full flex items-center justify-center mx-auto border border-green-100">
               <Check size={24} />
             </div>
             <div>
-              <h3 className="font-bold text-text-dark text-lg font-display">Report Scheduled!</h3>
-              <p className="text-text-secondary text-xs mt-1.5 leading-relaxed">
+              <h3 className="font-bold text-[#0F172A] text-lg font-display">Report Scheduled!</h3>
+              <p className="text-text-secondary text-xs mt-1.5 leading-relaxed font-semibold">
                 You will receive your &quot;{reportName}&quot; on the {deliveryDay} of every month at {deliveryTime} (WAT).
               </p>
             </div>
             <button 
               onClick={() => { setIsSuccessModalOpen(false); setView("reports"); }}
-              className="w-full bg-primary hover:bg-primary-hover text-white py-2.5 rounded-xl text-xs font-bold transition-colors"
+              className="w-full bg-primary hover:bg-primary-hover text-white py-2.5 rounded-xl text-xs font-bold transition-colors shadow-blue"
             >
               Go to Reports
             </button>
@@ -670,9 +673,9 @@ export default function AnalyticsPage() {
 
       {/* Export Format Modal */}
       {isExportModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-lg border border-border-light relative animate-dropdown">
-            <h3 className="font-bold text-text-dark text-lg font-display mb-2">Export Report</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-lg border border-[#E5EAF2] relative animate-dropdown">
+            <h3 className="font-bold text-[#0F172A] text-lg font-display mb-2">Export Report</h3>
             <p className="text-text-secondary text-xs mb-4">Choose format to download</p>
             
             <div className="space-y-2.5 mb-6">
@@ -684,9 +687,9 @@ export default function AnalyticsPage() {
                 <button 
                   key={i}
                   onClick={() => { setIsExportModalOpen(false); alert(`Exporting report as ${opt.format}...`); }}
-                  className="w-full text-left p-3 border border-border-light rounded-xl hover:bg-surface-secondary transition-colors"
+                  className="w-full text-left p-3 border border-[#E5EAF2] rounded-xl hover:bg-slate-50 transition-colors"
                 >
-                  <span className="text-xs font-bold text-text-dark block">{opt.format}</span>
+                  <span className="text-xs font-bold text-[#0F172A] block">{opt.format}</span>
                   <span className="text-[10px] text-text-secondary">{opt.desc}</span>
                 </button>
               ))}
@@ -694,7 +697,7 @@ export default function AnalyticsPage() {
 
             <button 
               onClick={() => setIsExportModalOpen(false)}
-              className="w-full bg-white border border-border-light hover:bg-surface-secondary text-text-dark py-2.5 rounded-xl text-xs font-bold transition-colors shadow-sm"
+              className="w-full bg-white border border-[#E5EAF2] hover:bg-slate-50 text-[#0F172A] py-2.5 rounded-xl text-xs font-bold transition-all shadow-sm"
             >
               Cancel
             </button>

@@ -34,51 +34,55 @@ export default function DashboardPage() {
   };
 
   return (
-    <>
+    <div className="space-y-8 animate-fade-in-up">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8 pt-12 sm:pt-0">
+      <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-2 pt-12 sm:pt-0">
         <div>
-          <h1 className="text-3xl font-bold text-text-dark mb-1 font-display">
+          <h1 className="text-3xl font-extrabold text-[#0F172A] mb-1 font-display">
             Good morning, {user?.user_metadata?.first_name || user?.email?.split('@')[0] || 'Alex'}! 👋
           </h1>
           <p className="text-text-secondary text-sm font-body">Here&apos;s what&apos;s happening with your business today.</p>
         </div>
         <div className="flex items-center gap-4">
-          <button className="text-text-muted hover:text-text-dark transition-colors">
-            <Bell size={22} />
+          <button className="text-text-muted hover:text-text-dark transition-colors p-2 rounded-full hover:bg-slate-100">
+            <Bell size={20} />
           </button>
           <div className="relative group">
-            <button className="hidden sm:flex bg-primary hover:bg-primary-hover text-white px-5 py-2.5 rounded-full text-sm font-semibold items-center gap-2 transition-colors shadow-blue font-body">
-              <Plus size={18} /> New Scope <ChevronDown size={16} />
+            <button className="hidden sm:flex bg-primary hover:bg-primary-hover text-white px-5 py-2.5 rounded-full text-sm font-semibold items-center gap-2 transition-all shadow-blue font-body">
+              <Plus size={16} /> New Scope <ChevronDown size={14} />
             </button>
           </div>
         </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { icon: Target, label: "New Scope", href: "/generate", color: "text-primary" },
-          { icon: FileText, label: "New Proposal", href: "/dashboard/proposals/new", color: "text-primary" },
-          { icon: Receipt, label: "New Invoice", href: "/dashboard/invoices/new", color: "text-primary" },
-          { icon: UserPlus, label: "Add Client", href: "/dashboard/clients/new", color: "text-primary" }
+          { icon: Target, label: "New Scope", href: "/generate", color: "text-primary bg-primary-light" },
+          { icon: FileText, label: "New Proposal", href: "/dashboard/proposals/new", color: "text-primary bg-primary-light" },
+          { icon: Receipt, label: "New Invoice", href: "/dashboard/invoices/new", color: "text-primary bg-primary-light" },
+          { icon: UserPlus, label: "Add Client", href: "/dashboard/clients/new", color: "text-primary bg-primary-light" }
         ].map((action, i) => (
-          <Link key={i} href={action.href} className="bg-white border border-border-light rounded-xl p-4 flex items-center justify-center gap-3 hover:shadow-md transition-shadow">
-            <div className={`rounded-full flex items-center justify-center ${action.color}`}>
-              <action.icon size={20} />
+          <Link 
+            key={i} 
+            href={action.href} 
+            className="bg-white border border-[#E5EAF2] rounded-2xl p-5 flex items-center gap-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group"
+          >
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${action.color} group-hover:scale-110 transition-transform`}>
+              <action.icon size={18} />
             </div>
-            <span className="font-semibold text-text-dark text-sm">{action.label}</span>
+            <span className="font-bold text-[#0F172A] text-sm font-display">{action.label}</span>
           </Link>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Revenue Summary */}
-        <div className="bg-white border border-border-light rounded-2xl p-6 lg:col-span-1 shadow-sm flex flex-col justify-between">
+        <div className="bg-white border border-[#E5EAF2] rounded-2xl p-6 lg:col-span-1 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
           <div>
             <div className="flex justify-between items-center mb-6">
-              <h3 className="font-bold text-text-dark text-lg font-display">Revenue Summary</h3>
-              <select className="bg-surface-secondary border border-border-light text-text-secondary text-xs rounded-lg px-2.5 py-1.5 outline-none font-semibold cursor-pointer">
+              <h3 className="font-bold text-[#0F172A] text-lg font-display">Revenue Summary</h3>
+              <select className="bg-slate-50 border border-[#E5EAF2] text-text-secondary text-xs rounded-lg px-2.5 py-1.5 outline-none font-semibold cursor-pointer">
                 <option>This Month</option>
               </select>
             </div>
@@ -87,42 +91,42 @@ export default function DashboardPage() {
               {/* Left Side: Total Earnings */}
               <div>
                 <p className="text-text-secondary text-xs font-semibold mb-1">Total Earnings</p>
-                <h2 className="text-2xl font-bold text-text-dark font-display">₦2,450,000</h2>
-                <p className="text-xs font-semibold mt-1.5">
-                  <span className="text-[#28C76F]">↑ 28%</span> <span className="text-text-muted font-normal">vs last month</span>
+                <h2 className="text-2xl font-black text-[#0F172A] font-display">₦2,450,000</h2>
+                <p className="text-xs font-bold mt-2">
+                  <span className="text-success">↑ 28%</span> <span className="text-text-muted font-normal">vs last month</span>
                 </p>
               </div>
               
               {/* Right Side: Outstanding & Overdue */}
-              <div className="flex flex-col justify-between pl-4 border-l border-border-light space-y-4">
+              <div className="flex flex-col justify-between pl-4 border-l border-[#E5EAF2] space-y-4">
                 <div>
-                  <p className="text-text-secondary text-xs font-semibold mb-1">Outstanding</p>
-                  <p className="text-[#FF9F43] text-lg font-bold font-display">₦1,250,000</p>
+                  <p className="text-text-secondary text-xs font-semibold mb-0.5">Outstanding</p>
+                  <p className="text-warning text-lg font-bold font-display">₦1,250,000</p>
                 </div>
                 <div>
-                  <p className="text-text-secondary text-xs font-semibold mb-1">Overdue</p>
-                  <p className="text-[#EA5455] text-lg font-bold font-display">₦350,000</p>
+                  <p className="text-text-secondary text-xs font-semibold mb-0.5">Overdue</p>
+                  <p className="text-danger text-lg font-bold font-display">₦350,000</p>
                 </div>
               </div>
             </div>
           </div>
           
-          {/* Sparkline at the bottom of the card */}
+          {/* Sparkline */}
           <div className="h-16 w-full mt-6 relative overflow-hidden rounded-lg">
-            <div className="absolute inset-0 bg-gradient-to-t from-[#28C76F]/10 to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-success/10 to-transparent"></div>
             <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
-              <path d="M 0 75 C 30 75, 45 85, 60 55 C 75 25, 90 45, 100 25 L 100 100 L 0 100 Z" fill="rgba(40,199,111,0.08)" />
-              <path d="M 0 75 C 30 75, 45 85, 60 55 C 75 25, 90 45, 100 25" fill="none" stroke="#28C76F" strokeWidth="2.5" vectorEffect="non-scaling-stroke" />
+              <path d="M 0 75 C 30 75, 45 85, 60 55 C 75 25, 90 45, 100 25 L 100 100 L 0 100 Z" fill="rgba(34,197,94,0.08)" />
+              <path d="M 0 75 C 30 75, 45 85, 60 55 C 75 25, 90 45, 100 25" fill="none" stroke="#22C55E" strokeWidth="2.5" vectorEffect="non-scaling-stroke" />
             </svg>
           </div>
         </div>
 
         {/* Proposal Pipeline */}
-        <div className="bg-white border border-border-light rounded-2xl p-6 lg:col-span-2 shadow-sm flex flex-col justify-between">
+        <div className="bg-white border border-[#E5EAF2] rounded-2xl p-6 lg:col-span-2 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
           <div>
             <div className="flex justify-between items-center mb-8">
-              <h3 className="font-bold text-text-dark text-lg font-display">Proposal Pipeline</h3>
-              <select className="bg-surface-secondary border border-border-light text-text-secondary text-xs rounded-lg px-2.5 py-1.5 outline-none font-semibold cursor-pointer">
+              <h3 className="font-bold text-[#0F172A] text-lg font-display">Proposal Pipeline</h3>
+              <select className="bg-slate-50 border border-[#E5EAF2] text-text-secondary text-xs rounded-lg px-2.5 py-1.5 outline-none font-semibold cursor-pointer">
                 <option>This Month</option>
               </select>
             </div>
@@ -138,19 +142,19 @@ export default function DashboardPage() {
                 <div 
                   key={i} 
                   style={getChevronStyle(i)}
-                  className="flex-1 bg-surface-secondary h-28 flex flex-col justify-center items-center shadow-sm select-none"
+                  className="flex-1 bg-[#F8FAFC] border border-[#E5EAF2] h-28 flex flex-col justify-center items-center shadow-inner select-none transition-all duration-300 hover:bg-slate-50"
                 >
                   <p className="text-text-secondary text-[10px] md:text-xs font-semibold text-center px-1 mb-2 leading-tight whitespace-pre-line">
                     {step.label}
                   </p>
-                  <p className="text-xl md:text-2xl font-bold text-text-dark font-display">
+                  <p className="text-xl md:text-2xl font-black text-[#0F172A] font-display">
                     {step.count}
                   </p>
                 </div>
               ))}
             </div>
 
-            {/* Dotted Arrow indicators below the Chevrons */}
+            {/* Dotted Arrow indicators */}
             <div className="flex justify-between items-center mt-6 px-4">
               {[
                 { percent: "66.7%" },
@@ -159,12 +163,12 @@ export default function DashboardPage() {
                 { percent: "80.0%" },
               ].map((arrow, i) => (
                 <div key={i} className="flex-1 flex items-center justify-center gap-1 mx-2">
-                  <div className="flex-grow border-t border-dashed border-border-light"></div>
-                  <span className="text-[10px] md:text-xs font-bold text-text-muted select-none">
+                  <div className="flex-grow border-t border-dashed border-[#E5EAF2]"></div>
+                  <span className="text-[10px] font-bold text-text-secondary bg-[#F8FAFC] border border-[#E5EAF2] px-2 py-0.5 rounded-md select-none">
                     {arrow.percent}
                   </span>
-                  <div className="w-1.5 h-1.5 border-t border-r border-border-light rotate-45 flex-shrink-0 -ml-1"></div>
-                  <div className="flex-grow border-t border-dashed border-border-light"></div>
+                  <div className="w-1.5 h-1.5 border-t border-r border-[#CBD5E1] rotate-45 flex-shrink-0 -ml-1"></div>
+                  <div className="flex-grow border-t border-dashed border-[#E5EAF2]"></div>
                 </div>
               ))}
             </div>
@@ -172,30 +176,30 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Active Projects */}
-        <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+        <div className="bg-white border border-[#E5EAF2] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
           <div>
             <div className="flex justify-between items-center mb-6">
-              <h3 className="font-bold text-text-dark text-lg font-display">Active Projects</h3>
-              <Link href="/dashboard/projects" className="text-primary text-xs font-semibold hover:text-primary-hover">View all →</Link>
+              <h3 className="font-bold text-[#0F172A] text-lg font-display">Active Projects</h3>
+              <Link href="/dashboard/projects" className="text-primary text-xs font-bold hover:underline">View all →</Link>
             </div>
             
             <div className="flex items-center justify-between gap-4">
               <div className="space-y-3 flex-grow">
                 {[
                   { label: "In Progress", count: 8, color: "bg-blue-500" },
-                  { label: "Under Review", count: 4, color: "bg-yellow-500" },
+                  { label: "Under Review", count: 4, color: "bg-amber-500" },
                   { label: "Pending Client", count: 3, color: "bg-purple-500" },
-                  { label: "Completed", count: 12, color: "bg-green-500" },
+                  { label: "Completed", count: 12, color: "bg-emerald-500" },
                   { label: "Overdue", count: 2, color: "bg-red-500" },
                 ].map((stat, i) => (
-                  <div key={i} className="flex items-center justify-between text-sm">
+                  <div key={i} className="flex items-center justify-between text-xs font-semibold">
                     <div className="flex items-center gap-2">
                       <div className={`w-2.5 h-2.5 rounded-full ${stat.color}`}></div>
-                      <span className="text-text-secondary font-medium">{stat.label}</span>
+                      <span className="text-text-secondary">{stat.label}</span>
                     </div>
-                    <span className="font-bold text-text-dark">{stat.count}</span>
+                    <span className="font-bold text-[#0F172A]">{stat.count}</span>
                   </div>
                 ))}
               </div>
@@ -204,7 +208,7 @@ export default function DashboardPage() {
                 <svg viewBox="0 0 36 36" className="w-full h-full transform -rotate-90">
                   <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#F1F5F9" strokeWidth="3.5" />
                   
-                  {/* Completed (Green): 12/29 */}
+                  {/* Completed (Emerald): 12/29 */}
                   <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#10B981" strokeWidth="3.5" 
                           strokeDasharray="38.3 61.7" strokeDashoffset="0" />
                   
@@ -212,7 +216,7 @@ export default function DashboardPage() {
                   <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#3B82F6" strokeWidth="3.5" 
                           strokeDasharray="25.5 74.5" strokeDashoffset="-39.8" />
                   
-                  {/* Under Review (Yellow): 4/29 */}
+                  {/* Under Review (Amber): 4/29 */}
                   <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#F59E0B" strokeWidth="3.5" 
                           strokeDasharray="12.8 87.2" strokeDashoffset="-66.8" />
                   
@@ -225,7 +229,7 @@ export default function DashboardPage() {
                           strokeDasharray="6.4 93.6" strokeDashoffset="-92.1" />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-2xl font-bold text-text-dark font-display leading-none">29</span>
+                  <span className="text-2xl font-black text-[#0F172A] font-display leading-none">29</span>
                   <span className="text-[10px] text-text-secondary font-semibold mt-1">Total Projects</span>
                 </div>
               </div>
@@ -234,29 +238,29 @@ export default function DashboardPage() {
         </div>
 
         {/* Recent Activity */}
-        <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+        <div className="bg-white border border-[#E5EAF2] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
           <div>
             <div className="flex justify-between items-center mb-6">
-              <h3 className="font-bold text-text-dark text-lg font-display">Recent Activity</h3>
-              <Link href="/dashboard/activity" className="text-primary text-xs font-semibold hover:text-primary-hover">View all →</Link>
+              <h3 className="font-bold text-[#0F172A] text-lg font-display">Recent Activity</h3>
+              <Link href="/dashboard/activity" className="text-primary text-xs font-bold hover:underline">View all →</Link>
             </div>
-            <div className="space-y-5">
+            <div className="space-y-4">
               {[
-                { icon: Eye, title: "Acme Corp proposal was opened", desc: "Website Redesign Proposal", time: "2h ago", color: "text-blue-500", bg: "bg-blue-50" },
-                { icon: CheckCircle2, title: "Invoice INV-2024-0012 was paid", desc: "Acme Corp", time: "5h ago", color: "text-green-500", bg: "bg-green-50" },
-                { icon: FileText, title: "New scope created", desc: "Mobile App Design for TechNova", time: "1d ago", color: "text-blue-500", bg: "bg-blue-50" },
-                { icon: CheckCircle2, title: "Milestone approved", desc: "Landing Page Design - TechNova", time: "1d ago", color: "text-green-500", bg: "bg-green-50" },
-                { icon: MessageSquare, title: "Kova negotiation session completed", desc: "Project: E-commerce Website", time: "2d ago", color: "text-purple-500", bg: "bg-purple-50" }
+                { icon: Eye, title: "Acme Corp proposal was opened", desc: "Website Redesign Proposal", time: "2h ago", color: "text-blue-500", bg: "bg-blue-50 border border-blue-100" },
+                { icon: CheckCircle2, title: "Invoice INV-2024-0012 was paid", desc: "Acme Corp", time: "5h ago", color: "text-emerald-500", bg: "bg-emerald-50 border border-emerald-100" },
+                { icon: FileText, title: "New scope created", desc: "Mobile App Design for TechNova", time: "1d ago", color: "text-blue-500", bg: "bg-blue-50 border border-blue-100" },
+                { icon: CheckCircle2, title: "Milestone approved", desc: "Landing Page Design - TechNova", time: "1d ago", color: "text-emerald-500", bg: "bg-emerald-50 border border-emerald-100" },
+                { icon: MessageSquare, title: "Kova negotiation session completed", desc: "Project: E-commerce Website", time: "2d ago", color: "text-purple-500", bg: "bg-purple-50 border border-purple-100" }
               ].map((activity, i) => (
-                 <div key={i} className="flex gap-4 items-start">
-                   <div className={`w-8 h-8 rounded-full ${activity.bg} flex items-center justify-center flex-shrink-0 mt-0.5`}>
-                     <activity.icon size={14} className={activity.color} />
+                 <div key={i} className="flex gap-3.5 items-start">
+                   <div className={`w-8 h-8 rounded-lg ${activity.bg} flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                     <activity.icon size={13} className={activity.color} />
                    </div>
                    <div className="flex-grow">
-                     <p className="text-sm font-semibold text-text-dark leading-tight">{activity.title}</p>
-                     <p className="text-xs text-text-secondary mt-0.5">{activity.desc}</p>
+                     <p className="text-xs font-bold text-[#0F172A] leading-tight">{activity.title}</p>
+                     <p className="text-[10px] text-text-secondary mt-0.5 font-medium">{activity.desc}</p>
                    </div>
-                   <div className="text-xs text-text-muted font-medium pt-0.5 flex-shrink-0">{activity.time}</div>
+                   <div className="text-[10px] text-text-muted font-bold pt-0.5 flex-shrink-0">{activity.time}</div>
                  </div>
               ))}
             </div>
@@ -264,9 +268,9 @@ export default function DashboardPage() {
         </div>
 
         {/* WhatsApp Copilot */}
-        <div className="bg-white border border-border-light rounded-2xl p-6 relative overflow-hidden flex flex-col shadow-sm">
+        <div className="bg-white border border-[#E5EAF2] rounded-2xl p-6 relative overflow-hidden flex flex-col shadow-sm hover:shadow-md transition-all duration-300">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="font-bold text-text-dark text-lg font-display flex items-center gap-2">
+            <h3 className="font-bold text-[#0F172A] text-lg font-display flex items-center gap-2">
               WhatsApp Copilot
             </h3>
             <span className="bg-[#E8F8F0] text-[#28C76F] text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">Coming Soon</span>
@@ -274,29 +278,29 @@ export default function DashboardPage() {
           
           <div className="flex-grow flex flex-col items-center justify-center text-center mt-2 mb-6">
             <div className="relative mb-4">
-              <div className="w-14 h-14 bg-[#E8F8F0] rounded-2xl flex items-center justify-center">
+              <div className="w-14 h-14 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center justify-center">
                 <span className="text-3xl">🤖</span>
               </div>
               <Sparkles size={16} className="text-[#FF9F43] absolute -top-1 -right-1 animate-pulse" />
             </div>
-            <h4 className="font-bold text-text-dark text-sm mb-1">AI negotiations that close more deals.</h4>
-            <p className="text-xs text-text-secondary max-w-[200px] leading-relaxed">Get real-time negotiation support, smart replies, and objection handling.</p>
+            <h4 className="font-bold text-[#0F172A] text-xs mb-1">AI negotiations that close more deals.</h4>
+            <p className="text-[10px] text-text-secondary max-w-[200px] leading-relaxed">Get real-time negotiation support, smart replies, and objection handling.</p>
           </div>
 
           <div className="grid grid-cols-2 gap-4 mb-6">
-            <div className="bg-white border border-border-light rounded-xl py-3 px-2 flex flex-col items-center shadow-sm">
-              <span className="font-bold text-2xl text-text-dark font-display">0</span>
-              <span className="text-[10px] text-text-secondary font-semibold uppercase tracking-wider mt-1 text-center leading-tight">Active<br/>Negotiations</span>
+            <div className="bg-slate-50 border border-[#E5EAF2] rounded-xl py-3 px-2 flex flex-col items-center shadow-inner">
+              <span className="font-black text-2xl text-[#0F172A] font-display">0</span>
+              <span className="text-[9px] text-text-secondary font-semibold uppercase tracking-wider mt-1 text-center leading-tight">Active<br/>Negotiations</span>
             </div>
-            <div className="bg-white border border-border-light rounded-xl py-3 px-2 flex flex-col items-center shadow-sm">
-              <span className="font-bold text-2xl text-text-dark font-display">0</span>
-              <span className="text-[10px] text-text-secondary font-semibold uppercase tracking-wider mt-1 text-center leading-tight">Pending<br/>Approvals</span>
+            <div className="bg-slate-50 border border-[#E5EAF2] rounded-xl py-3 px-2 flex flex-col items-center shadow-inner">
+              <span className="font-black text-2xl text-[#0F172A] font-display">0</span>
+              <span className="text-[9px] text-text-secondary font-semibold uppercase tracking-wider mt-1 text-center leading-tight">Pending<br/>Approvals</span>
             </div>
           </div>
 
-          <div className="flex items-center justify-between border-t border-border-light pt-4 mt-auto">
-             <span className="text-xs font-semibold text-text-secondary">Be the first to try it out.</span>
-             <button className="bg-primary hover:bg-primary-hover text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors shadow-sm border border-transparent">
+          <div className="flex items-center justify-between border-t border-[#E5EAF2] pt-4 mt-auto">
+             <span className="text-[10px] font-semibold text-text-secondary">Be the first to try it out.</span>
+             <button className="bg-primary hover:bg-primary-hover text-white text-[10px] font-bold px-4 py-2 rounded-full transition-colors shadow-sm">
                Join Waitlist
              </button>
           </div>
@@ -305,10 +309,10 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
          {/* Top Clients */}
-         <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm">
+         <div className="bg-white border border-[#E5EAF2] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="font-bold text-text-dark text-lg font-display">Top Clients by Value</h3>
-            <Link href="/dashboard/clients" className="text-primary text-xs font-semibold hover:text-primary-hover">View all →</Link>
+            <h3 className="font-bold text-[#0F172A] text-lg font-display">Top Clients by Value</h3>
+            <Link href="/dashboard/clients" className="text-primary text-xs font-bold hover:underline">View all →</Link>
           </div>
           <div className="space-y-4">
              {[
@@ -319,22 +323,22 @@ export default function DashboardPage() {
                { name: "StoreHub", value: "₦300,000", width: "25%" },
              ].map((client, i) => (
                <div key={i} className="flex items-center gap-4">
-                 <span className="text-sm font-bold text-text-muted w-4">{i + 1}</span>
-                 <span className="text-sm font-semibold text-text-dark w-28 truncate">{client.name}</span>
+                 <span className="text-xs font-bold text-text-muted w-4">{i + 1}</span>
+                 <span className="text-xs font-bold text-[#0F172A] w-28 truncate font-display">{client.name}</span>
                  <div className="flex-grow h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                   <div className="h-full bg-[#10B981] rounded-full transition-all duration-500" style={{ width: client.width }}></div>
+                   <div className="h-full bg-emerald-500 rounded-full transition-all duration-500" style={{ width: client.width }}></div>
                  </div>
-                 <span className="text-sm font-bold text-text-dark w-24 text-right">{client.value}</span>
+                 <span className="text-xs font-bold text-[#0F172A] w-24 text-right">{client.value}</span>
                </div>
              ))}
           </div>
          </div>
 
          {/* Upcoming Reminders */}
-         <div className="bg-white border border-border-light rounded-2xl p-6 shadow-sm">
+         <div className="bg-white border border-[#E5EAF2] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="font-bold text-text-dark text-lg font-display">Upcoming Reminders</h3>
-            <Link href="/dashboard/reminders" className="text-primary text-xs font-semibold hover:text-primary-hover">View all →</Link>
+            <h3 className="font-bold text-[#0F172A] text-lg font-display">Upcoming Reminders</h3>
+            <Link href="/dashboard/reminders" className="text-primary text-xs font-bold hover:underline">View all →</Link>
           </div>
           <div className="space-y-4">
             {[
@@ -342,20 +346,20 @@ export default function DashboardPage() {
               { date: "02 Jun", title: "Project deadline in 6 days", desc: "E-commerce Website - StoreHub", type: "Upcoming", icon: Flag, badge: "bg-blue-50 text-blue-600 border border-blue-100" },
               { date: "05 Jun", title: "Milestone review in 9 days", desc: "Mobile App Design - Acme Corp", type: "Upcoming", icon: Target, badge: "bg-blue-50 text-blue-600 border border-blue-100" },
             ].map((reminder, i) => (
-              <div key={i} className="flex gap-4 items-start pb-4 border-b border-border-light last:border-0 last:pb-0">
-                <div className="bg-[#EFF6FF] rounded-xl w-14 h-16 flex flex-col items-center justify-center text-[#2563EB] flex-shrink-0 border border-blue-50 shadow-sm">
-                  <reminder.icon size={16} className="mb-1 text-primary" />
+              <div key={i} className="flex gap-4 items-start pb-4 border-b border-[#E5EAF2] last:border-0 last:pb-0">
+                <div className="bg-blue-50 rounded-xl w-14 h-16 flex flex-col items-center justify-center text-[#2563EB] flex-shrink-0 border border-blue-100 shadow-sm">
+                  <reminder.icon size={15} className="mb-1 text-primary" />
                   <div className="flex flex-col items-center leading-none">
-                    <span className="text-xs font-bold text-[#1E3A8A]">{reminder.date.split(' ')[0]}</span>
-                    <span className="text-[9px] font-semibold text-[#3B82F6] uppercase mt-0.5">{reminder.date.split(' ')[1]}</span>
+                    <span className="text-xs font-bold text-blue-900">{reminder.date.split(' ')[0]}</span>
+                    <span className="text-[9px] font-bold text-blue-500 uppercase mt-0.5">{reminder.date.split(' ')[1]}</span>
                   </div>
                 </div>
                 <div className="flex-grow pt-1">
-                  <p className="text-sm font-semibold text-text-dark">{reminder.title}</p>
-                  <p className="text-xs text-text-secondary mt-1">{reminder.desc}</p>
+                  <p className="text-xs font-bold text-[#0F172A]">{reminder.title}</p>
+                  <p className="text-[10px] text-text-secondary mt-1 font-semibold">{reminder.desc}</p>
                 </div>
                 <div className="pt-1 flex-shrink-0">
-                  <span className={`text-[10px] font-bold px-2.5 py-1 rounded-md ${reminder.badge}`}>
+                  <span className={`text-[9px] font-bold px-2.5 py-1 rounded-md ${reminder.badge}`}>
                     {reminder.type}
                   </span>
                 </div>
@@ -364,6 +368,6 @@ export default function DashboardPage() {
           </div>
          </div>
       </div>
-    </>
+    </div>
   );
 }
