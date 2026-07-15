@@ -101,3 +101,9 @@ export async function saveQuote(
     ]
   );
 }
+
+// 13. Check Profile Exists
+export async function checkProfileExists(email: string) {
+  return await queryOne<any>("SELECT * FROM profiles WHERE email = $1", [email]);
+}
+
