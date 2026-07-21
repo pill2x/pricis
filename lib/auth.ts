@@ -17,7 +17,11 @@ const isBrowser = typeof window !== "undefined";
 const mockAuth = {
   signUp: async ({ email, password: _password }: any) => {
     try {
-      const existingUser = await checkProfileExists(email);
+      const res = await checkProfileExists(email);
+      if (!res.success) {
+        return { data: { user: null }, error: { message: `Database error: ${res.error}` } };
+      }
+      const existingUser = res.data;
       if (existingUser) {
         return { data: { user: null }, error: { message: "User already exists." } };
       }
@@ -33,7 +37,11 @@ const mockAuth = {
   },
   signInWithPassword: async ({ email, password: _password }: any) => {
     try {
-      const user = await checkProfileExists(email);
+      const res = await checkProfileExists(email);
+      if (!res.success) {
+        return { data: { user: null }, error: { message: `Database error: ${res.error}. Please check your database settings.` } };
+      }
+      const user = res.data;
       if (!user) {
         return { data: { user: null }, error: { message: "User not found. Please sign up." } };
       }

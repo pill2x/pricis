@@ -118,12 +118,12 @@ export default function TemplatesPage() {
             </div>
 
             {/* Filter Tabs */}
-            <div className="flex flex-wrap items-center justify-center gap-2 p-2 rounded-2xl bg-[#0D1526]/50 border border-white/5 w-fit mx-auto backdrop-blur-sm">
+            <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-2xl bg-[#0D1526]/50 border border-white/5 w-fit mx-auto backdrop-blur-sm">
               {categories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
-                  className={`px-4 py-2 rounded-xl text-xs md:text-sm font-semibold font-body transition-all ${
+                  className={`px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs md:text-sm font-semibold font-body transition-all ${
                     activeCategory === cat 
                       ? "bg-primary text-white shadow-sm" 
                       : "text-text-muted hover:text-white hover:bg-white/5"
@@ -146,7 +146,7 @@ export default function TemplatesPage() {
               <h2 className="text-lg font-bold font-display text-[#0F172A]">Popular Templates</h2>
             </div>
             
-            <div className="flex gap-6 overflow-x-auto pb-4 no-scrollbar -mx-6 px-6 snap-x">
+            <div className="flex gap-6 overflow-x-auto pb-4 no-scrollbar -mx-6 px-6 scroll-px-6 snap-x">
               {popularTemplates.map((t, idx) => (
                 <div 
                   key={t.id} 
