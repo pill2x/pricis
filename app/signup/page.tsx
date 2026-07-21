@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Loader2, AlertCircle, User, Briefcase, Mail, Lock, ArrowRight } from "lucide-react";
+import { Loader2, AlertCircle, User, Briefcase, Mail, Lock, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { supabaseAuth } from "@/lib/auth";
 import { insertProfile } from "@/app/actions/db";
 import Logo from "@/components/Logo";
@@ -13,6 +13,7 @@ export default function SignupPage() {
   const [businessName, setBusinessName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -47,18 +48,21 @@ export default function SignupPage() {
         // Create profile
         let profileError = null;
         try {
-          await insertProfile(
+          const res = await insertProfile(
             authData.user.id,
             authData.user.email || "",
             fullName,
             businessName
           );
-        } catch (e) {
-          profileError = e;
+          if (!res.success) {
+            profileError = res.error;
+          }
+        } catch (e: any) {
+          profileError = e.message;
         }
 
         if (profileError) {
-          setError("Account created but profile setup failed");
+          setError(`Account created but profile setup failed: ${profileError}`);
         } else {
           router.push("/dashboard");
         }
@@ -181,14 +185,26 @@ export default function SignupPage() {
               </span>
               <input
                 id="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={8}
-                className="w-full rounded-xl pl-10 pr-4 py-2.5 text-sm bg-white border border-border-light text-text-dark outline-none focus:border-primary focus:ring-4 focus:ring-primary-light transition-all font-body placeholder:text-slate-400"
+                className="w-full rounded-xl pl-10 pr-11 py-2.5 text-sm bg-white border border-border-light text-text-dark outline-none focus:border-primary focus:ring-4 focus:ring-primary-light transition-all font-body placeholder:text-slate-400"
                 placeholder="Min. 8 characters"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-dark transition-colors p-1.5 rounded-md focus:outline-none z-10"
+                title={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4.5 w-4.5" />
+                ) : (
+                  <Eye className="h-4.5 w-4.5" />
+                )}
+              </button>
             </div>
           </div>
 
