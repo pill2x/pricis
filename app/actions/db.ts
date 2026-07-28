@@ -4,10 +4,15 @@ import { query, queryOne } from "@/lib/db";
 
 // 1. Signup / Profiles
 export async function insertProfile(id: string, email: string, fullName: string, businessName: string) {
-  return await query(
-    "INSERT INTO profiles (id, email, full_name, business_name) VALUES ($1, $2, $3, $4)",
-    [id, email, fullName, businessName]
-  );
+  try {
+    await query(
+      "INSERT INTO profiles (id, email, full_name, business_name) VALUES ($1, $2, $3, $4)",
+      [id, email, fullName, businessName]
+    );
+    return { success: true, error: null };
+  } catch (error: any) {
+    return { success: false, error: error.message || "Database query failed" };
+  }
 }
 
 // 2. Fetch Profile
@@ -272,4 +277,14 @@ export async function fetchTemplates(userId: string) {
 
 export async function deleteTemplate(templateId: string, userId: string) {
   return await query("DELETE FROM templates WHERE id = $1 AND user_id = $2", [templateId, userId]);
+}
+
+// 23. Check Profile Exists
+export async function checkProfileExists(email: string) {
+  try {
+    const user = await queryOne<any>("SELECT * FROM profiles WHERE email = $1", [email]);
+    return { success: true, data: user, error: null };
+  } catch (error: any) {
+    return { success: false, data: null, error: error.message || "Database query failed" };
+  }
 }
