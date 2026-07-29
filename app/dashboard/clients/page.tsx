@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { 
   Plus, ArrowLeft, ArrowRight, Check, Trash2, ChevronRight, 
   Settings, Key, RefreshCw, AlertCircle, Link2, CheckCircle2, ShieldAlert, Sparkles,
   Users, Mail, Phone, ExternalLink, Briefcase, FileText, Receipt, Landmark, Eye, MoreHorizontal, Search
 } from "lucide-react";
+import { supabaseAuth } from "@/lib/auth";
+import { fetchClients, createClient, deleteClient } from "@/app/actions/db";
 
 // Client Avatar Mock matching the provided mockup designs
 const getClientAvatar = (name: string, size: "sm" | "md" = "sm") => {
@@ -78,6 +80,7 @@ interface ClientData {
 
 export default function ClientsPage() {
   const [view, setView] = useState<"list" | "wizard" | "details" | "edit" | "delete">("list");
+  const [userId, setUserId] = useState<string | null>(null);
   
   // Wizard States
   const [wizardStep, setWizardStep] = useState(1);
@@ -110,102 +113,100 @@ export default function ClientsPage() {
   // Edit Client modal tab state
   const [editTab, setEditTab] = useState<"info" | "billing" | "address" | "notes">("info");
 
-  const [clientsList, setClientsList] = useState<ClientData[]>([
-    {
-      id: "client-1",
-      name: "Acme Corp",
-      industry: "Technology",
-      projectsCount: 3,
-      totalRevenue: 5200000,
-      outstanding: 5100000,
-      lastActivity: "2 hours ago",
-      status: "Active",
-      contactPerson: "Alex Johnson",
-      email: "alex@acmecorp.com",
-      phone: "+234 801 234 5678",
-      companySize: "50 - 100 employees",
-      website: "www.acmecorp.com",
-      linkedin: "linkedin.com/company/acme",
-      clientSince: "May 12, 2024",
-      notes: "Key client for web and mobile product development."
-    },
-    {
-      id: "client-2",
-      name: "TechNova Ltd.",
-      industry: "Technology",
-      projectsCount: 4,
-      totalRevenue: 3750000,
-      outstanding: 0,
-      lastActivity: "1 day ago",
-      status: "Active",
-      contactPerson: "Sarah Davies",
-      email: "sarah@technova.com",
-      phone: "+234 802 345 6789",
-      companySize: "10 - 50 employees",
-      website: "www.technova.com",
-      linkedin: "linkedin.com/company/technova",
-      clientSince: "Mar 10, 2024",
-      notes: "Ongoing project contract."
-    },
-    {
-      id: "client-3",
-      name: "Greenlife NG",
-      industry: "Non-profit",
-      projectsCount: 2,
-      totalRevenue: 2300000,
-      outstanding: 2500000,
-      lastActivity: "3 days ago",
-      status: "Active",
-      contactPerson: "Efe Okoro",
-      email: "efe@greenlife.org",
-      phone: "+234 803 456 7890",
-      companySize: "1 - 10 employees",
-      website: "www.greenlife.org",
-      linkedin: "linkedin.com/company/greenlifeng",
-      clientSince: "Jan 15, 2024",
-      notes: "Brand identity assets and redesign scope."
-    },
-    {
-      id: "client-4",
-      name: "StartupX",
-      industry: "Technology",
-      projectsCount: 1,
-      totalRevenue: 1200000,
-      outstanding: 0,
-      lastActivity: "5 days ago",
-      status: "Active",
-      contactPerson: "Tunde Bakare",
-      email: "tunde@startupx.com",
-      phone: "+234 804 567 8901",
-      companySize: "10 - 50 employees",
-      website: "www.startupx.com",
-      linkedin: "linkedin.com/company/startupx",
-      clientSince: "Apr 5, 2024",
-      notes: "MVP development client."
-    },
-    {
-      id: "client-5",
-      name: "StoreHub",
-      industry: "E-commerce",
-      projectsCount: 2,
-      totalRevenue: 1000000,
-      outstanding: 500000,
-      lastActivity: "1 week ago",
-      status: "Inactive",
-      contactPerson: "Nkechi Obi",
-      email: "nkechi@storehub.ng",
-      phone: "+234 805 678 9012",
-      companySize: "10 - 50 employees",
-      website: "www.storehub.ng",
-      linkedin: "linkedin.com/company/storehubng",
-      clientSince: "Feb 20, 2024",
-      notes: "Payment processing contract paused."
-    }
-  ]);
+  const [clientsList, setClientsList] = useState<ClientData[]>([]);
 
-  const handleAddClient = () => {
+  useEffect(() => {
+    async function loadClients() {
+      const { data: { session } } = await supabaseAuth.auth.getSession();
+      if (session?.user) {
+        setUserId(session.user.id);
+        const list = await fetchClients(session.user.id);
+        if (list && list.length > 0) {
+          const mapped: ClientData[] = list.map((c: any) => ({
+            id: c.id,
+            name: c.name,
+            industry: c.industry || "Technology",
+            projectsCount: 0,
+            totalRevenue: 0,
+            outstanding: 0,
+            lastActivity: "Just now",
+            status: c.relationship === "Prospect" ? "Prospect" : "Active",
+            contactPerson: c.name,
+            email: c.email,
+            phone: c.phone || "",
+            companySize: c.business_size || "Startup",
+            website: "",
+            linkedin: "",
+            clientSince: new Date(c.created_at).toLocaleDateString(),
+            notes: ""
+          }));
+          setClientsList(mapped);
+        } else {
+          setClientsList([
+            {
+              id: "client-1",
+              name: "Acme Corp",
+              industry: "Technology",
+              projectsCount: 3,
+              totalRevenue: 5200000,
+              outstanding: 5100000,
+              lastActivity: "2 hours ago",
+              status: "Active",
+              contactPerson: "Alex Johnson",
+              email: "alex@acmecorp.com",
+              phone: "+234 801 234 5678",
+              companySize: "50 - 100 employees",
+              website: "www.acmecorp.com",
+              linkedin: "linkedin.com/company/acme",
+              clientSince: "May 12, 2024",
+              notes: "Key client for web and mobile product development."
+            },
+            {
+              id: "client-2",
+              name: "TechNova Ltd.",
+              industry: "Technology",
+              projectsCount: 4,
+              totalRevenue: 3750000,
+              outstanding: 0,
+              lastActivity: "1 day ago",
+              status: "Active",
+              contactPerson: "Sarah Davies",
+              email: "sarah@technova.com",
+              phone: "+234 802 345 6789",
+              companySize: "10 - 50 employees",
+              website: "www.technova.com",
+              linkedin: "linkedin.com/company/technova",
+              clientSince: "Mar 10, 2024",
+              notes: "Ongoing project contract."
+            }
+          ]);
+        }
+      }
+    }
+    loadClients();
+  }, []);
+
+  const handleAddClient = async () => {
+    let newId = `client-${Date.now()}`;
+    if (userId) {
+      const saved = await createClient(
+        userId,
+        clientName,
+        email,
+        phone,
+        addressCountry,
+        clientStatus === "Active" ? "Active" : "Prospect",
+        companySize,
+        "Normal",
+        "Friendly"
+      );
+      if (saved) {
+        newId = (saved as any).id;
+      }
+    }
+
     const newClient: ClientData = {
-      id: `client-${Date.now()}`,
+      id: newId,
       name: clientName,
       industry: industry,
       projectsCount: 0,
@@ -227,8 +228,11 @@ export default function ClientsPage() {
     setView("list");
   };
 
-  const handleDeleteClient = () => {
+  const handleDeleteClient = async () => {
     if (selectedClient) {
+      if (userId && !selectedClient.id.startsWith("client-")) {
+        await deleteClient(selectedClient.id, userId);
+      }
       setClientsList(clientsList.filter(c => c.id !== selectedClient.id));
       setSelectedClient(null);
       setView("list");

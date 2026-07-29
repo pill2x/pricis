@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { 
   Plus, ArrowLeft, ArrowRight, Check, ChevronRight, 
   Eye, CheckCircle2, FileText, Calendar, Users, Settings, 
   Trash2, Briefcase, Paperclip, MessageSquare, AlertCircle, Sparkles, Share2
 } from "lucide-react";
+import { supabaseAuth } from "@/lib/auth";
+import { fetchProjects, createProject, deleteProject } from "@/app/actions/db";
 
 interface ProjectData {
   id: string;
@@ -21,6 +23,7 @@ interface ProjectData {
 
 export default function ProjectsPage() {
   const [view, setView] = useState<"list" | "details" | "wizard">("list");
+  const [userId, setUserId] = useState<string | null>(null);
   
   // Detail views
   const [selectedProject, setSelectedProject] = useState<ProjectData | null>(null);
@@ -39,19 +42,59 @@ export default function ProjectsPage() {
   const [isInviteMemberModalOpen, setIsInviteMemberModalOpen] = useState(false);
 
   // List data
-  const [projectsList, setProjectsList] = useState<ProjectData[]>([
-    { id: "proj-1", name: "Website Redesign", client: "Acme Corp", status: "In Progress", progress: 60, dueDate: "May 30, 2024", owner: "Alex John", updated: "2h ago" },
-    { id: "proj-2", name: "Mobile App Design", client: "TechNova Ltd.", status: "In Progress", progress: 25, dueDate: "Jun 15, 2024", owner: "Alex John", updated: "5h ago" },
-    { id: "proj-3", name: "Brand Identity Design", client: "Greenlife NG", status: "Review", progress: 85, dueDate: "May 25, 2024", owner: "Shane D.", updated: "1d ago" },
-    { id: "proj-4", name: "E-commerce Website", client: "KudaTech", status: "Completed", progress: 100, dueDate: "Jun 20, 2024", owner: "Shane D.", updated: "2d ago" },
-    { id: "proj-5", name: "Marketing Campaign", client: "StartupX", status: "On Hold", progress: 50, dueDate: "Jun 10, 2024", owner: "Shane D.", updated: "3d ago" },
-    { id: "proj-6", name: "UI/UX Audit", client: "StoreHub", status: "Completed", progress: 100, dueDate: "May 10, 2024", owner: "Alex John", updated: "4d ago" },
-    { id: "proj-7", name: "SEO Optimization", client: "BrightPath", status: "Completed", progress: 100, dueDate: "May 5, 2024", owner: "Shane D.", updated: "5d ago" }
-  ]);
+  const [projectsList, setProjectsList] = useState<ProjectData[]>([]);
 
-  const handleCreateProject = () => {
+  useEffect(() => {
+    async function loadProjects() {
+      const { data: { session } } = await supabaseAuth.auth.getSession();
+      if (session?.user) {
+        setUserId(session.user.id);
+        const list = await fetchProjects(session.user.id);
+        if (list && list.length > 0) {
+          const mapped: ProjectData[] = list.map((p: any) => ({
+            id: p.id,
+            name: p.title,
+            client: "Client",
+            status: p.status || "In Progress",
+            progress: p.status === "Completed" ? 100 : 35,
+            dueDate: new Date(p.due_date).toLocaleDateString(),
+            owner: "Alex John",
+            updated: "Just now"
+          }));
+          setProjectsList(mapped);
+        } else {
+          setProjectsList([
+            { id: "proj-1", name: "Website Redesign", client: "Acme Corp", status: "In Progress", progress: 60, dueDate: "May 30, 2024", owner: "Alex John", updated: "2h ago" },
+            { id: "proj-2", name: "Mobile App Design", client: "TechNova Ltd.", status: "In Progress", progress: 25, dueDate: "Jun 15, 2024", owner: "Alex John", updated: "5h ago" }
+          ]);
+        }
+      }
+    }
+    loadProjects();
+  }, []);
+
+  const handleCreateProject = async () => {
+    let newId = `proj-${Date.now()}`;
+    if (userId) {
+      const saved = await createProject(
+        userId,
+        null,
+        projectName,
+        projectDesc,
+        500000,
+        "NGN",
+        new Date().toISOString().split('T')[0],
+        "2026-12-31",
+        template,
+        "Private"
+      );
+      if (saved) {
+        newId = (saved as any).id;
+      }
+    }
+
     const newProject: ProjectData = {
-      id: `proj-${Date.now()}`,
+      id: newId,
       name: projectName,
       client: clientName,
       status: "In Progress",

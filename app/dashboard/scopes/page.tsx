@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { 
   Plus, Target, FileText, ArrowLeft, ArrowRight, Copy, 
   ExternalLink, Check, Trash2, Calendar, FileCheck, CheckCircle2, ChevronRight, Eye
 } from "lucide-react";
+import { supabaseAuth } from "@/lib/auth";
+import { fetchQuotes, saveQuote, deleteQuote } from "@/app/actions/db";
 
 interface ScopeData {
   id: string;
@@ -28,6 +30,7 @@ interface ScopeData {
 
 export default function ScopesPage() {
   const [view, setView] = useState<"list" | "wizard" | "details" | "client_view" | "invoice">("list");
+  const [userId, setUserId] = useState<string | null>(null);
   
   // Wizard States
   const [wizardStep, setWizardStep] = useState(1);
@@ -55,62 +58,64 @@ export default function ScopesPage() {
   const [isCopied, setIsCopied] = useState(false);
 
   // List data
-  const [scopesList, setScopesList] = useState<ScopeData[]>([
-    {
-      id: "scope-1",
-      projectTitle: "Acme Corp Website Redesign",
-      clientName: "Acme Corp",
-      amount: 600000,
-      status: "Viewed",
-      created: "May 12, 2024",
-      service: "Web Development",
-      relationship: "New Client",
-      businessSize: "Solo Founder",
-      urgency: "Normal",
-      commStyle: "Friendly",
-      description: "Acme Corp needs a modern, conversion-focused website.",
-      revisions: "2 included revisions",
-      timeline: "4 weeks",
-      deliverables: ["Landing Page", "About Us", "Contact"],
-      pricingTier: "Standard"
-    },
-    {
-      id: "scope-2",
-      projectTitle: "Mobile App Design",
-      clientName: "KudaTech",
-      amount: 750000,
-      status: "Sent",
-      created: "May 10, 2024",
-      service: "UI/UX Design",
-      relationship: "Returning Client",
-      businessSize: "Startup",
-      urgency: "Fast",
-      commStyle: "Formal",
-      description: "Mobile App mockup and UI system design.",
-      revisions: "3 included revisions",
-      timeline: "6 weeks",
-      deliverables: ["App Mockups", "UI Library", "Prototype"],
-      pricingTier: "Premium"
-    },
-    {
-      id: "scope-3",
-      projectTitle: "Brand Identity Design",
-      clientName: "Greenlife NG",
-      amount: 450000,
-      status: "Draft",
-      created: "May 8, 2024",
-      service: "Brand Design",
-      relationship: "New Client",
-      businessSize: "Small Business",
-      urgency: "Normal",
-      commStyle: "Corporate",
-      description: "Logo design, color guidelines, and brand assets.",
-      revisions: "1 included revision",
-      timeline: "3 weeks",
-      deliverables: ["Logo", "Color Guidelines", "Assets"],
-      pricingTier: "Conservative"
+  const [scopesList, setScopesList] = useState<ScopeData[]>([]);
+
+  useEffect(() => {
+    async function loadScopes() {
+      const { data: { session } } = await supabaseAuth.auth.getSession();
+      if (session?.user) {
+        setUserId(session.user.id);
+        const list = await fetchQuotes(session.user.id);
+        if (list && list.length > 0) {
+          const mapped: ScopeData[] = list.map((q: any) => {
+            const deliverablesArray = typeof q.deliverables === "string" ? JSON.parse(q.deliverables) : (Array.isArray(q.deliverables) ? q.deliverables : []);
+            const amount = q.selected_tier === "Conservative" ? Number(q.price_conservative) : (q.selected_tier === "Premium" ? Number(q.price_premium) : Number(q.price_standard));
+            return {
+              id: q.id,
+              projectTitle: q.project_title || "Untitled Project",
+              clientName: "Client",
+              amount: amount || 500000,
+              status: "Draft",
+              created: new Date(q.created_at).toLocaleDateString(),
+              service: q.industry || "Web Development",
+              relationship: q.experience_level || "New Client",
+              businessSize: "Startup",
+              urgency: "Normal",
+              commStyle: "Friendly",
+              description: q.project_description || "",
+              revisions: q.revision_policy || "2 included revisions",
+              timeline: q.timeline || "4 weeks",
+              deliverables: deliverablesArray,
+              pricingTier: q.selected_tier || "Standard"
+            };
+          });
+          setScopesList(mapped);
+        } else {
+          setScopesList([
+            {
+              id: "scope-1",
+              projectTitle: "Acme Corp Website Redesign",
+              clientName: "Acme Corp",
+              amount: 600000,
+              status: "Viewed",
+              created: "May 12, 2024",
+              service: "Web Development",
+              relationship: "New Client",
+              businessSize: "Solo Founder",
+              urgency: "Normal",
+              commStyle: "Friendly",
+              description: "Acme Corp needs a modern, conversion-focused website.",
+              revisions: "2 included revisions",
+              timeline: "4 weeks",
+              deliverables: ["Landing Page", "About Us", "Contact"],
+              pricingTier: "Standard"
+            }
+          ]);
+        }
+      }
     }
-  ]);
+    loadScopes();
+  }, []);
 
   const addDeliverable = () => {
     if (newDeliverable.trim()) {
@@ -123,9 +128,32 @@ export default function ScopesPage() {
     setDeliverables(deliverables.filter((_, i) => i !== index));
   };
 
-  const handleCreateScope = () => {
+  const handleCreateScope = async () => {
+    let newId = `scope-${Date.now()}`;
+    if (userId) {
+      const saved = await saveQuote(
+        userId,
+        selectedService,
+        clientRelationship,
+        projectDesc,
+        projectTitle,
+        deliverables,
+        timeline,
+        revisions,
+        [], // out of scope
+        pricingAmount * 0.9, // conservative
+        pricingAmount, // standard
+        pricingAmount * 1.3, // premium
+        "Generated standard quote",
+        pricingTier
+      );
+      if (saved) {
+        newId = (saved as any).id;
+      }
+    }
+
     const newScope: ScopeData = {
-      id: `scope-${Date.now()}`,
+      id: newId,
       projectTitle,
       clientName: "Acme Corp",
       amount: pricingAmount,
