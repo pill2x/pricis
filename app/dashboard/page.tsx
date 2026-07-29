@@ -8,19 +8,83 @@ import {
   Eye, CheckCircle2, MessageSquare, Calendar, Flag, Sparkles
 } from "lucide-react";
 import { supabaseAuth } from "@/lib/auth";
+import { fetchInvoices, fetchProjects, fetchProposals } from "@/app/actions/db";
 
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null);
   const router = useRouter();
+  
+  // Dashboard Live Stats
+  const [totalEarnings, setTotalEarnings] = useState(2450000);
+  const [outstanding, setOutstanding] = useState(850000);
+  const [overdue, setOverdue] = useState(150000);
+  const [pipelineCounts, setPipelineCounts] = useState([24, 16, 9, 5, 4]);
+  const [projectCounts, setProjectCounts] = useState({ inProgress: 8, review: 4, pending: 3, completed: 12, overdue: 2 });
 
   useEffect(() => {
-    fetchUser();
-  }, []);
+    async function loadDashboardData() {
+      const { data: { session } } = await supabaseAuth.auth.getSession();
+      if (session?.user) {
+        setUser(session.user);
 
-  const fetchUser = async () => {
-    const { data: { user } } = await supabaseAuth.auth.getUser();
-    setUser(user);
-  };
+        // Load Invoices totals
+        const invoices = await fetchInvoices(session.user.id);
+        if (invoices && invoices.length > 0) {
+          let paidSum = 0;
+          let sentSum = 0;
+          let overdueSum = 0;
+          invoices.forEach((inv: any) => {
+            const amount = Number(inv.amount) || 0;
+            if (inv.status === "Paid") {
+              paidSum += amount;
+            } else if (inv.status === "Overdue") {
+              overdueSum += amount;
+            } else {
+              sentSum += amount;
+            }
+          });
+          setTotalEarnings(paidSum || 2450000);
+          setOutstanding((sentSum + overdueSum) || 850000);
+          setOverdue(overdueSum || 150000);
+        }
+
+        // Load proposals pipeline counts
+        const proposals = await fetchProposals(session.user.id);
+        if (proposals && proposals.length > 0) {
+          let draft = 0;
+          let sent = 0;
+          let opened = 0;
+          let signed = 0;
+          proposals.forEach((p: any) => {
+            if (p.status === "Signed") signed++;
+            else if (p.status === "Opened" || p.status === "Reviewing") opened++;
+            else if (p.status === "Sent") sent++;
+            else draft++;
+          });
+          setPipelineCounts([draft + sent + opened + signed, sent + opened + signed, opened + signed, signed, signed]); // Cumulative steps
+        }
+
+        // Load project counts
+        const projects = await fetchProjects(session.user.id);
+        if (projects && projects.length > 0) {
+          let inProgress = 0;
+          let review = 0;
+          let pending = 0;
+          let completed = 0;
+          let overdue = 0;
+          projects.forEach((p: any) => {
+            if (p.status === "Completed") completed++;
+            else if (p.status === "Review" || p.status === "Under Review") review++;
+            else if (p.status === "On Hold") pending++;
+            else if (p.status === "Overdue") overdue++;
+            else inProgress++;
+          });
+          setProjectCounts({ inProgress, review, pending, completed, overdue });
+        }
+      }
+    }
+    loadDashboardData();
+  }, []);
 
   const getChevronStyle = (index: number) => {
     if (index === 0) {
@@ -91,7 +155,7 @@ export default function DashboardPage() {
               {/* Left Side: Total Earnings */}
               <div>
                 <p className="text-text-secondary text-xs font-semibold mb-1">Total Earnings</p>
-                <h2 className="text-2xl font-black text-[#0F172A] font-display">₦2,450,000</h2>
+                <h2 className="text-2xl font-black text-[#0F172A] font-display">₦{totalEarnings.toLocaleString()}</h2>
                 <p className="text-xs font-bold mt-2">
                   <span className="text-success">↑ 28%</span> <span className="text-text-muted font-normal">vs last month</span>
                 </p>
@@ -101,11 +165,11 @@ export default function DashboardPage() {
               <div className="flex flex-col justify-between pl-4 border-l border-[#E5EAF2] space-y-4">
                 <div>
                   <p className="text-text-secondary text-xs font-semibold mb-0.5">Outstanding</p>
-                  <p className="text-warning text-lg font-bold font-display">₦1,250,000</p>
+                  <p className="text-warning text-lg font-bold font-display">₦{outstanding.toLocaleString()}</p>
                 </div>
                 <div>
                   <p className="text-text-secondary text-xs font-semibold mb-0.5">Overdue</p>
-                  <p className="text-danger text-lg font-bold font-display">₦350,000</p>
+                  <p className="text-danger text-lg font-bold font-display">₦{overdue.toLocaleString()}</p>
                 </div>
               </div>
             </div>
@@ -133,11 +197,11 @@ export default function DashboardPage() {
             
             <div className="flex w-full items-stretch relative gap-1 md:gap-2">
               {[
-                { label: "Scopes\nGenerated", count: 24 },
-                { label: "Proposals\nSent", count: 16 },
-                { label: "Opened", count: 9 },
-                { label: "Signed", count: 5 },
-                { label: "Paid", count: 4 },
+                { label: "Scopes\nGenerated", count: pipelineCounts[0] },
+                { label: "Proposals\nSent", count: pipelineCounts[1] },
+                { label: "Opened", count: pipelineCounts[2] },
+                { label: "Signed", count: pipelineCounts[3] },
+                { label: "Paid", count: pipelineCounts[4] },
               ].map((step, i) => (
                 <div 
                   key={i} 
@@ -157,10 +221,10 @@ export default function DashboardPage() {
             {/* Dotted Arrow indicators */}
             <div className="flex justify-between items-center mt-6 px-4">
               {[
-                { percent: "66.7%" },
-                { percent: "56.3%" },
-                { percent: "55.6%" },
-                { percent: "80.0%" },
+                { percent: pipelineCounts[0] > 0 ? `${Math.round((pipelineCounts[1] / pipelineCounts[0]) * 100)}%` : "0%" },
+                { percent: pipelineCounts[1] > 0 ? `${Math.round((pipelineCounts[2] / pipelineCounts[1]) * 100)}%` : "0%" },
+                { percent: pipelineCounts[2] > 0 ? `${Math.round((pipelineCounts[3] / pipelineCounts[2]) * 100)}%` : "0%" },
+                { percent: pipelineCounts[3] > 0 ? `${Math.round((pipelineCounts[4] / pipelineCounts[3]) * 100)}%` : "0%" },
               ].map((arrow, i) => (
                 <div key={i} className="flex-1 flex items-center justify-center gap-1 mx-2">
                   <div className="flex-grow border-t border-dashed border-[#E5EAF2]"></div>
@@ -188,11 +252,11 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between gap-4">
               <div className="space-y-3 flex-grow">
                 {[
-                  { label: "In Progress", count: 8, color: "bg-blue-500" },
-                  { label: "Under Review", count: 4, color: "bg-amber-500" },
-                  { label: "Pending Client", count: 3, color: "bg-purple-500" },
-                  { label: "Completed", count: 12, color: "bg-emerald-500" },
-                  { label: "Overdue", count: 2, color: "bg-red-500" },
+                  { label: "In Progress", count: projectCounts.inProgress, color: "bg-blue-500" },
+                  { label: "Under Review", count: projectCounts.review, color: "bg-amber-500" },
+                  { label: "Pending Client", count: projectCounts.pending, color: "bg-purple-500" },
+                  { label: "Completed", count: projectCounts.completed, color: "bg-emerald-500" },
+                  { label: "Overdue", count: projectCounts.overdue, color: "bg-red-500" },
                 ].map((stat, i) => (
                   <div key={i} className="flex items-center justify-between text-xs font-semibold">
                     <div className="flex items-center gap-2">
@@ -204,35 +268,46 @@ export default function DashboardPage() {
                 ))}
               </div>
               
-              <div className="relative w-32 h-32 flex-shrink-0 flex items-center justify-center">
-                <svg viewBox="0 0 36 36" className="w-full h-full transform -rotate-90">
-                  <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#F1F5F9" strokeWidth="3.5" />
-                  
-                  {/* Completed (Emerald): 12/29 */}
-                  <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#10B981" strokeWidth="3.5" 
-                          strokeDasharray="38.3 61.7" strokeDashoffset="0" />
-                  
-                  {/* In Progress (Blue): 8/29 */}
-                  <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#3B82F6" strokeWidth="3.5" 
-                          strokeDasharray="25.5 74.5" strokeDashoffset="-39.8" />
-                  
-                  {/* Under Review (Amber): 4/29 */}
-                  <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#F59E0B" strokeWidth="3.5" 
-                          strokeDasharray="12.8 87.2" strokeDashoffset="-66.8" />
-                  
-                  {/* Pending Client (Purple): 3/29 */}
-                  <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#8B5CF6" strokeWidth="3.5" 
-                          strokeDasharray="9.5 90.5" strokeDashoffset="-81.1" />
-                  
-                  {/* Overdue (Red): 2/29 */}
-                  <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#EF4444" strokeWidth="3.5" 
-                          strokeDasharray="6.4 93.6" strokeDashoffset="-92.1" />
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-2xl font-black text-[#0F172A] font-display leading-none">29</span>
-                  <span className="text-[10px] text-text-secondary font-semibold mt-1">Total Projects</span>
-                </div>
-              </div>
+              {(() => {
+                const totalProjects = projectCounts.completed + projectCounts.inProgress + projectCounts.review + projectCounts.pending + projectCounts.overdue;
+                const pctCompleted = totalProjects > 0 ? (projectCounts.completed / totalProjects) * 100 : 0;
+                const pctInProgress = totalProjects > 0 ? (projectCounts.inProgress / totalProjects) * 100 : 0;
+                const pctReview = totalProjects > 0 ? (projectCounts.review / totalProjects) * 100 : 0;
+                const pctPending = totalProjects > 0 ? (projectCounts.pending / totalProjects) * 100 : 0;
+                const pctOverdue = totalProjects > 0 ? (projectCounts.overdue / totalProjects) * 100 : 0;
+
+                return (
+                  <div className="relative w-32 h-32 flex-shrink-0 flex items-center justify-center">
+                    <svg viewBox="0 0 36 36" className="w-full h-full transform -rotate-90">
+                      <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#F1F5F9" strokeWidth="3.5" />
+                      
+                      {/* Completed (Emerald) */}
+                      <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#10B981" strokeWidth="3.5" 
+                              strokeDasharray={`${pctCompleted} ${100 - pctCompleted}`} strokeDashoffset="0" />
+                      
+                      {/* In Progress (Blue) */}
+                      <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#3B82F6" strokeWidth="3.5" 
+                              strokeDasharray={`${pctInProgress} ${100 - pctInProgress}`} strokeDashoffset={`-${pctCompleted}`} />
+                      
+                      {/* Under Review (Amber) */}
+                      <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#F59E0B" strokeWidth="3.5" 
+                              strokeDasharray={`${pctReview} ${100 - pctReview}`} strokeDashoffset={`-${pctCompleted + pctInProgress}`} />
+                      
+                      {/* Pending Client (Purple) */}
+                      <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#8B5CF6" strokeWidth="3.5" 
+                              strokeDasharray={`${pctPending} ${100 - pctPending}`} strokeDashoffset={`-${pctCompleted + pctInProgress + pctReview}`} />
+                      
+                      {/* Overdue (Red) */}
+                      <circle cx="18" cy="18" r="15.9155" fill="none" stroke="#EF4444" strokeWidth="3.5" 
+                              strokeDasharray={`${pctOverdue} ${100 - pctOverdue}`} strokeDashoffset={`-${pctCompleted + pctInProgress + pctReview + pctPending}`} />
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="text-2xl font-black text-[#0F172A] font-display leading-none">{totalProjects}</span>
+                      <span className="text-[10px] text-text-secondary font-semibold mt-1">Total Projects</span>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>

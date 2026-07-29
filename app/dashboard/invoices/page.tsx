@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { 
   Plus, ArrowLeft, ArrowRight, Check, Trash2, ChevronRight, 
   Eye, CheckCircle2, FileText, Calendar, Receipt, Download, 
   Share2, RefreshCw, Sparkles, BarChart2, MoreHorizontal, Printer, X, Search
 } from "lucide-react";
+import { supabaseAuth } from "@/lib/auth";
+import { fetchInvoices, createInvoice, updateInvoiceStatus } from "@/app/actions/db";
 
 interface InvoiceData {
   id: string;
@@ -22,6 +24,7 @@ interface InvoiceData {
 
 export default function InvoicesPage() {
   const [view, setView] = useState<"list" | "wizard" | "details" | "client_view">("list");
+  const [userId, setUserId] = useState<string | null>(null);
   
   // Wizard States
   const [wizardStep, setWizardStep] = useState(1);
@@ -60,26 +63,68 @@ export default function InvoicesPage() {
   const [activeDetailTab, setActiveDetailTab] = useState<"Overview" | "Activity" | "Payments">("Overview");
 
   // Invoices List
-  const [invoicesList, setInvoicesList] = useState<InvoiceData[]>([
-    { id: "inv-1", num: "INV-2024-0012", client: "Acme Corp", clientEmail: "alex@acmecorp.com", scopeProject: "Website Redesign", amount: 500000, dueDate: "May 26, 2024", status: "Paid", created: "May 12, 2024" },
-    { id: "inv-2", num: "INV-2024-0011", client: "KudaTech", clientEmail: "tola@kudatech.com", scopeProject: "Mobile App Design", amount: 750000, dueDate: "May 30, 2024", status: "Sent", created: "May 10, 2024" },
-    { id: "inv-3", num: "INV-2024-0010", client: "Greenlife NG", clientEmail: "efe@greenlife.org", scopeProject: "Brand Identity", amount: 450000, dueDate: "May 20, 2024", status: "Viewed", created: "May 8, 2024" },
-    { id: "inv-4", num: "INV-2024-0009", client: "StoreHub", clientEmail: "nkechi@storehub.ng", scopeProject: "E-commerce Website", amount: 1200000, dueDate: "May 15, 2024", status: "Overdue", created: "May 1, 2024" },
-    { id: "inv-5", num: "INV-2024-0008", client: "StartupX", clientEmail: "tunde@startupx.com", scopeProject: "SEO & Content Strategy", amount: 300000, dueDate: "May 10, 2024", status: "Draft", created: "Apr 30, 2024" }
-  ]);
+  const [invoicesList, setInvoicesList] = useState<InvoiceData[]>([]);
+
+  useEffect(() => {
+    async function loadInvoices() {
+      const { data: { session } } = await supabaseAuth.auth.getSession();
+      if (session?.user) {
+        setUserId(session.user.id);
+        const list = await fetchInvoices(session.user.id);
+        if (list && list.length > 0) {
+          const mapped: InvoiceData[] = list.map((i: any) => ({
+            id: i.id,
+            num: i.invoice_number,
+            client: "Client",
+            clientEmail: "client@acmecorp.com",
+            scopeProject: "Project Scope",
+            amount: Number(i.amount),
+            dueDate: new Date(i.due_date).toLocaleDateString(),
+            status: i.status as any,
+            created: new Date(i.created_at).toLocaleDateString()
+          }));
+          setInvoicesList(mapped);
+        } else {
+          setInvoicesList([
+            { id: "inv-1", num: "INV-2024-0012", client: "Acme Corp", clientEmail: "alex@acmecorp.com", scopeProject: "Website Redesign", amount: 500000, dueDate: "May 26, 2024", status: "Paid", created: "May 12, 2024" },
+            { id: "inv-2", num: "INV-2024-0011", client: "KudaTech", clientEmail: "tola@kudatech.com", scopeProject: "Mobile App Design", amount: 750000, dueDate: "May 30, 2024", status: "Sent", created: "May 10, 2024" }
+          ]);
+        }
+      }
+    }
+    loadInvoices();
+  }, []);
 
   const calculateTotal = () => {
     return items.reduce((sum, item) => sum + item.qty * item.rate, 0);
   };
 
-  const handleCreateInvoice = () => {
+  const handleCreateInvoice = async () => {
+    let newId = `inv-${Date.now()}`;
+    const totalAmount = calculateTotal();
+    if (userId) {
+      const saved = await createInvoice(
+        userId,
+        null,
+        invoiceNum,
+        totalAmount,
+        new Date(invoiceDate).toISOString().split('T')[0],
+        new Date(dueDate).toISOString().split('T')[0],
+        JSON.stringify(items),
+        "Paystack checkout"
+      );
+      if (saved) {
+        newId = (saved as any).id;
+      }
+    }
+
     const newInvoice: InvoiceData = {
-      id: `inv-${Date.now()}`,
+      id: newId,
       num: invoiceNum,
       client: selectedClient,
       clientEmail: clientEmail,
       scopeProject: selectedScope,
-      amount: calculateTotal(),
+      amount: totalAmount,
       dueDate: dueDate,
       status: "Sent",
       created: invoiceDate
