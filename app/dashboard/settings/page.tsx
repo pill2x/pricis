@@ -1,17 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { 
   User, Palette, CreditCard, Sliders, Users, Puzzle, Bell, Shield,
   ArrowLeft, Upload, CheckCircle2, Info, LucideIcon, Download,
   Check, Lock, RefreshCw, Key, Settings
 } from "lucide-react";
+import { supabaseAuth } from "@/lib/auth";
+import { fetchProfile, saveProfile, updateBrandingSettings, updatePreferenceSettings, updateTwoFactor } from "@/app/actions/db";
 
 export default function SettingsPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"home" | "profile" | "branding" | "billing" | "preferences" | "team" | "integrations" | "notifications" | "security">("home");
   const [showSavedSuccess, setShowSavedSuccess] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
 
   // Profile Form States
   const [fullName, setFullName] = useState("Alex John");
@@ -59,7 +62,47 @@ export default function SettingsPage() {
     zapier: false
   });
 
-  const handleSaveChanges = () => {
+  useEffect(() => {
+    async function loadSettings() {
+      const { data: { session } } = await supabaseAuth.auth.getSession();
+      if (session?.user) {
+        setUserId(session.user.id);
+        const profile = await fetchProfile(session.user.id);
+        if (profile) {
+          const prof = profile as any;
+          setFullName(prof.full_name || "Alex John");
+          setEmail(prof.email || "alexjohn@example.com");
+          setPhone(prof.phone || "+234 801 234 5678");
+          setBrandName(prof.brand_name || "Alex John Studio");
+          setPrimaryColor(prof.primary_color || "#2563EB");
+          setSecondaryColor(prof.secondary_color || "#1E40AF");
+          setBrandFont(prof.brand_font || "Inter");
+          setFooterNote(prof.footer_note || "Thank you for the opportunity to work together.");
+          setCurrency(prof.default_currency || "NGN - Nigerian Naira (₦)");
+          setPaymentTerms(prof.default_payment_terms || "50% upfront, 50% on completion");
+          setRevisionLimit(prof.default_revision_limit || "2 revisions");
+          setTimeline(prof.default_timeline || "4 weeks");
+          setProjectStart(prof.default_project_start || "Upon payment");
+          setValidity(prof.default_validity || "Default validity");
+          setTwoFactor(!!prof.two_factor_enabled);
+        }
+      }
+    }
+    loadSettings();
+  }, []);
+
+  const handleSaveChanges = async () => {
+    if (userId) {
+      if (activeTab === "profile") {
+        await saveProfile(userId, email, fullName, brandName);
+      } else if (activeTab === "branding") {
+        await updateBrandingSettings(userId, brandName, "", primaryColor, secondaryColor, brandFont, footerNote);
+      } else if (activeTab === "preferences") {
+        await updatePreferenceSettings(userId, currency, paymentTerms, revisionLimit, timeline, projectStart, validity);
+      } else if (activeTab === "security") {
+        await updateTwoFactor(userId, twoFactor);
+      }
+    }
     setShowSavedSuccess(true);
   };
 
