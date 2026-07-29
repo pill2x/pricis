@@ -106,6 +106,10 @@ export default function NegotiationAIPage() {
       const data = await res.json();
       if (data.message) {
         setAiResponseText(data.message);
+        if (selectedNeg && !selectedNeg.id.startsWith("neg-")) {
+          await insertMessage(selectedNeg.id, "user", objectionText);
+          await insertMessage(selectedNeg.id, "assistant", data.message);
+        }
       } else {
         setAiResponseText("Sorry, I could not generate a response at this time.");
       }
@@ -140,6 +144,10 @@ export default function NegotiationAIPage() {
             ...updatedHistory,
             { role: "kova", content: data.message }
           ]);
+          if (selectedNeg && !selectedNeg.id.startsWith("neg-")) {
+            await insertMessage(selectedNeg.id, "user", practiceInput);
+            await insertMessage(selectedNeg.id, "assistant", data.message);
+          }
         } else {
           setPracticeHistory([
             ...updatedHistory,
