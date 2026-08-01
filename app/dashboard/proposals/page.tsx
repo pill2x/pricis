@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { 
   Plus, FileText, ArrowLeft, Copy, ExternalLink, Check, Trash2, 
   Eye, CheckCircle2, ChevronRight, BarChart2, Calendar, Share2, Download, Lock
 } from "lucide-react";
+import { supabaseAuth } from "@/lib/auth";
+import { fetchProposals, createProposal } from "@/app/actions/db";
 
 interface ProposalData {
   id: string;
@@ -22,6 +24,7 @@ interface ProposalData {
 
 export default function ProposalsPage() {
   const [view, setView] = useState<"list" | "details" | "wizard" | "export">("list");
+  const [userId, setUserId] = useState<string | null>(null);
   
   // Detail views
   const [selectedProposal, setSelectedProposal] = useState<ProposalData | null>(null);
@@ -36,68 +39,41 @@ export default function ProposalsPage() {
   const [isCopied, setIsCopied] = useState(false);
 
   // List data
-  const [proposalsList, setProposalsList] = useState<ProposalData[]>([
-    {
-      id: "prop-1",
-      projectTitle: "Website Redesign Project",
-      clientName: "Acme Corp",
-      amount: 1200000,
-      status: "Opened",
-      created: "May 15, 2024",
-      openCount: 7,
-      timeSpent: "22m 45s",
-      avgTime: "3m 15s",
-      timeline: "4 weeks"
-    },
-    {
-      id: "prop-2",
-      projectTitle: "Mobile App Design",
-      clientName: "TechNova Ltd.",
-      amount: 850000,
-      status: "Reviewing",
-      created: "May 10, 2024",
-      openCount: 3,
-      timeSpent: "12m 10s",
-      avgTime: "4m 03s",
-      timeline: "6 weeks"
-    },
-    {
-      id: "prop-3",
-      projectTitle: "Brand Identity Design",
-      clientName: "Greenlife NG",
-      amount: 450000,
-      status: "Signed",
-      created: "May 8, 2024",
-      openCount: 2,
-      timeSpent: "8m 50s",
-      avgTime: "4m 25s",
-      timeline: "3 weeks"
-    },
-    {
-      id: "prop-4",
-      projectTitle: "UI/UX Design System",
-      clientName: "StartupX",
-      amount: 300000,
-      status: "Sent",
-      created: "May 3, 2024",
-      openCount: 1,
-      timeSpent: "2m 15s",
-      avgTime: "2m 15s",
-      timeline: "2 weeks"
-    },
-    {
-      id: "prop-5",
-      projectTitle: "E-commerce Website",
-      clientName: "StoreHub",
-      amount: 500000,
-      status: "Expired",
-      created: "Apr 28, 2024",
-      openCount: 0,
-      timeSpent: "0s",
-      avgTime: "0s",
-      timeline: "4 weeks"
+  const [proposalsList, setProposalsList] = useState<ProposalData[]>([]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("new") === "true") {
+      setView("wizard");
+      setWizardStep(1);
     }
-  ]);
+
+    async function loadProposals() {
+      const { data: { session } } = await supabaseAuth.auth.getSession();
+      if (session?.user) {
+        setUserId(session.user.id);
+        const list = await fetchProposals(session.user.id);
+        if (list && list.length > 0) {
+          const mapped: ProposalData[] = list.map((p: any) => ({
+            id: p.id,
+            projectTitle: p.title || "Project Proposal",
+            clientName: "Client",
+            amount: 500000,
+            status: p.status as any || "Sent",
+            created: new Date(p.created_at).toLocaleDateString(),
+            openCount: 0,
+            timeSpent: "0s",
+            avgTime: "0s",
+            timeline: "4 weeks"
+          }));
+          setProposalsList(mapped);
+        } else {
+          setProposalsList([]);
+        }
+      }
+    }
+    loadProposals();
+  }, []);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText("https://pricis.co/p/prop_3f2e8h2");
@@ -105,7 +81,7 @@ export default function ProposalsPage() {
     setTimeout(() => setIsCopied(false), 2000);
   };
 
-  const handleCreateProposal = () => {
+  const handleCreateProposal = async () => {
     const scopeMap: Record<string, { title: string, amount: number, client: string }> = {
       "scope-1": { title: "Acme Corp Website Redesign", amount: 1200000, client: "Acme Corp" },
       "scope-2": { title: "Mobile App Design for TechNova", amount: 850000, client: "TechNova Ltd." },
@@ -113,13 +89,31 @@ export default function ProposalsPage() {
     };
     const scopeInfo = scopeMap[selectedScopeId] || scopeMap["scope-1"];
 
+    let newId = `prop-${Date.now()}`;
+    if (userId) {
+      const saved = await createProposal(
+        userId,
+        null,
+        scopeInfo.client,
+        proposalTitle || scopeInfo.title,
+        scopeInfo.amount,
+        "4 weeks",
+        new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        introMsg,
+        paymentTerms
+      );
+      if (saved) {
+        newId = (saved as any).id;
+      }
+    }
+
     const newProposal: ProposalData = {
-      id: `prop-${Date.now()}`,
+      id: newId,
       projectTitle: proposalTitle || scopeInfo.title,
       clientName: scopeInfo.client,
       amount: scopeInfo.amount,
       status: "Sent",
-      created: "Today",
+      created: new Date().toLocaleDateString(),
       openCount: 0,
       timeSpent: "0s",
       avgTime: "0s",
@@ -190,30 +184,38 @@ export default function ProposalsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#E5EAF2] text-xs font-semibold">
-                  {proposalsList.map((prop) => (
-                    <tr key={prop.id} className="hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => {
-                      setSelectedProposal(prop);
-                      setView("details");
-                      setActiveDetailTab("Overview");
-                    }}>
-                      <td className="p-4 text-[#0F172A] font-bold">{prop.projectTitle}</td>
-                      <td className="p-4 text-text-secondary">{prop.clientName}</td>
-                      <td className="p-4 text-[#0F172A] font-bold">₦{prop.amount.toLocaleString()}</td>
-                      <td className="p-4">
-                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
-                          prop.status === "Signed" ? "bg-emerald-50 text-[#10B981] border-emerald-100" :
-                          prop.status === "Opened" ? "bg-green-50 text-emerald-600 border-green-100" :
-                          prop.status === "Reviewing" ? "bg-purple-50 text-purple-600 border-purple-100" :
-                          prop.status === "Sent" ? "bg-blue-50 text-primary border-blue-100" :
-                          "bg-slate-100 text-text-secondary border-slate-200"
-                        }`}>{prop.status}</span>
-                      </td>
-                      <td className="p-4 text-text-muted">{prop.created}</td>
-                      <td className="p-4 text-text-muted hover:text-primary transition-colors text-right">
-                        <ChevronRight size={16} className="inline" />
+                  {proposalsList.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="p-8 text-center text-text-muted">
+                        No proposals found. Click "New Proposal" to create one.
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    proposalsList.map((prop) => (
+                      <tr key={prop.id} className="hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => {
+                        setSelectedProposal(prop);
+                        setView("details");
+                        setActiveDetailTab("Overview");
+                      }}>
+                        <td className="p-4 text-[#0F172A] font-bold">{prop.projectTitle}</td>
+                        <td className="p-4 text-text-secondary">{prop.clientName}</td>
+                        <td className="p-4 text-[#0F172A] font-bold">₦{prop.amount.toLocaleString()}</td>
+                        <td className="p-4">
+                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
+                            prop.status === "Signed" ? "bg-emerald-50 text-[#10B981] border-emerald-100" :
+                            prop.status === "Opened" ? "bg-green-50 text-emerald-600 border-green-100" :
+                            prop.status === "Reviewing" ? "bg-purple-50 text-purple-600 border-purple-100" :
+                            prop.status === "Sent" ? "bg-blue-50 text-primary border-blue-100" :
+                            "bg-slate-100 text-text-secondary border-slate-200"
+                          }`}>{prop.status}</span>
+                        </td>
+                        <td className="p-4 text-text-muted">{prop.created}</td>
+                        <td className="p-4 text-text-muted hover:text-primary transition-colors text-right">
+                          <ChevronRight size={16} className="inline" />
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>

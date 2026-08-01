@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { 
   Plus, ArrowLeft, Check, Trash2, ChevronRight, Star, FileText, 
@@ -9,6 +9,8 @@ import {
   SendHorizontal, Brain, Code, PenTool, BookOpen, Layers, Edit, 
   Save, EyeOff, CheckCircle2, DollarSign, Calendar, Mail, FileCheck
 } from "lucide-react";
+import { supabaseAuth } from "@/lib/auth";
+import { createTemplate, fetchTemplates, deleteTemplate } from "@/app/actions/db";
 
 interface Template {
   id: string;
@@ -31,6 +33,7 @@ interface UserTemplate {
 export default function TemplatesDashboardPage() {
   const router = useRouter();
   const [activeSubTab, setActiveSubTab] = useState<"all" | "my">("all");
+  const [userId, setUserId] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -73,13 +76,33 @@ export default function TemplatesDashboardPage() {
   ];
 
   // User created templates list
-  const [userTemplates, setUserTemplates] = useState<UserTemplate[]>([
-    { id: "utemp-1", title: "My Website Redesign Template", category: "Web Development", projectsUsed: 12, lastUpdated: "May 18, 2024" },
-    { id: "utemp-2", title: "Startup Landing Page Scope", category: "Design", projectsUsed: 8, lastUpdated: "May 10, 2024" },
-    { id: "utemp-3", title: "Brand Identity Package", category: "Branding", projectsUsed: 5, lastUpdated: "May 5, 2024" },
-    { id: "utemp-4", title: "Monthly Social Media Retainer", category: "Marketing", projectsUsed: 7, lastUpdated: "Apr 28, 2024" },
-    { id: "utemp-5", title: "SEO Content Strategy Template", category: "Marketing", projectsUsed: 3, lastUpdated: "Apr 20, 2024" }
-  ]);
+  const [userTemplates, setUserTemplates] = useState<UserTemplate[]>([]);
+
+  useEffect(() => {
+    async function loadUserTemplates() {
+      const { data: { session } } = await supabaseAuth.auth.getSession();
+      if (session?.user) {
+        setUserId(session.user.id);
+        const list = await fetchTemplates(session.user.id);
+        if (list && list.length > 0) {
+          const mapped = list.map((t: any) => ({
+            id: t.id,
+            title: t.title,
+            category: t.category,
+            projectsUsed: 0,
+            lastUpdated: new Date(t.created_at).toLocaleDateString()
+          }));
+          setUserTemplates(mapped);
+        } else {
+          setUserTemplates([
+            { id: "utemp-1", title: "My Website Redesign Template", category: "Web Development", projectsUsed: 12, lastUpdated: "May 18, 2024" },
+            { id: "utemp-2", title: "Startup Landing Page Scope", category: "Design", projectsUsed: 8, lastUpdated: "May 10, 2024" }
+          ]);
+        }
+      }
+    }
+    loadUserTemplates();
+  }, []);
 
   const categories = ["All", "Web Development", "Design", "Branding", "Marketing", "Writing", "Consulting"];
 
@@ -100,13 +123,28 @@ export default function TemplatesDashboardPage() {
     setFlow("wizard_scope");
   };
 
-  const handleSaveCustomTemplate = () => {
+  const handleSaveCustomTemplate = async () => {
+    let newId = `utemp-${Date.now()}`;
+    if (userId) {
+      const saved = await createTemplate(
+        userId,
+        newTemplateName,
+        newTemplateCat,
+        "Custom Scope Template Outline",
+        newTemplateVisibility,
+        newTemplatePriceType,
+        "{project_title}"
+      );
+      if (saved) {
+        newId = (saved as any).id;
+      }
+    }
     const newUTemp: UserTemplate = {
-      id: `utemp-${Date.now()}`,
+      id: newId,
       title: newTemplateName,
       category: newTemplateCat,
       projectsUsed: 0,
-      lastUpdated: "Today"
+      lastUpdated: new Date().toLocaleDateString()
     };
     setUserTemplates([newUTemp, ...userTemplates]);
     setFlow("list");
