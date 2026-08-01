@@ -42,6 +42,12 @@ export default function ProposalsPage() {
   const [proposalsList, setProposalsList] = useState<ProposalData[]>([]);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("new") === "true") {
+      setView("wizard");
+      setWizardStep(1);
+    }
+
     async function loadProposals() {
       const { data: { session } } = await supabaseAuth.auth.getSession();
       if (session?.user) {
@@ -62,10 +68,7 @@ export default function ProposalsPage() {
           }));
           setProposalsList(mapped);
         } else {
-          setProposalsList([
-            { id: "prop-1", projectTitle: "Website Redesign Project", clientName: "Acme Corp", amount: 1200000, status: "Opened", created: "May 15, 2024", openCount: 7, timeSpent: "22m 45s", avgTime: "3m 15s", timeline: "4 weeks" },
-            { id: "prop-2", projectTitle: "Mobile App Design", clientName: "TechNova Ltd.", amount: 850000, status: "Reviewing", created: "May 10, 2024", openCount: 3, timeSpent: "12m 10s", avgTime: "4m 03s", timeline: "6 weeks" }
-          ]);
+          setProposalsList([]);
         }
       }
     }
@@ -181,30 +184,38 @@ export default function ProposalsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#E5EAF2] text-xs font-semibold">
-                  {proposalsList.map((prop) => (
-                    <tr key={prop.id} className="hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => {
-                      setSelectedProposal(prop);
-                      setView("details");
-                      setActiveDetailTab("Overview");
-                    }}>
-                      <td className="p-4 text-[#0F172A] font-bold">{prop.projectTitle}</td>
-                      <td className="p-4 text-text-secondary">{prop.clientName}</td>
-                      <td className="p-4 text-[#0F172A] font-bold">₦{prop.amount.toLocaleString()}</td>
-                      <td className="p-4">
-                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
-                          prop.status === "Signed" ? "bg-emerald-50 text-[#10B981] border-emerald-100" :
-                          prop.status === "Opened" ? "bg-green-50 text-emerald-600 border-green-100" :
-                          prop.status === "Reviewing" ? "bg-purple-50 text-purple-600 border-purple-100" :
-                          prop.status === "Sent" ? "bg-blue-50 text-primary border-blue-100" :
-                          "bg-slate-100 text-text-secondary border-slate-200"
-                        }`}>{prop.status}</span>
-                      </td>
-                      <td className="p-4 text-text-muted">{prop.created}</td>
-                      <td className="p-4 text-text-muted hover:text-primary transition-colors text-right">
-                        <ChevronRight size={16} className="inline" />
+                  {proposalsList.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="p-8 text-center text-text-muted">
+                        No proposals found. Click "New Proposal" to create one.
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    proposalsList.map((prop) => (
+                      <tr key={prop.id} className="hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => {
+                        setSelectedProposal(prop);
+                        setView("details");
+                        setActiveDetailTab("Overview");
+                      }}>
+                        <td className="p-4 text-[#0F172A] font-bold">{prop.projectTitle}</td>
+                        <td className="p-4 text-text-secondary">{prop.clientName}</td>
+                        <td className="p-4 text-[#0F172A] font-bold">₦{prop.amount.toLocaleString()}</td>
+                        <td className="p-4">
+                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
+                            prop.status === "Signed" ? "bg-emerald-50 text-[#10B981] border-emerald-100" :
+                            prop.status === "Opened" ? "bg-green-50 text-emerald-600 border-green-100" :
+                            prop.status === "Reviewing" ? "bg-purple-50 text-purple-600 border-purple-100" :
+                            prop.status === "Sent" ? "bg-blue-50 text-primary border-blue-100" :
+                            "bg-slate-100 text-text-secondary border-slate-200"
+                          }`}>{prop.status}</span>
+                        </td>
+                        <td className="p-4 text-text-muted">{prop.created}</td>
+                        <td className="p-4 text-text-muted hover:text-primary transition-colors text-right">
+                          <ChevronRight size={16} className="inline" />
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>

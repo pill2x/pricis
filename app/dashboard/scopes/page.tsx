@@ -61,6 +61,12 @@ export default function ScopesPage() {
   const [scopesList, setScopesList] = useState<ScopeData[]>([]);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("new") === "true") {
+      setView("wizard");
+      setWizardStep(1);
+    }
+
     async function loadScopes() {
       const { data: { session } } = await supabaseAuth.auth.getSession();
       if (session?.user) {
@@ -91,26 +97,7 @@ export default function ScopesPage() {
           });
           setScopesList(mapped);
         } else {
-          setScopesList([
-            {
-              id: "scope-1",
-              projectTitle: "Acme Corp Website Redesign",
-              clientName: "Acme Corp",
-              amount: 600000,
-              status: "Viewed",
-              created: "May 12, 2024",
-              service: "Web Development",
-              relationship: "New Client",
-              businessSize: "Solo Founder",
-              urgency: "Normal",
-              commStyle: "Friendly",
-              description: "Acme Corp needs a modern, conversion-focused website.",
-              revisions: "2 included revisions",
-              timeline: "4 weeks",
-              deliverables: ["Landing Page", "About Us", "Contact"],
-              pricingTier: "Standard"
-            }
-          ]);
+          setScopesList([]);
         }
       }
     }
@@ -241,32 +228,40 @@ export default function ScopesPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#E5EAF2] text-xs font-semibold">
-                  {scopesList.map((scope) => (
-                    <tr key={scope.id} className="hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => {
-                      setProjectTitle(scope.projectTitle);
-                      setProjectDesc(scope.description);
-                      setDeliverables(scope.deliverables);
-                      setPricingAmount(scope.amount);
-                      setPricingTier(scope.pricingTier);
-                      setView("details");
-                    }}>
-                      <td className="p-4 text-[#0F172A] font-bold">{scope.projectTitle}</td>
-                      <td className="p-4 text-text-secondary">{scope.clientName}</td>
-                      <td className="p-4 text-[#0F172A] font-bold">₦{scope.amount.toLocaleString()}</td>
-                      <td className="p-4">
-                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
-                          scope.status === "Viewed" ? "bg-emerald-50 text-[#10B981] border-emerald-100" :
-                          scope.status === "Sent" ? "bg-blue-50 text-primary border-blue-100" :
-                          scope.status === "Approved" ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
-                          "bg-slate-100 text-text-secondary border-slate-200"
-                        }`}>{scope.status}</span>
-                      </td>
-                      <td className="p-4 text-text-muted">{scope.created}</td>
-                      <td className="p-4 text-text-muted hover:text-primary transition-colors text-right">
-                        <ChevronRight size={16} className="inline" />
+                  {scopesList.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="p-8 text-center text-text-muted">
+                        No scopes found. Click "New Scope" to create one.
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    scopesList.map((scope) => (
+                      <tr key={scope.id} className="hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => {
+                        setProjectTitle(scope.projectTitle);
+                        setProjectDesc(scope.description);
+                        setDeliverables(scope.deliverables);
+                        setPricingAmount(scope.amount);
+                        setPricingTier(scope.pricingTier);
+                        setView("details");
+                      }}>
+                        <td className="p-4 text-[#0F172A] font-bold">{scope.projectTitle}</td>
+                        <td className="p-4 text-text-secondary">{scope.clientName}</td>
+                        <td className="p-4 text-[#0F172A] font-bold">₦{scope.amount.toLocaleString()}</td>
+                        <td className="p-4">
+                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
+                            scope.status === "Viewed" ? "bg-emerald-50 text-[#10B981] border-emerald-100" :
+                            scope.status === "Sent" ? "bg-blue-50 text-primary border-blue-100" :
+                            scope.status === "Approved" ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
+                            "bg-slate-100 text-text-secondary border-slate-200"
+                          }`}>{scope.status}</span>
+                        </td>
+                        <td className="p-4 text-text-muted">{scope.created}</td>
+                        <td className="p-4 text-text-muted hover:text-primary transition-colors text-right">
+                          <ChevronRight size={16} className="inline" />
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>

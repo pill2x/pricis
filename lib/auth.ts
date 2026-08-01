@@ -1,28 +1,39 @@
 class CustomAuthClient {
+  private cachedSession: any = null;
+
   auth = {
-    async getSession() {
+    getSession: async () => {
+      if (this.cachedSession) {
+        return { data: { session: this.cachedSession }, error: null };
+      }
       try {
         const res = await fetch("/api/auth/session");
         if (res.ok) {
           const data = await res.json();
+          this.cachedSession = data.session;
           return { data, error: null };
         }
       } catch (e) {}
       return { data: { session: null }, error: null };
     },
 
-    async getUser() {
+    getUser: async () => {
+      if (this.cachedSession) {
+        return { data: { user: this.cachedSession.user || null }, error: null };
+      }
       try {
         const res = await fetch("/api/auth/session");
         if (res.ok) {
           const data = await res.json();
+          this.cachedSession = data.session;
           return { data: { user: data.session?.user || null }, error: null };
         }
       } catch (e) {}
       return { data: { user: null }, error: null };
     },
 
-    async signInWithPassword({ email, password }: any) {
+    signInWithPassword: async ({ email, password }: any) => {
+      this.cachedSession = null;
       try {
         const res = await fetch("/api/auth/login", {
           method: "POST",
@@ -39,7 +50,8 @@ class CustomAuthClient {
       }
     },
 
-    async signUp({ email, password, options }: any) {
+    signUp: async ({ email, password, options }: any) => {
+      this.cachedSession = null;
       try {
         const res = await fetch("/api/auth/signup", {
           method: "POST",
@@ -61,14 +73,16 @@ class CustomAuthClient {
       }
     },
 
-    async signOut() {
+    signOut: async () => {
+      this.cachedSession = null;
       try {
         await fetch("/api/auth/logout", { method: "POST" });
       } catch (e) {}
       return { error: null };
     },
 
-    async signInWithOAuth({ provider }: any) {
+    signInWithOAuth: async ({ provider }: any) => {
+      this.cachedSession = null;
       if (provider === "google") {
         window.location.href = "/api/auth/google";
       }

@@ -45,6 +45,12 @@ export default function ProjectsPage() {
   const [projectsList, setProjectsList] = useState<ProjectData[]>([]);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("new") === "true") {
+      setView("wizard");
+      setWizardStep(1);
+    }
+
     async function loadProjects() {
       const { data: { session } } = await supabaseAuth.auth.getSession();
       if (session?.user) {
@@ -63,10 +69,7 @@ export default function ProjectsPage() {
           }));
           setProjectsList(mapped);
         } else {
-          setProjectsList([
-            { id: "proj-1", name: "Website Redesign", client: "Acme Corp", status: "In Progress", progress: 60, dueDate: "May 30, 2024", owner: "Alex John", updated: "2h ago" },
-            { id: "proj-2", name: "Mobile App Design", client: "TechNova Ltd.", status: "In Progress", progress: 25, dueDate: "Jun 15, 2024", owner: "Alex John", updated: "5h ago" }
-          ]);
+          setProjectsList([]);
         }
       }
     }
@@ -175,38 +178,46 @@ export default function ProjectsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#E5EAF2] text-xs font-semibold">
-                  {projectsList.map((proj) => (
-                    <tr key={proj.id} className="hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => {
-                      setSelectedProject(proj);
-                      setView("details");
-                      setActiveDetailTab("Overview");
-                    }}>
-                      <td className="p-4 text-[#0F172A] font-bold">{proj.name}</td>
-                      <td className="p-4 text-text-secondary">{proj.client}</td>
-                      <td className="p-4">
-                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
-                          proj.status === "Completed" ? "bg-emerald-50 text-[#10B981] border-emerald-100" :
-                          proj.status === "In Progress" ? "bg-blue-50 text-primary border-blue-100" :
-                          proj.status === "Review" ? "bg-purple-50 text-purple-600 border-purple-100" :
-                          "bg-amber-50 text-amber-600 border-amber-100"
-                        }`}>{proj.status}</span>
-                      </td>
-                      <td className="p-4">
-                        <div className="flex items-center gap-2">
-                          <div className="w-20 h-2 bg-slate-100 rounded-full overflow-hidden">
-                            <div className={`h-full rounded-full ${proj.status === "Completed" ? "bg-emerald-500" : "bg-primary"}`} style={{ width: `${proj.progress}%` }}></div>
-                          </div>
-                          <span className="text-xs font-bold text-[#0F172A]">{proj.progress}%</span>
-                        </div>
-                      </td>
-                      <td className="p-4 text-text-muted">{proj.dueDate}</td>
-                      <td className="p-4 text-text-secondary">{proj.owner}</td>
-                      <td className="p-4 text-text-muted">{proj.updated}</td>
-                      <td className="p-4 text-text-muted hover:text-primary transition-colors text-right">
-                        <ChevronRight size={16} className="inline" />
+                  {projectsList.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className="p-8 text-center text-text-muted">
+                        No projects found. Click "New Project" (or generate scope to kickstart a project).
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    projectsList.map((proj) => (
+                      <tr key={proj.id} className="hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => {
+                        setSelectedProject(proj);
+                        setView("details");
+                        setActiveDetailTab("Overview");
+                      }}>
+                        <td className="p-4 text-[#0F172A] font-bold">{proj.name}</td>
+                        <td className="p-4 text-text-secondary">{proj.client}</td>
+                        <td className="p-4">
+                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
+                            proj.status === "Completed" ? "bg-emerald-50 text-[#10B981] border-emerald-100" :
+                            proj.status === "In Progress" ? "bg-blue-50 text-primary border-blue-100" :
+                            proj.status === "Review" ? "bg-purple-50 text-purple-600 border-purple-100" :
+                            "bg-amber-50 text-amber-600 border-amber-100"
+                          }`}>{proj.status}</span>
+                        </td>
+                        <td className="p-4">
+                          <div className="flex items-center gap-2">
+                            <div className="w-16 bg-slate-100 h-2 rounded-full overflow-hidden">
+                              <div className="h-full bg-primary rounded-full" style={{ width: `${proj.progress}%` }}></div>
+                            </div>
+                            <span>{proj.progress}%</span>
+                          </div>
+                        </td>
+                        <td className="p-4 text-text-muted">{proj.dueDate}</td>
+                        <td className="p-4 text-[#0F172A] font-bold">{proj.owner}</td>
+                        <td className="p-4 text-text-muted">{proj.updated}</td>
+                        <td className="p-4 text-text-muted hover:text-primary transition-colors text-right">
+                          <ChevronRight size={16} className="inline" />
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>

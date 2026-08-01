@@ -66,6 +66,12 @@ export default function InvoicesPage() {
   const [invoicesList, setInvoicesList] = useState<InvoiceData[]>([]);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("new") === "true") {
+      setView("wizard");
+      setWizardStep(1);
+    }
+
     async function loadInvoices() {
       const { data: { session } } = await supabaseAuth.auth.getSession();
       if (session?.user) {
@@ -85,10 +91,7 @@ export default function InvoicesPage() {
           }));
           setInvoicesList(mapped);
         } else {
-          setInvoicesList([
-            { id: "inv-1", num: "INV-2024-0012", client: "Acme Corp", clientEmail: "alex@acmecorp.com", scopeProject: "Website Redesign", amount: 500000, dueDate: "May 26, 2024", status: "Paid", created: "May 12, 2024" },
-            { id: "inv-2", num: "INV-2024-0011", client: "KudaTech", clientEmail: "tola@kudatech.com", scopeProject: "Mobile App Design", amount: 750000, dueDate: "May 30, 2024", status: "Sent", created: "May 10, 2024" }
-          ]);
+          setInvoicesList([]);
         }
       }
     }
@@ -241,27 +244,35 @@ export default function InvoicesPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#E5EAF2] text-xs font-semibold">
-                  {invoicesList.map((inv) => (
-                    <tr key={inv.id} className="hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => {
-                      setSelectedInvoice(inv);
-                      setView("details");
-                      setActiveDetailTab("Overview");
-                    }}>
-                      <td className="p-4 text-[#0F172A] font-bold">{inv.num}</td>
-                      <td className="p-4 text-[#0F172A] font-bold">{inv.client}</td>
-                      <td className="p-4 text-text-secondary">{inv.scopeProject}</td>
-                      <td className="p-4 text-[#0F172A] font-bold">₦{inv.amount.toLocaleString()}</td>
-                      <td className="p-4 text-text-muted">{inv.dueDate}</td>
-                      <td className="p-4">
-                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${getStatusBadgeClass(inv.status)}`}>
-                          {inv.status}
-                        </span>
-                      </td>
-                      <td className="p-4 text-text-muted hover:text-primary transition-colors text-right">
-                        <ChevronRight size={16} className="inline" />
+                  {invoicesList.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="p-8 text-center text-text-muted">
+                        No invoices found. Click "New Invoice" to create one.
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    invoicesList.map((inv) => (
+                      <tr key={inv.id} className="hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => {
+                        setSelectedInvoice(inv);
+                        setView("details");
+                        setActiveDetailTab("Overview");
+                      }}>
+                        <td className="p-4 text-[#0F172A] font-bold">{inv.num}</td>
+                        <td className="p-4 text-[#0F172A] font-bold">{inv.client}</td>
+                        <td className="p-4 text-text-secondary">{inv.scopeProject}</td>
+                        <td className="p-4 text-[#0F172A] font-bold">₦{inv.amount.toLocaleString()}</td>
+                        <td className="p-4 text-text-muted">{inv.dueDate}</td>
+                        <td className="p-4">
+                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${getStatusBadgeClass(inv.status)}`}>
+                            {inv.status}
+                          </span>
+                        </td>
+                        <td className="p-4 text-text-muted hover:text-primary transition-colors text-right">
+                          <ChevronRight size={16} className="inline" />
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>

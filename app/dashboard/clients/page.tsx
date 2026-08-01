@@ -116,6 +116,12 @@ export default function ClientsPage() {
   const [clientsList, setClientsList] = useState<ClientData[]>([]);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("new") === "true") {
+      setView("wizard");
+      setWizardStep(1);
+    }
+
     async function loadClients() {
       const { data: { session } } = await supabaseAuth.auth.getSession();
       if (session?.user) {
@@ -142,44 +148,7 @@ export default function ClientsPage() {
           }));
           setClientsList(mapped);
         } else {
-          setClientsList([
-            {
-              id: "client-1",
-              name: "Acme Corp",
-              industry: "Technology",
-              projectsCount: 3,
-              totalRevenue: 5200000,
-              outstanding: 5100000,
-              lastActivity: "2 hours ago",
-              status: "Active",
-              contactPerson: "Alex Johnson",
-              email: "alex@acmecorp.com",
-              phone: "+234 801 234 5678",
-              companySize: "50 - 100 employees",
-              website: "www.acmecorp.com",
-              linkedin: "linkedin.com/company/acme",
-              clientSince: "May 12, 2024",
-              notes: "Key client for web and mobile product development."
-            },
-            {
-              id: "client-2",
-              name: "TechNova Ltd.",
-              industry: "Technology",
-              projectsCount: 4,
-              totalRevenue: 3750000,
-              outstanding: 0,
-              lastActivity: "1 day ago",
-              status: "Active",
-              contactPerson: "Sarah Davies",
-              email: "sarah@technova.com",
-              phone: "+234 802 345 6789",
-              companySize: "10 - 50 employees",
-              website: "www.technova.com",
-              linkedin: "linkedin.com/company/technova",
-              clientSince: "Mar 10, 2024",
-              notes: "Ongoing project contract."
-            }
-          ]);
+          setClientsList([]);
         }
       }
     }
@@ -320,35 +289,43 @@ export default function ClientsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#E5EAF2] text-xs font-semibold">
-                  {clientsList.map((client) => (
-                    <tr key={client.id} className="hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => {
-                      setSelectedClient(client);
-                      setView("details");
-                      setActiveDetailTab("Overview");
-                    }}>
-                      <td className="p-4 flex items-center gap-3">
-                        {getClientAvatar(client.name, "sm")}
-                        <span className="font-bold text-[#0F172A]">{client.name}</span>
-                      </td>
-                      <td className="p-4 text-text-secondary">{client.industry}</td>
-                      <td className="p-4 text-[#0F172A] font-bold">{client.projectsCount}</td>
-                      <td className="p-4 text-[#0F172A] font-bold">₦{client.totalRevenue.toLocaleString()}</td>
-                      <td className="p-4 text-danger font-bold">
-                        {client.outstanding > 0 ? `₦${client.outstanding.toLocaleString()}` : "₦0"}
-                      </td>
-                      <td className="p-4 text-text-muted">{client.lastActivity}</td>
-                      <td className="p-4">
-                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
-                          client.status === "Active" ? "bg-emerald-50 text-[#10B981] border-emerald-100" :
-                          client.status === "Prospect" ? "bg-blue-50 text-primary border-blue-100" :
-                          "bg-slate-100 text-text-secondary border-slate-200"
-                        }`}>{client.status}</span>
-                      </td>
-                      <td className="p-4 text-text-muted hover:text-primary transition-colors text-right">
-                        <ChevronRight size={16} className="inline" />
+                  {clientsList.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className="p-8 text-center text-text-muted">
+                        No clients found. Click "New Client" to add one.
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    clientsList.map((client) => (
+                      <tr key={client.id} className="hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => {
+                        setSelectedClient(client);
+                        setView("details");
+                        setActiveDetailTab("Overview");
+                      }}>
+                        <td className="p-4 flex items-center gap-3">
+                          {getClientAvatar(client.name, "sm")}
+                          <span className="font-bold text-[#0F172A]">{client.name}</span>
+                        </td>
+                        <td className="p-4 text-text-secondary">{client.industry}</td>
+                        <td className="p-4 text-[#0F172A] font-bold">{client.projectsCount}</td>
+                        <td className="p-4 text-[#0F172A] font-bold">₦{client.totalRevenue.toLocaleString()}</td>
+                        <td className="p-4 text-danger font-bold">
+                          {client.outstanding > 0 ? `₦${client.outstanding.toLocaleString()}` : "₦0"}
+                        </td>
+                        <td className="p-4 text-text-muted">{client.lastActivity}</td>
+                        <td className="p-4">
+                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
+                            client.status === "Active" ? "bg-emerald-50 text-[#10B981] border-emerald-100" :
+                            client.status === "Prospect" ? "bg-blue-50 text-primary border-blue-100" :
+                            "bg-slate-100 text-text-secondary border-slate-200"
+                          }`}>{client.status}</span>
+                        </td>
+                        <td className="p-4 text-text-muted hover:text-primary transition-colors text-right">
+                          <ChevronRight size={16} className="inline" />
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>

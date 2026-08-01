@@ -25,7 +25,7 @@ export async function sendEmail(payload: EmailPayload) {
       body: JSON.stringify({
         sender: {
           name: "Pricis",
-          email: "notifications@pricis.co",
+          email: process.env.SENDER_EMAIL || "notifications@pricis.co",
         },
         to: [
           {
@@ -38,8 +38,11 @@ export async function sendEmail(payload: EmailPayload) {
     });
 
     const data = await response.json();
+    console.log(`[BREVO API STATUS]: ${response.status}`);
+    console.log(`[BREVO API RESPONSE]:`, JSON.stringify(data));
+
     if (!response.ok) {
-      throw new Error(data.message || "Failed to send email via Brevo");
+      throw new Error(data.message || `Failed to send email via Brevo (Status: ${response.status})`);
     }
 
     return { success: true, data };

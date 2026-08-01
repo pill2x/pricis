@@ -112,9 +112,9 @@ export default function DashboardPage() {
             <Bell size={20} />
           </button>
           <div className="relative group">
-            <button className="hidden sm:flex bg-primary hover:bg-primary-hover text-white px-5 py-2.5 rounded-full text-sm font-semibold items-center gap-2 transition-all shadow-blue font-body">
-              <Plus size={16} /> New Scope <ChevronDown size={14} />
-            </button>
+            <Link href="/dashboard/scopes?new=true" className="hidden sm:flex bg-primary hover:bg-primary-hover text-white px-5 py-2.5 rounded-full text-sm font-semibold items-center gap-2 transition-all shadow-blue font-body">
+              <Plus size={16} /> New Scope
+            </Link>
           </div>
         </div>
       </div>
@@ -122,10 +122,10 @@ export default function DashboardPage() {
       {/* Quick Actions */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { icon: Target, label: "New Scope", href: "/generate", color: "text-primary bg-primary-light" },
-          { icon: FileText, label: "New Proposal", href: "/dashboard/proposals/new", color: "text-primary bg-primary-light" },
-          { icon: Receipt, label: "New Invoice", href: "/dashboard/invoices/new", color: "text-primary bg-primary-light" },
-          { icon: UserPlus, label: "Add Client", href: "/dashboard/clients/new", color: "text-primary bg-primary-light" }
+          { icon: Target, label: "New Scope", href: "/dashboard/scopes?new=true", color: "text-primary bg-primary-light" },
+          { icon: FileText, label: "New Proposal", href: "/dashboard/proposals?new=true", color: "text-primary bg-primary-light" },
+          { icon: Receipt, label: "New Invoice", href: "/dashboard/invoices?new=true", color: "text-primary bg-primary-light" },
+          { icon: UserPlus, label: "Add Client", href: "/dashboard/clients?new=true", color: "text-primary bg-primary-light" }
         ].map((action, i) => (
           <Link 
             key={i} 
