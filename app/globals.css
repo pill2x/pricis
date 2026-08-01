@@ -133,5 +133,16 @@ body {
       transform: scale(calc(100cqw / 850));
     }
   }
+
+  .bg-dot-pattern-light {
+    background-image: radial-gradient(rgba(148, 163, 184, 0.25) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  .bg-dot-pattern-dark {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
 }
+
 
