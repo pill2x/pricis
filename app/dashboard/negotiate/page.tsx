@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { 
   Plus, ArrowLeft, Check, Trash2, ChevronRight, 
   Settings, Key, RefreshCw, AlertCircle, Link2, CheckCircle2, 
   ShieldAlert, Sparkles, MessageSquare, SendHorizontal, Brain, 
   Search, PenTool, Users, Copy, Download, Lock, CheckCircle,
-  MoreHorizontal, HelpCircle, ArrowUpRight, Volume2, Mic, Play, Smile
+  MoreHorizontal, HelpCircle, ArrowUpRight, Volume2, Mic, Play, Smile, Loader2
 } from "lucide-react";
+import { supabaseAuth } from "@/lib/auth";
+import { fetchConversations, fetchMessages, createNegotiation, insertMessage, deleteNegotiation } from "@/app/actions/db";
 
 interface Negotiation {
   id: string;
@@ -21,15 +23,40 @@ interface Negotiation {
 
 export default function NegotiationAIPage() {
   const [view, setView] = useState<"list" | "chat" | "options_hub" | "draft_response" | "practice_mode" | "resolved">("list");
+  const [userId, setUserId] = useState<string | null>(null);
+  const [aiResponseText, setAiResponseText] = useState("");
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [selectedMode, setSelectedMode] = useState("draft");
   
   // Negotiations List
-  const [negotiations, setNegotiations] = useState<Negotiation[]>([
-    { id: "neg-1", title: "Client pushback on price", scope: "Acme Corp Website Redesign", status: "Active", lastMessage: "Client: That seems a bit high...", updated: "2h ago" },
-    { id: "neg-2", title: "Scope reduction request", scope: "Mobile App Design", status: "Active", lastMessage: "Client: Can we reduce the number of...", updated: "1d ago" },
-    { id: "neg-3", title: "Justifying timeline", scope: "Brand Identity Design", status: "Resolved", lastMessage: "You: Thanks, that makes sense...", updated: "3d ago" },
-    { id: "neg-4", title: "Rate increase conversation", scope: "E-commerce Website", status: "Resolved", lastMessage: "Client: I understand. Let's proceed.", updated: "5d ago" },
-    { id: "neg-5", title: "Practice: Handling objections", scope: "Practice Session", status: "Practice", lastMessage: "Kova: Great response! Here's...", updated: "1w ago" }
-  ]);
+  const [negotiations, setNegotiations] = useState<Negotiation[]>([]);
+
+  useEffect(() => {
+    async function loadNegotiations() {
+      const { data: { session } } = await supabaseAuth.auth.getSession();
+      if (session?.user) {
+        setUserId(session.user.id);
+        const list = await fetchConversations(session.user.id);
+        if (list && list.length > 0) {
+          const mapped: Negotiation[] = list.map((n: any) => ({
+            id: n.id,
+            title: n.title || "Objection Thread",
+            scope: n.context || "Acme Corp Website Redesign",
+            status: n.status as any || "Active",
+            lastMessage: "Conversation loaded",
+            updated: new Date(n.created_at).toLocaleDateString()
+          }));
+          setNegotiations(mapped);
+        } else {
+          setNegotiations([
+            { id: "neg-1", title: "Client pushback on price", scope: "Acme Corp Website Redesign", status: "Active", lastMessage: "Client: That seems a bit high...", updated: "2h ago" },
+            { id: "neg-2", title: "Scope reduction request", scope: "Mobile App Design", status: "Active", lastMessage: "Client: Can we reduce the number of...", updated: "1d ago" }
+          ]);
+        }
+      }
+    }
+    loadNegotiations();
+  }, []);
 
   const [selectedNeg, setSelectedNeg] = useState<Negotiation | null>({
     id: "neg-1", 
@@ -60,20 +87,81 @@ export default function NegotiationAIPage() {
     }
   };
 
-  const handleSendPracticeReply = () => {
+  const loadAiResponse = async (mode: string) => {
+    setSelectedMode(mode);
+    setIsAiLoading(true);
+    setView("draft_response");
+    try {
+      const apiMode = mode === "counter_offer" ? "analyze" : (mode === "value_justification" ? "coach" : "draft");
+      const res = await fetch("/api/negotiate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mode: apiMode,
+          context: selectedNeg?.scope || "Acme Corp Website Redesign",
+          messages: [{ role: "user", content: objectionText }],
+          userName: "Alex"
+        })
+      });
+      const data = await res.json();
+      if (data.message) {
+        setAiResponseText(data.message);
+        if (selectedNeg && !selectedNeg.id.startsWith("neg-")) {
+          await insertMessage(selectedNeg.id, "user", objectionText);
+          await insertMessage(selectedNeg.id, "assistant", data.message);
+        }
+      } else {
+        setAiResponseText("Sorry, I could not generate a response at this time.");
+      }
+    } catch (e) {
+      setAiResponseText("An error occurred while connecting to Kova AI.");
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
+  const handleSendPracticeReply = async () => {
     if (practiceInput.trim()) {
       const updatedHistory = [...practiceHistory, { role: "user", content: practiceInput }];
       setPracticeHistory(updatedHistory);
       setPracticeInput("");
       setIsTyping(true);
 
-      setTimeout(() => {
-        setIsTyping(false);
+      try {
+        const res = await fetch("/api/negotiate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            mode: "roleplay",
+            context: selectedNeg?.scope || "Practice Session",
+            messages: updatedHistory.map(h => ({ role: h.role === "kova" ? "assistant" : "user", content: h.content })),
+            userName: "Alex"
+          })
+        });
+        const data = await res.json();
+        if (data.message) {
+          setPracticeHistory([
+            ...updatedHistory,
+            { role: "kova", content: data.message }
+          ]);
+          if (selectedNeg && !selectedNeg.id.startsWith("neg-")) {
+            await insertMessage(selectedNeg.id, "user", practiceInput);
+            await insertMessage(selectedNeg.id, "assistant", data.message);
+          }
+        } else {
+          setPracticeHistory([
+            ...updatedHistory,
+            { role: "kova", content: "I'm sorry, I encountered a connection issue." }
+          ]);
+        }
+      } catch (e) {
         setPracticeHistory([
           ...updatedHistory,
-          { role: "kova", content: "Hmm, that makes sense but we really can't go above ₦500,000 right now. Can we drop the CMS features to save costs?" }
+          { role: "kova", content: "I'm sorry, I encountered a connection issue." }
         ]);
-      }, 1200);
+      } finally {
+        setIsTyping(false);
+      }
     }
   };
 
@@ -376,9 +464,12 @@ export default function NegotiationAIPage() {
               <button 
                 key={opt.id}
                 onClick={() => {
-                  if (opt.id === "draft_response") { setView("draft_response"); }
-                  else if (opt.id === "practice_mode") { setPracticeHistory([{ role: "kova", content: objectionText }]); setView("practice_mode"); }
-                  else { alert(`${opt.title} loaded! Try Draft Response or Practice Mode.`); }
+                  if (opt.id === "practice_mode") { 
+                    setPracticeHistory([{ role: "kova", content: objectionText }]); 
+                    setView("practice_mode"); 
+                  } else {
+                    loadAiResponse(opt.id);
+                  }
                 }}
                 className="bg-white border border-[#E5EAF2] rounded-2xl p-6 text-left hover:shadow-md transition-shadow group flex items-start gap-4 shadow-sm"
               >
@@ -432,14 +523,15 @@ export default function NegotiationAIPage() {
                 </div>
 
                 {/* Response text body */}
-                <div className="bg-[#F8FAFC] border border-[#E5EAF2] rounded-2xl p-6 text-xs font-semibold text-[#0F172A] leading-relaxed space-y-4">
-                  <p>Thanks for your honesty — I appreciate you sharing that.</p>
-                  <p>
-                    I understand budget is an important factor. The price reflects the amount of planning, design, and development that goes into creating a website that not only looks great but also performs well and helps you achieve your business goals.
-                  </p>
-                  <p>
-                    That said, I'm open to exploring options that work for you. We can adjust the scope or phase the work to align better with your budget while still delivering the most impact. Would you like me to share a couple of options?
-                  </p>
+                <div className="bg-[#F8FAFC] border border-[#E5EAF2] rounded-2xl p-6 text-xs font-semibold text-[#0F172A] leading-relaxed space-y-4 min-h-[150px] flex flex-col justify-center">
+                  {isAiLoading ? (
+                    <div className="flex flex-col items-center justify-center space-y-2 py-8 text-primary">
+                      <Loader2 className="w-8 h-8 animate-spin" />
+                      <span className="text-text-secondary text-xs">Consulting Kova AI...</span>
+                    </div>
+                  ) : (
+                    <div className="whitespace-pre-wrap">{aiResponseText || "No response generated yet."}</div>
+                  )}
                 </div>
 
                 {/* Explanation notes */}
@@ -455,7 +547,7 @@ export default function NegotiationAIPage() {
                 {/* Actions */}
                 <div className="flex gap-3 border-t border-[#E5EAF2] pt-6">
                   <button 
-                    onClick={() => { navigator.clipboard.writeText("Thanks for your honesty..."); alert("Copied suggested response!"); }}
+                    onClick={() => { navigator.clipboard.writeText(aiResponseText); alert("Copied suggested response!"); }}
                     className="bg-white hover:bg-slate-50 border border-[#E5EAF2] text-[#0F172A] px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm"
                   >
                     <Copy size={14} /> Copy

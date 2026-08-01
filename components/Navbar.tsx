@@ -211,7 +211,7 @@ export default function Navbar() {
         <div className="flex items-center gap-2 sm:gap-4">
           <Link
             href="/login"
-            className="hidden sm:block text-sm font-medium text-text-white hover:text-gray-200 transition-colors bg-white/10 border border-white/15 rounded-full px-5 py-2"
+            className="hidden sm:block text-sm font-medium text-white hover:text-gray-200 transition-colors bg-white/10 border border-white/15 rounded-full px-5 py-2"
           >
             Log in
           </Link>

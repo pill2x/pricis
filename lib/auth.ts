@@ -1,96 +1,95 @@
-import { checkProfileExists } from "@/app/actions/db";
+class CustomAuthClient {
+  private cachedSession: any = null;
 
-// Helper for generating UUIDs on the client side
-function generateUUID(): string {
-  if (typeof crypto !== "undefined" && crypto.randomUUID) {
-    return crypto.randomUUID();
-  }
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    const r = (Math.random() * 16) | 0,
-      v = c === "x" ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
+  auth = {
+    getSession: async () => {
+      if (this.cachedSession) {
+        return { data: { session: this.cachedSession }, error: null };
+      }
+      try {
+        const res = await fetch("/api/auth/session");
+        if (res.ok) {
+          const data = await res.json();
+          this.cachedSession = data.session;
+          return { data, error: null };
+        }
+      } catch (e) {}
+      return { data: { session: null }, error: null };
+    },
+
+    getUser: async () => {
+      if (this.cachedSession) {
+        return { data: { user: this.cachedSession.user || null }, error: null };
+      }
+      try {
+        const res = await fetch("/api/auth/session");
+        if (res.ok) {
+          const data = await res.json();
+          this.cachedSession = data.session;
+          return { data: { user: data.session?.user || null }, error: null };
+        }
+      } catch (e) {}
+      return { data: { user: null }, error: null };
+    },
+
+    signInWithPassword: async ({ email, password }: any) => {
+      this.cachedSession = null;
+      try {
+        const res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          return { data: null, error: { message: data.error || "Login failed" } };
+        }
+        return { data, error: null };
+      } catch (e: any) {
+        return { data: null, error: { message: e.message || "Network error" } };
+      }
+    },
+
+    signUp: async ({ email, password, options }: any) => {
+      this.cachedSession = null;
+      try {
+        const res = await fetch("/api/auth/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email,
+            password,
+            fullName: options?.data?.full_name || "",
+            businessName: options?.data?.business_name || "",
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          return { data: { user: null }, error: { message: data.error || "Signup failed" } };
+        }
+        return { data: { user: { id: data.userId, email } }, error: null };
+      } catch (e: any) {
+        return { data: { user: null }, error: { message: e.message || "Network error" } };
+      }
+    },
+
+    signOut: async () => {
+      this.cachedSession = null;
+      try {
+        await fetch("/api/auth/logout", { method: "POST" });
+      } catch (e) {}
+      return { error: null };
+    },
+
+    signInWithOAuth: async ({ provider }: any) => {
+      this.cachedSession = null;
+      if (provider === "google") {
+        window.location.href = "/api/auth/google";
+      }
+      return { data: {}, error: null };
+    }
+  };
 }
 
-const isBrowser = typeof window !== "undefined";
-
-const mockAuth = {
-  signUp: async ({ email, password: _password }: any) => {
-    try {
-      const res = await checkProfileExists(email);
-      if (!res.success) {
-        return { data: { user: null }, error: { message: `Database error: ${res.error}` } };
-      }
-      const existingUser = res.data;
-      if (existingUser) {
-        return { data: { user: null }, error: { message: "User already exists." } };
-      }
-      const userId = generateUUID();
-      const user = { id: userId, email };
-      if (isBrowser) {
-        localStorage.setItem("pricis_user", JSON.stringify(user));
-      }
-      return { data: { user }, error: null };
-    } catch (e: any) {
-      return { data: { user: null }, error: { message: e.message || "Sign up failed" } };
-    }
-  },
-  signInWithPassword: async ({ email, password: _password }: any) => {
-    try {
-      const res = await checkProfileExists(email);
-      if (!res.success) {
-        return { data: { user: null }, error: { message: `Database error: ${res.error}. Please check your database settings.` } };
-      }
-      const user = res.data;
-      if (!user) {
-        return { data: { user: null }, error: { message: "User not found. Please sign up." } };
-      }
-      if (isBrowser) {
-        localStorage.setItem("pricis_user", JSON.stringify(user));
-      }
-      return { data: { user, session: { user } }, error: null };
-    } catch (e: any) {
-      return { data: { user: null }, error: { message: e.message || "Sign in failed" } };
-    }
-  },
-  getUser: async () => {
-    if (!isBrowser) {
-      return { data: { user: null }, error: null };
-    }
-    const stored = localStorage.getItem("pricis_user");
-    if (!stored) {
-      return { data: { user: null }, error: null };
-    }
-    try {
-      const user = JSON.parse(stored);
-      return { data: { user }, error: null };
-    } catch {
-      return { data: { user: null }, error: null };
-    }
-  },
-  getSession: async () => {
-    if (!isBrowser) {
-      return { data: { session: null }, error: null };
-    }
-    const stored = localStorage.getItem("pricis_user");
-    if (!stored) {
-      return { data: { session: null }, error: null };
-    }
-    try {
-      const user = JSON.parse(stored);
-      return { data: { session: { user } }, error: null };
-    } catch {
-      return { data: { session: null }, error: null };
-    }
-  },
-  signOut: async () => {
-    if (isBrowser) {
-      localStorage.removeItem("pricis_user");
-    }
-    return { error: null };
-  }
-};
-
-export const supabaseAuth = {
-  auth: mockAuth
-};
+export const supabaseAuth = new CustomAuthClient();
+export const createBrowserClient = () => supabaseAuth;

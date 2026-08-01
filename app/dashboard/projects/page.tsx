@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { 
   Plus, ArrowLeft, ArrowRight, Check, ChevronRight, 
   Eye, CheckCircle2, FileText, Calendar, Users, Settings, 
   Trash2, Briefcase, Paperclip, MessageSquare, AlertCircle, Sparkles, Share2
 } from "lucide-react";
+import { supabaseAuth } from "@/lib/auth";
+import { fetchProjects, createProject, deleteProject } from "@/app/actions/db";
 
 interface ProjectData {
   id: string;
@@ -21,6 +23,7 @@ interface ProjectData {
 
 export default function ProjectsPage() {
   const [view, setView] = useState<"list" | "details" | "wizard">("list");
+  const [userId, setUserId] = useState<string | null>(null);
   
   // Detail views
   const [selectedProject, setSelectedProject] = useState<ProjectData | null>(null);
@@ -39,19 +42,62 @@ export default function ProjectsPage() {
   const [isInviteMemberModalOpen, setIsInviteMemberModalOpen] = useState(false);
 
   // List data
-  const [projectsList, setProjectsList] = useState<ProjectData[]>([
-    { id: "proj-1", name: "Website Redesign", client: "Acme Corp", status: "In Progress", progress: 60, dueDate: "May 30, 2024", owner: "Alex John", updated: "2h ago" },
-    { id: "proj-2", name: "Mobile App Design", client: "TechNova Ltd.", status: "In Progress", progress: 25, dueDate: "Jun 15, 2024", owner: "Alex John", updated: "5h ago" },
-    { id: "proj-3", name: "Brand Identity Design", client: "Greenlife NG", status: "Review", progress: 85, dueDate: "May 25, 2024", owner: "Shane D.", updated: "1d ago" },
-    { id: "proj-4", name: "E-commerce Website", client: "KudaTech", status: "Completed", progress: 100, dueDate: "Jun 20, 2024", owner: "Shane D.", updated: "2d ago" },
-    { id: "proj-5", name: "Marketing Campaign", client: "StartupX", status: "On Hold", progress: 50, dueDate: "Jun 10, 2024", owner: "Shane D.", updated: "3d ago" },
-    { id: "proj-6", name: "UI/UX Audit", client: "StoreHub", status: "Completed", progress: 100, dueDate: "May 10, 2024", owner: "Alex John", updated: "4d ago" },
-    { id: "proj-7", name: "SEO Optimization", client: "BrightPath", status: "Completed", progress: 100, dueDate: "May 5, 2024", owner: "Shane D.", updated: "5d ago" }
-  ]);
+  const [projectsList, setProjectsList] = useState<ProjectData[]>([]);
 
-  const handleCreateProject = () => {
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("new") === "true") {
+      setView("wizard");
+      setWizardStep(1);
+    }
+
+    async function loadProjects() {
+      const { data: { session } } = await supabaseAuth.auth.getSession();
+      if (session?.user) {
+        setUserId(session.user.id);
+        const list = await fetchProjects(session.user.id);
+        if (list && list.length > 0) {
+          const mapped: ProjectData[] = list.map((p: any) => ({
+            id: p.id,
+            name: p.title,
+            client: "Client",
+            status: p.status || "In Progress",
+            progress: p.status === "Completed" ? 100 : 35,
+            dueDate: new Date(p.due_date).toLocaleDateString(),
+            owner: "Alex John",
+            updated: "Just now"
+          }));
+          setProjectsList(mapped);
+        } else {
+          setProjectsList([]);
+        }
+      }
+    }
+    loadProjects();
+  }, []);
+
+  const handleCreateProject = async () => {
+    let newId = `proj-${Date.now()}`;
+    if (userId) {
+      const saved = await createProject(
+        userId,
+        null,
+        projectName,
+        projectDesc,
+        500000,
+        "NGN",
+        new Date().toISOString().split('T')[0],
+        "2026-12-31",
+        template,
+        "Private"
+      );
+      if (saved) {
+        newId = (saved as any).id;
+      }
+    }
+
     const newProject: ProjectData = {
-      id: `proj-${Date.now()}`,
+      id: newId,
       name: projectName,
       client: clientName,
       status: "In Progress",
@@ -132,38 +178,46 @@ export default function ProjectsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#E5EAF2] text-xs font-semibold">
-                  {projectsList.map((proj) => (
-                    <tr key={proj.id} className="hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => {
-                      setSelectedProject(proj);
-                      setView("details");
-                      setActiveDetailTab("Overview");
-                    }}>
-                      <td className="p-4 text-[#0F172A] font-bold">{proj.name}</td>
-                      <td className="p-4 text-text-secondary">{proj.client}</td>
-                      <td className="p-4">
-                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
-                          proj.status === "Completed" ? "bg-emerald-50 text-[#10B981] border-emerald-100" :
-                          proj.status === "In Progress" ? "bg-blue-50 text-primary border-blue-100" :
-                          proj.status === "Review" ? "bg-purple-50 text-purple-600 border-purple-100" :
-                          "bg-amber-50 text-amber-600 border-amber-100"
-                        }`}>{proj.status}</span>
-                      </td>
-                      <td className="p-4">
-                        <div className="flex items-center gap-2">
-                          <div className="w-20 h-2 bg-slate-100 rounded-full overflow-hidden">
-                            <div className={`h-full rounded-full ${proj.status === "Completed" ? "bg-emerald-500" : "bg-primary"}`} style={{ width: `${proj.progress}%` }}></div>
-                          </div>
-                          <span className="text-xs font-bold text-[#0F172A]">{proj.progress}%</span>
-                        </div>
-                      </td>
-                      <td className="p-4 text-text-muted">{proj.dueDate}</td>
-                      <td className="p-4 text-text-secondary">{proj.owner}</td>
-                      <td className="p-4 text-text-muted">{proj.updated}</td>
-                      <td className="p-4 text-text-muted hover:text-primary transition-colors text-right">
-                        <ChevronRight size={16} className="inline" />
+                  {projectsList.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className="p-8 text-center text-text-muted">
+                        No projects found. Click "New Project" (or generate scope to kickstart a project).
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    projectsList.map((proj) => (
+                      <tr key={proj.id} className="hover:bg-slate-50 cursor-pointer transition-colors" onClick={() => {
+                        setSelectedProject(proj);
+                        setView("details");
+                        setActiveDetailTab("Overview");
+                      }}>
+                        <td className="p-4 text-[#0F172A] font-bold">{proj.name}</td>
+                        <td className="p-4 text-text-secondary">{proj.client}</td>
+                        <td className="p-4">
+                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
+                            proj.status === "Completed" ? "bg-emerald-50 text-[#10B981] border-emerald-100" :
+                            proj.status === "In Progress" ? "bg-blue-50 text-primary border-blue-100" :
+                            proj.status === "Review" ? "bg-purple-50 text-purple-600 border-purple-100" :
+                            "bg-amber-50 text-amber-600 border-amber-100"
+                          }`}>{proj.status}</span>
+                        </td>
+                        <td className="p-4">
+                          <div className="flex items-center gap-2">
+                            <div className="w-16 bg-slate-100 h-2 rounded-full overflow-hidden">
+                              <div className="h-full bg-primary rounded-full" style={{ width: `${proj.progress}%` }}></div>
+                            </div>
+                            <span>{proj.progress}%</span>
+                          </div>
+                        </td>
+                        <td className="p-4 text-text-muted">{proj.dueDate}</td>
+                        <td className="p-4 text-[#0F172A] font-bold">{proj.owner}</td>
+                        <td className="p-4 text-text-muted">{proj.updated}</td>
+                        <td className="p-4 text-text-muted hover:text-primary transition-colors text-right">
+                          <ChevronRight size={16} className="inline" />
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
