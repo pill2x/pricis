@@ -2,14 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { 
-  Zap, Tag, Gift, Lock, ChevronDown, ChevronUp, 
-  Sparkles, Star, Users, ShieldCheck
+  Zap, Tag, Gift, Lock, ChevronDown, ChevronUp 
 } from "lucide-react";
 import WaitlistNavbar from "@/components/WaitlistNavbar";
 import WaitlistHero from "@/components/WaitlistHero";
 import CountdownTimer from "@/components/CountdownTimer";
 import WaitlistForm from "@/components/WaitlistForm";
-import WaitlistDashboardPreview from "@/components/WaitlistDashboardPreview";
 import Footer from "@/components/Footer";
 import { fetchWaitlistCount } from "@/app/actions/db";
 
@@ -70,45 +68,15 @@ export default function WaitlistPage() {
       {/* HERO SECTION matching provided UI mockup */}
       <WaitlistHero onSuccess={handleWaitlistSuccess} />
 
-      {/* LOGOS BAR (Built for ambitious teams worldwide) */}
-      <section className="py-12 border-y border-slate-200/80 bg-white">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-8 font-body">
-            Built for ambitious teams worldwide
-          </p>
-
-          <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-14 text-slate-700 font-display font-bold text-lg sm:text-xl">
-            <div className="flex items-center gap-2 hover:text-[#2563EB] transition-colors"><Sparkles size={18} className="text-[#2563EB]" /> Acme Corp</div>
-            <div className="flex items-center gap-2 hover:text-[#2563EB] transition-colors"><Star size={18} className="text-cyan-500" /> TechNova</div>
-            <div className="flex items-center gap-2 hover:text-[#2563EB] transition-colors"><Zap size={18} className="text-amber-500" /> KudaTech</div>
-            <div className="flex items-center gap-2 hover:text-[#2563EB] transition-colors"><ShieldCheck size={18} className="text-emerald-500" /> Greenlife NG</div>
-            <div className="flex items-center gap-2 hover:text-[#2563EB] transition-colors"><Users size={18} className="text-purple-500" /> StoreHub</div>
-          </div>
-        </div>
-      </section>
-
       {/* DEDICATED LAUNCH COUNTDOWN TIMER SECTION */}
-      <section id="countdown" className="py-16 px-4 sm:px-8 border-b bg-[#F8FAFC] border-slate-200/80">
+      <section id="countdown" className="py-16 px-4 sm:px-8 border-y bg-[#F8FAFC] border-slate-200/80">
         <div className="max-w-5xl mx-auto">
           <CountdownTimer targetDate="2026-09-15T12:00:00Z" />
         </div>
       </section>
 
-      {/* DASHBOARD PREVIEW SHOWCASE SECTION */}
-      <section className="py-20 px-4 max-w-6xl mx-auto bg-white">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl sm:text-4xl font-extrabold font-display mb-3 text-slate-900">
-            Designed for Speed, Precision, and Control
-          </h2>
-          <p className="max-w-xl mx-auto text-sm sm:text-base font-body text-slate-500">
-            Here is a sneak peek of your future workspace inside Pricis.
-          </p>
-        </div>
-        <WaitlistDashboardPreview />
-      </section>
-
       {/* ASYMMETRIC WHY JOIN SECTION */}
-      <section id="why-join" className="py-24 px-4 sm:px-8 max-w-7xl mx-auto bg-[#F8FAFC]">
+      <section id="why-join" className="py-24 px-4 sm:px-8 max-w-7xl mx-auto bg-white">
         <div className="grid lg:grid-cols-12 gap-12 items-start">
           
           {/* Left Column Title & Mission */}
@@ -175,7 +143,7 @@ export default function WaitlistPage() {
       </section>
 
       {/* SPLIT FAQ SECTION */}
-      <section id="faq" className="py-20 px-4 sm:px-8 max-w-7xl mx-auto border-t bg-white border-slate-200">
+      <section id="faq" className="py-20 px-4 sm:px-8 max-w-7xl mx-auto border-t bg-[#F8FAFC] border-slate-200">
         <div className="grid lg:grid-cols-12 gap-12 items-start">
           <div className="lg:col-span-4 text-left">
             <h2 className="text-3xl sm:text-4xl font-extrabold font-display mb-4 text-slate-900">
