@@ -5,9 +5,13 @@ import { Clock, Sparkles } from "lucide-react";
 
 interface CountdownTimerProps {
   targetDate?: string;
+  theme?: "light" | "dark";
 }
 
-export default function CountdownTimer({ targetDate = "2026-09-15T12:00:00Z" }: CountdownTimerProps) {
+export default function CountdownTimer({ 
+  targetDate = "2026-09-15T12:00:00Z",
+  theme = "light" 
+}: CountdownTimerProps) {
   const [timeLeft, setTimeLeft] = useState<{
     days: number;
     hours: number;
@@ -23,6 +27,7 @@ export default function CountdownTimer({ targetDate = "2026-09-15T12:00:00Z" }: 
   });
 
   const [mounted, setMounted] = useState(false);
+  const isLight = theme === "light";
 
   useEffect(() => {
     setMounted(true);
@@ -51,7 +56,9 @@ export default function CountdownTimer({ targetDate = "2026-09-15T12:00:00Z" }: 
 
   if (!mounted) {
     return (
-      <div className="w-full max-w-2xl mx-auto p-4 rounded-2xl bg-slate-900/60 border border-slate-800 animate-pulse text-center">
+      <div className={`w-full max-w-2xl mx-auto p-4 rounded-2xl border animate-pulse text-center ${
+        isLight ? "bg-slate-50 border-slate-200" : "bg-slate-900/60 border-slate-800"
+      }`}>
         <span className="text-slate-400 text-sm font-body">Loading countdown...</span>
       </div>
     );
@@ -66,39 +73,46 @@ export default function CountdownTimer({ targetDate = "2026-09-15T12:00:00Z" }: 
 
   return (
     <div id="countdown" className="w-full max-w-3xl mx-auto my-6 px-4">
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-[#0D1526] to-[#080D1A] border border-blue-500/20 p-6 md:p-8 shadow-[0_10px_40px_-15px_rgba(37,99,235,0.25)] text-center">
-        {/* Glowing background highlights */}
-        <div className="absolute -top-24 -left-24 w-48 h-48 bg-blue-600/15 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-cyan-500/15 rounded-full blur-3xl pointer-events-none"></div>
-
-        <div className="flex items-center justify-center gap-2 mb-4 text-xs md:text-sm font-semibold uppercase tracking-wider text-blue-400 font-body">
-          <Clock size={16} className="animate-spin-slow text-cyan-400" />
-          <span>Official Launch Countdown — Mid September 2026</span>
-          <Sparkles size={14} className="text-amber-400" />
+      <div className={`relative overflow-hidden rounded-3xl p-6 sm:p-8 text-center transition-colors border shadow-sm ${
+        isLight 
+          ? "bg-white border-slate-200/90 text-slate-900 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)]" 
+          : "bg-gradient-to-b from-[#0D1526] to-[#080D1A] border-blue-500/20 text-white shadow-2xl"
+      }`}>
+        <div className="flex items-center justify-center gap-2 mb-3 text-xs sm:text-sm font-semibold uppercase tracking-wider text-blue-600 font-body">
+          <Clock size={16} className="text-blue-600" />
+          <span>Launch Countdown — Mid September 2026</span>
+          <Sparkles size={14} className="text-amber-500" />
         </div>
 
-        <h3 className="text-lg md:text-xl font-bold text-white mb-6 font-display">
-          Pricis AI Workspace is Launching In:
+        <h3 className={`text-lg sm:text-2xl font-extrabold font-display mb-6 tracking-tight ${
+          isLight ? "text-slate-900" : "text-white"
+        }`}>
+          Pricis AI Workspace Launching In:
         </h3>
 
         <div className="grid grid-cols-4 gap-2.5 sm:gap-4 max-w-xl mx-auto">
           {timeUnits.map((unit, index) => (
             <div key={index} className="flex flex-col items-center">
-              <div className="w-full aspect-[1/1] sm:h-20 bg-slate-900/90 border border-slate-700/60 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-inner relative overflow-hidden group">
-                <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-blue-400/40 to-transparent"></div>
-                <span className="text-2xl sm:text-4xl font-extrabold text-white font-display tracking-tight group-hover:scale-105 transition-transform duration-200">
+              <div className={`w-full aspect-[1/1] sm:h-20 border rounded-2xl flex items-center justify-center shadow-inner relative overflow-hidden group transition-all ${
+                isLight 
+                  ? "bg-slate-50 border-slate-200/80 text-slate-900" 
+                  : "bg-slate-900/90 border-slate-700/60 text-white"
+              }`}>
+                <span className="text-2xl sm:text-4xl font-extrabold font-display tracking-tight group-hover:scale-105 transition-transform duration-200">
                   {String(unit.value).padStart(2, "0")}
                 </span>
               </div>
-              <span className="text-[10px] sm:text-xs font-bold text-slate-400 mt-2 tracking-widest font-body">
+              <span className={`text-[10px] sm:text-xs font-bold mt-2 tracking-widest font-body ${
+                isLight ? "text-slate-400" : "text-slate-400"
+              }`}>
                 {unit.label}
               </span>
             </div>
           ))}
         </div>
 
-        <p className="text-xs text-slate-400 mt-6 font-body">
-          Target Date: <span className="text-blue-300 font-semibold">{new Date(targetDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</span> (Subject to final quality assurance)
+        <p className={`text-xs mt-6 font-body ${isLight ? "text-slate-500" : "text-slate-400"}`}>
+          Target Date: <strong className="text-blue-600 font-semibold">{new Date(targetDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</strong> (Subject to final QA)
         </p>
       </div>
     </div>

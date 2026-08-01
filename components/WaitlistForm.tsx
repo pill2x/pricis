@@ -1,15 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, Check, ArrowRight, Loader2, Sparkles, Share2, CheckCircle2 } from "lucide-react";
+import { Mail, Check, ArrowRight, Loader2, Sparkles, CheckCircle2 } from "lucide-react";
 import { joinWaitlist } from "@/app/actions/db";
 
 interface WaitlistFormProps {
   onSuccess?: (email: string, totalCount?: number) => void;
   compact?: boolean;
+  theme?: "light" | "dark";
 }
 
-export default function WaitlistForm({ onSuccess, compact = false }: WaitlistFormProps) {
+export default function WaitlistForm({ onSuccess, compact = false, theme = "light" }: WaitlistFormProps) {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("Freelancer");
   const [loading, setLoading] = useState(false);
@@ -22,6 +23,8 @@ export default function WaitlistForm({ onSuccess, compact = false }: WaitlistFor
     type: "idle",
     message: "",
   });
+
+  const isLight = theme === "light";
 
   const roles = [
     { id: "Freelancer", label: "Freelancer / Solo" },
@@ -63,24 +66,28 @@ export default function WaitlistForm({ onSuccess, compact = false }: WaitlistFor
 
   if (status.type === "success") {
     return (
-      <div className="w-full max-w-xl mx-auto bg-white rounded-3xl p-8 shadow-2xl border border-blue-100 text-center animate-fade-in-up">
+      <div className={`w-full max-w-xl mx-auto rounded-3xl p-8 shadow-xl border text-center animate-fade-in-up transition-colors ${
+        isLight ? "bg-white border-blue-100 text-slate-900" : "bg-[#0D1526] border-blue-500/20 text-white"
+      }`}>
         <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 border border-blue-200">
           <CheckCircle2 size={36} className="text-blue-600 animate-bounce-short" />
         </div>
-        <h3 className="text-2xl font-bold text-slate-900 font-display mb-2">
-          {status.alreadySubscribed ? "You're Already On The List!" : "You're Spot Is Secured! 🎉"}
+        <h3 className="text-2xl font-bold font-display mb-2">
+          {status.alreadySubscribed ? "You're Already On The List!" : "Your Spot Is Secured! 🎉"}
         </h3>
-        <p className="text-slate-600 font-body text-base mb-6 leading-relaxed">
+        <p className={`font-body text-base mb-6 leading-relaxed ${isLight ? "text-slate-600" : "text-slate-300"}`}>
           {status.message}
         </p>
 
-        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-6 text-left">
+        <div className={`border rounded-2xl p-4 mb-6 text-left ${
+          isLight ? "bg-slate-50 border-slate-200" : "bg-[#080D1A] border-slate-800"
+        }`}>
           <div className="flex items-center gap-2 text-xs font-semibold text-blue-600 font-body uppercase tracking-wider mb-1">
-            <Sparkles size={14} /> Exclusive VIP Perks Unlocked
+            <Sparkles size={14} /> VIP Perks Unlocked
           </div>
-          <ul className="text-xs text-slate-700 font-body space-y-2 mt-2">
+          <ul className={`text-xs font-body space-y-2 mt-2 ${isLight ? "text-slate-700" : "text-slate-300"}`}>
             <li className="flex items-center gap-2"><Check size={14} className="text-blue-600" /> Priority access 48 hours before public launch</li>
-            <li className="flex items-center gap-2"><Check size={14} className="text-blue-600" /> 50% discount on Pricis Pro first year</li>
+            <li className="flex items-center gap-2"><Check size={14} className="text-blue-600" /> Special launch pricing & exclusive bonuses</li>
             <li className="flex items-center gap-2"><Check size={14} className="text-blue-600" /> Direct invitation to private beta user group</li>
           </ul>
         </div>
@@ -96,13 +103,17 @@ export default function WaitlistForm({ onSuccess, compact = false }: WaitlistFor
   }
 
   return (
-    <div id="hero-waitlist-form" className={`w-full ${compact ? "max-w-md" : "max-w-2xl"} mx-auto bg-white rounded-3xl p-6 sm:p-8 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] border border-slate-100 text-slate-900 relative z-20`}>
+    <div id="hero-waitlist-form" className={`w-full ${compact ? "max-w-md" : "max-w-2xl"} mx-auto rounded-3xl p-6 sm:p-8 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.06)] border text-left relative z-20 transition-colors ${
+      isLight ? "bg-white border-slate-200/80 text-slate-900" : "bg-[#0D1526] border-white/10 text-white"
+    }`}>
       {!compact && (
         <div className="text-center mb-6">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-display tracking-tight mb-2">
+          <h2 className={`text-2xl sm:text-3xl font-extrabold font-display tracking-tight mb-1.5 ${
+            isLight ? "text-slate-900" : "text-white"
+          }`}>
             Join the wait-list
           </h2>
-          <p className="text-slate-500 font-body text-sm sm:text-base">
+          <p className={`font-body text-sm sm:text-base ${isLight ? "text-slate-500" : "text-slate-400"}`}>
             Be the first to experience Pricis when we launch.
           </p>
         </div>
@@ -111,7 +122,9 @@ export default function WaitlistForm({ onSuccess, compact = false }: WaitlistFor
       {/* Role Selection Pills */}
       {!compact && (
         <div className="mb-5">
-          <label className="block text-xs font-bold text-slate-500 font-body uppercase tracking-wider mb-2 text-center sm:text-left">
+          <label className={`block text-xs font-bold font-body uppercase tracking-wider mb-2 text-center sm:text-left ${
+            isLight ? "text-slate-400" : "text-slate-400"
+          }`}>
             Select your role:
           </label>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -122,8 +135,10 @@ export default function WaitlistForm({ onSuccess, compact = false }: WaitlistFor
                 onClick={() => setRole(r.id)}
                 className={`py-2 px-3 rounded-xl text-xs font-semibold font-body transition-all text-center border ${
                   role === r.id
-                    ? "bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-500/20"
-                    : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
+                    ? "bg-[#2563EB] text-white border-[#2563EB] shadow-sm"
+                    : isLight 
+                      ? "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
+                      : "bg-[#080D1A] text-slate-300 border-slate-800 hover:bg-slate-800"
                 }`}
               >
                 {r.label}
@@ -133,25 +148,31 @@ export default function WaitlistForm({ onSuccess, compact = false }: WaitlistFor
         </div>
       )}
 
-      {/* Main Email Input Box */}
+      {/* Main Email Input Box matching hero mockup */}
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="flex flex-col sm:flex-row items-stretch gap-2.5 p-1.5 bg-slate-50 border border-slate-200 focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-600/20 rounded-2xl transition-all shadow-inner">
+        <div className={`flex flex-col sm:flex-row items-stretch gap-2.5 p-1.5 border rounded-2xl transition-all ${
+          isLight 
+            ? "bg-white border-slate-200 focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-600/10 shadow-sm" 
+            : "bg-[#080D1A] border-slate-800 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20"
+        }`}>
           <div className="flex items-center gap-3 px-3 py-2 flex-1">
-            <Mail size={20} className="text-slate-400 flex-shrink-0" />
+            <Mail size={20} className={isLight ? "text-slate-400" : "text-slate-500"} />
             <input
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your work email"
-              className="w-full bg-transparent text-slate-900 placeholder-slate-400 font-body text-sm sm:text-base focus:outline-none"
+              className={`w-full bg-transparent font-body text-sm sm:text-base focus:outline-none ${
+                isLight ? "text-slate-900 placeholder-slate-400" : "text-white placeholder-slate-500"
+              }`}
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-7 py-3 sm:py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-md shadow-blue-600/30 disabled:opacity-75 flex-shrink-0 font-body text-sm sm:text-base"
+            className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold px-7 py-3 sm:py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-md shadow-blue-600/20 disabled:opacity-75 flex-shrink-0 font-body text-sm sm:text-base"
           >
             {loading ? (
               <>
@@ -174,24 +195,26 @@ export default function WaitlistForm({ onSuccess, compact = false }: WaitlistFor
         )}
       </form>
 
-      {/* Checkmarks Footer */}
-      <div className="mt-6 pt-5 border-t border-slate-100 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm text-slate-600 font-medium font-body select-none">
+      {/* Checkmarks Footer matching hero mockup */}
+      <div className={`mt-6 pt-5 border-t flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs sm:text-sm font-medium font-body select-none ${
+        isLight ? "border-slate-100 text-slate-600" : "border-white/10 text-slate-400"
+      }`}>
         <div className="flex items-center gap-1.5">
-          <div className="w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center">
+          <div className="w-4 h-4 rounded-full bg-[#2563EB] text-white flex items-center justify-center flex-shrink-0">
             <Check size={10} strokeWidth={3} />
           </div>
           <span>No spam</span>
         </div>
 
         <div className="flex items-center gap-1.5">
-          <div className="w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center">
+          <div className="w-4 h-4 rounded-full bg-[#2563EB] text-white flex items-center justify-center flex-shrink-0">
             <Check size={10} strokeWidth={3} />
           </div>
           <span>Early access</span>
         </div>
 
         <div className="flex items-center gap-1.5">
-          <div className="w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center">
+          <div className="w-4 h-4 rounded-full bg-[#2563EB] text-white flex items-center justify-center flex-shrink-0">
             <Check size={10} strokeWidth={3} />
           </div>
           <span>Exclusive launch offers</span>

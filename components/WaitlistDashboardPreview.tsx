@@ -6,7 +6,13 @@ import {
 } from "lucide-react";
 import Logo from "@/components/Logo";
 
-export default function WaitlistDashboardPreview() {
+interface WaitlistDashboardPreviewProps {
+  theme?: "light" | "dark";
+}
+
+export default function WaitlistDashboardPreview({ theme = "light" }: WaitlistDashboardPreviewProps) {
+  const isLight = theme === "light";
+
   return (
     <div className="w-full max-w-[850px] mx-auto my-8 text-left">
       {/* DESKTOP MOCKUP (Scaled, Fixed Width) */}
@@ -23,12 +29,18 @@ export default function WaitlistDashboardPreview() {
             }}
           >
             {/* Dashboard Modal */}
-            <div className="w-full h-full shadow-2xl rounded-[2rem] border border-slate-200 bg-white flex overflow-hidden">
+            <div className={`w-full h-full rounded-[2rem] border flex overflow-hidden transition-colors ${
+              isLight 
+                ? "shadow-[0_20px_60px_-15px_rgba(0,0,0,0.12)] border-slate-200 bg-white" 
+                : "shadow-2xl border-white/10 bg-[#0D1526]"
+            }`}>
               {/* Sidebar */}
-              <div className="w-[220px] bg-white border-r border-slate-200 p-4 flex flex-col justify-between">
+              <div className={`w-[220px] border-r p-4 flex flex-col justify-between transition-colors ${
+                isLight ? "bg-white border-slate-200" : "bg-[#0D1526] border-white/10"
+              }`}>
                 <div>
                   <div className="mb-10 px-2 mt-2">
-                    <Logo variant="dark" />
+                    <Logo variant={isLight ? "dark" : "light"} />
                   </div>
                   <nav className="space-y-1.5 font-body">
                     <div className="flex items-center gap-3 bg-blue-50 text-blue-600 px-3 py-2.5 rounded-lg font-semibold text-sm">
@@ -41,7 +53,9 @@ export default function WaitlistDashboardPreview() {
                       { icon: Receipt, label: "Invoices" },
                       { icon: Settings, label: "Settings" }
                     ].map((item, i) => (
-                      <div key={i} className="flex items-center gap-3 text-slate-500 px-3 py-2.5 rounded-lg font-medium text-sm hover:text-slate-900 hover:bg-slate-50 cursor-pointer transition-colors">
+                      <div key={i} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium text-sm cursor-pointer transition-colors ${
+                        isLight ? "text-slate-500 hover:text-slate-900 hover:bg-slate-50" : "text-slate-400 hover:text-white hover:bg-white/5"
+                      }`}>
                         <item.icon size={18} /> {item.label}
                       </div>
                     ))}
@@ -49,12 +63,14 @@ export default function WaitlistDashboardPreview() {
                 </div>
                 
                 {/* Upgrade Card */}
-                <div className="bg-white border border-slate-200 p-4 rounded-xl flex items-start gap-3 shadow-sm cursor-pointer hover:border-slate-300 transition-all font-body">
+                <div className={`border p-4 rounded-xl flex items-start gap-3 shadow-sm cursor-pointer transition-all font-body ${
+                  isLight ? "bg-white border-slate-200 hover:border-slate-300" : "bg-[#080D1A] border-white/10 hover:border-white/20"
+                }`}>
                   <div className="mt-0.5 w-6 h-6 flex items-center justify-center flex-shrink-0">
                      <span className="text-xl leading-none">👑</span>
                   </div>
                   <div>
-                    <div className="text-sm font-bold text-slate-900">Upgrade to Pro</div>
+                    <div className={`text-sm font-bold ${isLight ? "text-slate-900" : "text-white"}`}>Upgrade to Pro</div>
                     <div className="text-xs text-slate-500 mt-0.5">Unlock all features</div>
                   </div>
                 </div>
@@ -121,7 +137,7 @@ export default function WaitlistDashboardPreview() {
             </div>
 
             {/* Mobile Scope Card (Overlapping Overlay) */}
-            <div className="absolute -right-12 -bottom-16 w-[260px] h-[520px] bg-white rounded-[2.5rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] border-[8px] border-[#1a1a1a] overflow-hidden flex flex-col z-20 ring-1 ring-slate-200/50">
+            <div className="absolute -right-12 -bottom-16 w-[260px] h-[520px] bg-white rounded-[2.5rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.4)] border-[8px] border-[#1a1a1a] overflow-hidden flex flex-col z-20 ring-1 ring-slate-200/50">
               {/* Notch */}
               <div className="w-[120px] h-[24px] bg-[#1a1a1a] absolute top-0 left-1/2 -translate-x-1/2 rounded-b-[16px] z-30 flex justify-center items-end pb-1 gap-2">
                 <div className="w-10 h-1.5 rounded-full bg-[#333]"></div>
@@ -172,7 +188,9 @@ export default function WaitlistDashboardPreview() {
 
       {/* MOBILE MOCKUP (Natively Responsive) */}
       <div className="lg:hidden relative mx-auto w-full max-w-[850px] text-left">
-        <div className="w-full shadow-xl rounded-2xl border border-slate-200 bg-white flex flex-col overflow-hidden relative z-10">
+        <div className={`w-full rounded-2xl border flex flex-col overflow-hidden relative z-10 ${
+          isLight ? "bg-white border-slate-200 shadow-xl" : "bg-[#0D1526] border-white/10 shadow-2xl"
+        }`}>
           <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-white">
             <Logo variant="dark" />
             <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center cursor-pointer">
