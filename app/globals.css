@@ -26,6 +26,8 @@
   --color-danger: #EF4444;
 
   /* Typography */
+  --font-sora: 'Sora', sans-serif;
+  --font-dm-sans: 'DM Sans', sans-serif;
   --font-display: var(--font-sora), sans-serif;
   --font-body: var(--font-dm-sans), sans-serif;
 
