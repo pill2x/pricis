@@ -1,214 +1,222 @@
 "use client";
 
 import { 
-  Grid, FileText, MessageSquare, Receipt, Settings, Bell, Plus, 
-  TrendingUp, Users, CheckCircle, ChevronRight, Sparkles 
+  Target, FileText as FileTextIcon, MessageSquare, Receipt, Settings, 
+  ChevronRight, Bookmark, TrendingUp, Grid, DownloadCloud, Link as LinkIcon, Menu
 } from "lucide-react";
 import Logo from "@/components/Logo";
 
 export default function WaitlistDashboardPreview() {
   return (
-    <div className="w-full max-w-5xl mx-auto my-12 px-4">
-      {/* Outer Glow Container */}
-      <div className="relative rounded-3xl p-1 bg-gradient-to-b from-blue-500/20 via-slate-800/40 to-slate-900/60 shadow-[0_25px_70px_-15px_rgba(37,99,235,0.3)]">
-        
-        {/* Top Browser Bar */}
-        <div className="bg-[#0F172A] rounded-t-[1.4rem] px-4 py-3 flex items-center justify-between border-b border-white/10">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
-            <div className="w-3 h-3 rounded-full bg-amber-500/80"></div>
-            <div className="w-3 h-3 rounded-full bg-emerald-500/80"></div>
-          </div>
-          <div className="bg-slate-800/80 border border-slate-700/60 rounded-full px-4 py-1 text-xs text-slate-300 font-mono flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            app.pricis.io/dashboard
-          </div>
-          <div className="text-xs text-slate-400 font-semibold font-body hidden sm:block">
-            Pricis OS v2.0
+    <div className="w-full max-w-[850px] mx-auto my-8 text-left">
+      {/* DESKTOP MOCKUP (Scaled, Fixed Width) */}
+      <div className="hidden lg:block relative mx-auto w-full max-w-[850px] text-left flex justify-center">
+        <div 
+          className="relative w-full aspect-[1.57/1] max-w-[850px] flex-shrink-0"
+          style={{ containerType: 'inline-size' }}
+        >
+          <div 
+            className="absolute top-0 left-0 origin-top-left dashboard-mock-scale"
+            style={{ 
+              width: '850px', 
+              height: '541px'
+            }}
+          >
+            {/* Dashboard Modal */}
+            <div className="w-full h-full shadow-2xl rounded-[2rem] border border-slate-200 bg-white flex overflow-hidden">
+              {/* Sidebar */}
+              <div className="w-[220px] bg-white border-r border-slate-200 p-4 flex flex-col justify-between">
+                <div>
+                  <div className="mb-10 px-2 mt-2">
+                    <Logo variant="dark" />
+                  </div>
+                  <nav className="space-y-1.5 font-body">
+                    <div className="flex items-center gap-3 bg-blue-50 text-blue-600 px-3 py-2.5 rounded-lg font-semibold text-sm">
+                      <Grid size={18} /> Dashboard
+                    </div>
+                    {[
+                      { icon: FileTextIcon, label: "Scopes" },
+                      { icon: MessageSquare, label: "Negotiations" },
+                      { icon: Bookmark, label: "Templates" },
+                      { icon: Receipt, label: "Invoices" },
+                      { icon: Settings, label: "Settings" }
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center gap-3 text-slate-500 px-3 py-2.5 rounded-lg font-medium text-sm hover:text-slate-900 hover:bg-slate-50 cursor-pointer transition-colors">
+                        <item.icon size={18} /> {item.label}
+                      </div>
+                    ))}
+                  </nav>
+                </div>
+                
+                {/* Upgrade Card */}
+                <div className="bg-white border border-slate-200 p-4 rounded-xl flex items-start gap-3 shadow-sm cursor-pointer hover:border-slate-300 transition-all font-body">
+                  <div className="mt-0.5 w-6 h-6 flex items-center justify-center flex-shrink-0">
+                     <span className="text-xl leading-none">👑</span>
+                  </div>
+                  <div>
+                    <div className="text-sm font-bold text-slate-900">Upgrade to Pro</div>
+                    <div className="text-xs text-slate-500 mt-0.5">Unlock all features</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Main Content */}
+              <div className="flex-1 bg-[#F9FAFB] p-10 overflow-hidden relative">
+                <div className="flex justify-between items-start mb-8">
+                  <div>
+                    <h1 className="text-3xl font-extrabold text-slate-900 font-display mb-1.5">Welcome back, Alex 👋</h1>
+                    <p className="text-slate-500 text-base font-body">Let&apos;s create a scope or continue where you left off.</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <button className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-full text-sm font-semibold flex items-center gap-2 transition-colors shadow-sm font-body">
+                      + New Scope
+                    </button>
+                  </div>
+                </div>
+
+                {/* Action Cards */}
+                <div className="grid grid-cols-2 gap-5 mb-10 pr-[200px]">
+                  <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col items-start font-body">
+                    <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mb-5">
+                      <Target size={24} />
+                    </div>
+                    <h3 className="font-bold text-slate-900 mb-1 text-base">Scope Generator</h3>
+                    <p className="text-xs text-slate-500 mb-auto h-8 leading-relaxed">Create accurate scopes, pricing and timelines.</p>
+                    <button className="bg-blue-600 text-white w-full py-2.5 rounded-lg text-sm font-semibold transition-colors hover:bg-blue-700 mt-8">Start New</button>
+                  </div>
+                  <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col items-start font-body">
+                    <div className="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mb-5">
+                      <TrendingUp size={24} />
+                    </div>
+                    <h3 className="font-bold text-slate-900 mb-1 text-base">Negotiation Assistant</h3>
+                    <p className="text-xs text-slate-500 mb-auto h-8 leading-relaxed">Get help with strategy, messages and practice.</p>
+                    <button className="bg-blue-600 text-white w-full py-2.5 rounded-lg text-sm font-semibold transition-colors hover:bg-blue-700 mt-8">Open Assistant</button>
+                  </div>
+                </div>
+
+                {/* Recent Scopes List */}
+                <div className="pr-[200px]">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="font-bold text-slate-900 font-display text-lg">Recent Scopes</h3>
+                    <span className="text-blue-600 text-sm font-semibold hover:text-blue-700 cursor-pointer font-body">View all</span>
+                  </div>
+                  <div className="divide-y divide-slate-200 border-y border-slate-200">
+                    {[
+                      { title: "Brand Identity Design for Fintech Startup", price: "₦650,000", status: "Viewed", statusClass: "bg-emerald-50 text-emerald-600" },
+                      { title: "Website Redesign for E-commerce Store", price: "₦1,250,000", status: "Draft", statusClass: "bg-slate-100 text-slate-600" },
+                      { title: "Social Media Management (3 Months)", price: "₦450,000", status: "Sent", statusClass: "bg-blue-50 text-blue-600" },
+                    ].map((scope, i) => (
+                      <div key={i} className="flex items-center justify-between py-3.5 hover:bg-slate-50 transition-colors cursor-pointer group">
+                        <div className="text-sm font-bold text-slate-900 truncate pr-4 font-body flex-1">{scope.title}</div>
+                        <div className="flex items-center gap-6 flex-shrink-0">
+                          <div className="text-sm font-semibold text-slate-900 w-20 text-right font-body">{scope.price}</div>
+                          <div className={`text-xs font-semibold px-2 py-1 rounded-full w-16 text-center font-body ${scope.statusClass}`}>{scope.status}</div>
+                          <ChevronRight size={16} className="text-slate-400 group-hover:text-blue-600" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile Scope Card (Overlapping Overlay) */}
+            <div className="absolute -right-12 -bottom-16 w-[260px] h-[520px] bg-white rounded-[2.5rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] border-[8px] border-[#1a1a1a] overflow-hidden flex flex-col z-20 ring-1 ring-slate-200/50">
+              {/* Notch */}
+              <div className="w-[120px] h-[24px] bg-[#1a1a1a] absolute top-0 left-1/2 -translate-x-1/2 rounded-b-[16px] z-30 flex justify-center items-end pb-1 gap-2">
+                <div className="w-10 h-1.5 rounded-full bg-[#333]"></div>
+                <div className="w-1.5 h-1.5 rounded-full bg-[#333]"></div>
+              </div>
+              
+              {/* Status Bar */}
+              <div className="flex justify-between items-center px-6 pt-3 pb-2 text-[11px] font-medium text-slate-800 z-20 relative bg-white">
+                <span>9:41</span>
+                <div className="flex gap-1.5 items-center">
+                  <div className="w-3.5 h-2.5 border border-slate-800 rounded-[2px] relative">
+                    <div className="absolute right-[-2px] top-[2px] w-[1px] h-1 bg-slate-800"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white px-5 pb-5 pt-2 relative flex-1 flex flex-col">
+                <div className="text-[11px] font-semibold text-slate-500 mb-1 font-body">Scope Summary</div>
+                <div className="text-[13px] font-medium text-slate-900 mb-4 font-body">Total Price</div>
+                <div className="text-3xl font-extrabold text-slate-900 mb-1 font-display tracking-tight">₦650,000</div>
+                <div className="text-[11px] text-slate-500 mb-6 bg-slate-50 border border-slate-100 inline-block px-2.5 py-1 rounded-md font-body font-medium w-fit">Valid 30 days</div>
+                
+                <button className="w-full bg-blue-600 text-white font-semibold py-2.5 rounded-xl mb-3 shadow-md shadow-blue-600/20 font-body hover:bg-blue-700 transition-colors text-[13px]">View Scope</button>
+                <button className="w-full bg-white border-2 border-slate-100 text-slate-800 font-semibold py-2.5 rounded-xl mb-6 hover:bg-slate-50 transition-colors font-body text-[13px]">Share Link</button>
+                
+                <div className="text-[11px] font-bold text-slate-900 mb-1 font-body">Next Step</div>
+                <div className="text-[11px] text-slate-500 mb-3 font-body">Send to client or download your PDF.</div>
+                
+                <div className="space-y-2 mt-auto font-body">
+                  <div className="flex items-center justify-between p-3.5 border border-slate-100 rounded-xl hover:border-blue-200 hover:bg-blue-50 cursor-pointer transition-all group">
+                    <div className="flex items-center gap-3 text-[13px] font-medium text-slate-800 group-hover:text-blue-600">
+                      <DownloadCloud size={16} className="text-slate-400 group-hover:text-blue-600" /> Download PDF
+                    </div>
+                    <ChevronRight size={16} className="text-slate-300 group-hover:text-blue-600" />
+                  </div>
+                  <div className="flex items-center justify-between p-3.5 border border-slate-100 rounded-xl hover:border-blue-200 hover:bg-blue-50 cursor-pointer transition-all group">
+                    <div className="flex items-center gap-3 text-[13px] font-medium text-slate-800 group-hover:text-blue-600">
+                      <LinkIcon size={16} className="text-slate-400 group-hover:text-blue-600" /> Copy Link
+                    </div>
+                    <ChevronRight size={16} className="text-slate-300 group-hover:text-blue-600" />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* Dashboard Frame */}
-        <div className="bg-[#F8FAFC] text-slate-900 rounded-b-[1.4rem] overflow-hidden flex flex-col md:flex-row shadow-2xl border-t border-slate-200">
-          
-          {/* Sidebar */}
-          <div className="hidden md:flex w-52 bg-white border-r border-slate-200 p-4 flex-col justify-between flex-shrink-0">
-            <div>
-              <div className="mb-8 px-2 mt-2">
-                <Logo variant="dark" />
-              </div>
-
-              <nav className="space-y-1 font-body">
-                <div className="flex items-center gap-3 bg-blue-50 text-blue-600 px-3 py-2.5 rounded-xl font-bold text-xs">
-                  <Grid size={16} /> Dashboard
-                </div>
-                {[
-                  { icon: FileText, label: "Scopes" },
-                  { icon: MessageSquare, label: "Proposals" },
-                  { icon: Sparkles, label: "Negotiation AI" },
-                  { icon: FileText, label: "Projects" },
-                  { icon: Users, label: "Clients" },
-                  { icon: Receipt, label: "Invoices" },
-                  { icon: Settings, label: "Settings" }
-                ].map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-3 text-slate-500 px-3 py-2 rounded-xl font-medium text-xs hover:text-slate-900 hover:bg-slate-100 cursor-pointer transition-colors">
-                    <item.icon size={16} /> {item.label}
-                  </div>
-                ))}
-              </nav>
-            </div>
-
-            <div className="bg-slate-900 text-white rounded-2xl p-3.5 text-xs font-body">
-              <div className="font-bold flex items-center justify-between mb-1">
-                <span>Pricis Pro</span>
-                <span className="bg-emerald-500 text-slate-950 font-extrabold text-[9px] px-1.5 py-0.5 rounded">AI ACTIVE</span>
-              </div>
-              <p className="text-[11px] text-slate-400">Unlimited scopes & client negotiation copilot.</p>
+      {/* MOBILE MOCKUP (Natively Responsive) */}
+      <div className="lg:hidden relative mx-auto w-full max-w-[850px] text-left">
+        <div className="w-full shadow-xl rounded-2xl border border-slate-200 bg-white flex flex-col overflow-hidden relative z-10">
+          <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-white">
+            <Logo variant="dark" />
+            <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center cursor-pointer">
+              <Menu size={16} className="text-blue-600" />
             </div>
           </div>
 
-          {/* Main Dashboard Area */}
-          <div className="flex-1 p-5 sm:p-7 bg-[#F8FAFC]">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-200">
-              <div>
-                <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 font-display flex items-center gap-2">
-                  Good morning, Alex 👋
-                </h1>
-                <p className="text-xs sm:text-sm text-slate-500 font-body">Here&apos;s what&apos;s happening with your business today.</p>
+          <div className="p-5 bg-[#F9FAFB]">
+            <h1 className="text-xl font-extrabold text-slate-900 font-display mb-1">Welcome back, Alex 👋</h1>
+            <p className="text-slate-500 text-sm font-body mb-6">Let&apos;s create a scope or continue where you left off.</p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 font-body">
+              <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+                <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3">
+                  <Target size={20} />
+                </div>
+                <h3 className="font-bold text-slate-900 text-sm mb-1">Scope Generator</h3>
+                <p className="text-xs text-slate-500 mb-4 leading-relaxed">Create accurate scopes, pricing and timelines.</p>
+                <button className="bg-blue-600 text-white w-full py-2 rounded-lg text-xs font-semibold hover:bg-blue-700">Start New</button>
               </div>
 
-              <div className="flex items-center gap-3">
-                <button className="p-2 rounded-full border border-slate-200 bg-white text-slate-600 hover:text-slate-900 shadow-sm">
-                  <Bell size={18} />
-                </button>
-                <button className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-full flex items-center gap-1.5 shadow-md shadow-blue-500/20 font-body">
-                  <Plus size={16} /> New Scope
-                </button>
-              </div>
-            </div>
-
-            {/* Quick Actions Row */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-              {[
-                { icon: FileText, label: "New Scope", color: "bg-blue-50 text-blue-600" },
-                { icon: MessageSquare, label: "New Proposal", color: "bg-indigo-50 text-indigo-600" },
-                { icon: Receipt, label: "New Invoice", color: "bg-emerald-50 text-emerald-600" },
-                { icon: Users, label: "Add Client", color: "bg-purple-50 text-purple-600" },
-              ].map((act, i) => (
-                <div key={i} className="bg-white border border-slate-200/80 rounded-xl p-3 flex items-center gap-3 shadow-sm hover:shadow-md transition-all cursor-pointer">
-                  <div className={`w-8 h-8 rounded-lg ${act.color} flex items-center justify-center flex-shrink-0`}>
-                    <act.icon size={16} />
-                  </div>
-                  <span className="text-xs font-bold text-slate-800 font-body">{act.label}</span>
+              <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+                <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mb-3">
+                  <TrendingUp size={20} />
                 </div>
-              ))}
-            </div>
-
-            {/* Financial & Pipeline Cards */}
-            <div className="grid md:grid-cols-2 gap-4 mb-6">
-              {/* Revenue Summary */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-                <div className="flex justify-between items-center mb-3">
-                  <h3 className="font-bold text-xs text-slate-500 uppercase tracking-wider font-body">Revenue Summary</h3>
-                  <span className="text-[11px] font-semibold text-slate-400 font-body">This Month ▾</span>
-                </div>
-                <div className="mb-3">
-                  <span className="text-2xl font-extrabold text-slate-900 font-display">₦2,450,000</span>
-                  <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full ml-2 font-body">↑ 28% vs last month</span>
-                </div>
-                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 font-body text-xs">
-                  <div>
-                    <span className="text-slate-400 block text-[10px]">Outstanding</span>
-                    <span className="font-bold text-amber-600">₦1,250,000</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 block text-[10px]">Overdue</span>
-                    <span className="font-bold text-rose-500">₦350,000</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Proposal Pipeline */}
-              <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-                <div className="flex justify-between items-center mb-3">
-                  <h3 className="font-bold text-xs text-slate-500 uppercase tracking-wider font-body">Proposal Pipeline</h3>
-                  <span className="text-[11px] font-semibold text-slate-400 font-body">This Month ▾</span>
-                </div>
-
-                <div className="grid grid-cols-5 gap-1 text-center font-body my-2">
-                  <div className="bg-slate-50 p-2 rounded-lg">
-                    <span className="block text-[10px] text-slate-400 font-medium">Scopes</span>
-                    <span className="text-sm font-extrabold text-slate-800">24</span>
-                  </div>
-                  <div className="bg-blue-50 p-2 rounded-lg">
-                    <span className="block text-[10px] text-blue-600 font-medium">Proposals</span>
-                    <span className="text-sm font-extrabold text-blue-700">16</span>
-                  </div>
-                  <div className="bg-indigo-50 p-2 rounded-lg">
-                    <span className="block text-[10px] text-indigo-600 font-medium">Opened</span>
-                    <span className="text-sm font-extrabold text-indigo-700">9</span>
-                  </div>
-                  <div className="bg-purple-50 p-2 rounded-lg">
-                    <span className="block text-[10px] text-purple-600 font-medium">Signed</span>
-                    <span className="text-sm font-extrabold text-purple-700">5</span>
-                  </div>
-                  <div className="bg-emerald-50 p-2 rounded-lg">
-                    <span className="block text-[10px] text-emerald-600 font-medium">Paid</span>
-                    <span className="text-sm font-extrabold text-emerald-700">4</span>
-                  </div>
-                </div>
-
-                <div className="flex justify-between items-center text-[10px] font-semibold text-slate-400 pt-2 font-body">
-                  <span>Conversion rate: <strong className="text-emerald-600">80.0%</strong></span>
-                  <span>Avg deal cycle: <strong>4.2 days</strong></span>
-                </div>
+                <h3 className="font-bold text-slate-900 text-sm mb-1">Negotiation Assistant</h3>
+                <p className="text-xs text-slate-500 mb-4 leading-relaxed">Get help with strategy, messages and practice.</p>
+                <button className="bg-blue-600 text-white w-full py-2 rounded-lg text-xs font-semibold hover:bg-blue-700">Open Assistant</button>
               </div>
             </div>
 
-            {/* Bottom Row: Active Projects & WhatsApp Copilot */}
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="md:col-span-2 bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-                <div className="flex justify-between items-center mb-3">
-                  <h3 className="font-bold text-xs text-slate-900 font-display">Active Projects (29)</h3>
-                  <span className="text-xs text-blue-600 font-semibold font-body cursor-pointer hover:underline">View all →</span>
-                </div>
-                <div className="space-y-2 font-body text-xs">
-                  <div className="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                      <span className="font-semibold text-slate-800">Acme Corp Website Redesign</span>
-                    </div>
-                    <span className="bg-blue-100 text-blue-700 font-bold px-2 py-0.5 rounded text-[10px]">In Progress</span>
+            <div className="font-body">
+              <h3 className="font-bold text-slate-900 font-display text-base mb-3">Recent Scopes</h3>
+              <div className="divide-y divide-slate-200 border-y border-slate-200">
+                {[
+                  { title: "Brand Identity Design for Fintech", price: "₦650,000", status: "Viewed" },
+                  { title: "Website Redesign for E-commerce", price: "₦1,250,000", status: "Draft" },
+                  { title: "Social Media Management (3 Months)", price: "₦450,000", status: "Sent" },
+                ].map((scope, i) => (
+                  <div key={i} className="flex items-center justify-between py-3">
+                    <div className="text-xs font-bold text-slate-900 truncate pr-2 flex-1">{scope.title}</div>
+                    <div className="text-xs font-semibold text-slate-900">{scope.price}</div>
                   </div>
-                  <div className="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                      <span className="font-semibold text-slate-800">TechNova Mobile App Scope</span>
-                    </div>
-                    <span className="bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded text-[10px]">Signed & Paid</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* WhatsApp Copilot Card */}
-              <div className="bg-gradient-to-br from-emerald-900 to-slate-900 text-white rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden">
-                <div className="absolute top-2 right-2 bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">
-                  Coming Soon
-                </div>
-                <div>
-                  <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-2">
-                    <Sparkles size={16} />
-                  </div>
-                  <h4 className="font-extrabold text-sm font-display mb-1">WhatsApp AI Copilot</h4>
-                  <p className="text-[11px] text-slate-300 font-body leading-relaxed">
-                    AI negotiations that close more deals right inside WhatsApp.
-                  </p>
-                </div>
-                <div className="mt-3 pt-2 border-t border-emerald-800/40 text-[10px] text-emerald-300 font-semibold flex items-center justify-between">
-                  <span>Included in Waitlist VIP</span>
-                  <ChevronRight size={14} />
-                </div>
+                ))}
               </div>
             </div>
           </div>

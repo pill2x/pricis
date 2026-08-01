@@ -1,17 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { 
-  Zap, Tag, Gift, Lock, CheckCircle2, ChevronDown, ChevronUp, 
-  Sparkles, ArrowRight, ShieldCheck, Star, Users, MessageSquare 
+  Zap, Tag, Gift, Lock, ChevronDown, ChevronUp, 
+  Sparkles, CheckCircle2 
 } from "lucide-react";
 import WaitlistNavbar from "@/components/WaitlistNavbar";
 import CountdownTimer from "@/components/CountdownTimer";
 import WaitlistForm from "@/components/WaitlistForm";
 import WaitlistDashboardPreview from "@/components/WaitlistDashboardPreview";
 import Footer from "@/components/Footer";
-import Logo from "@/components/Logo";
 import { fetchWaitlistCount } from "@/app/actions/db";
 
 export default function WaitlistPage() {
@@ -19,7 +17,6 @@ export default function WaitlistPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   useEffect(() => {
-    // Set background styling
     document.body.style.backgroundColor = "#080D1A";
     document.documentElement.style.backgroundColor = "#080D1A";
 
@@ -55,7 +52,7 @@ export default function WaitlistPage() {
       a: "Yes! Joining the wait-list is 100% free with no credit card required. You'll also unlock an exclusive 50% discount for your first year of Pricis Pro."
     },
     {
-      q: "What makes Pricis different from general AI writing tools?",
+      q: "What makes Pricis different from general AI tools?",
       a: "Pricis is specifically engineered for freelancers, agencies, and service providers. It generates realistic pricing calibrated for real market conditions, professional scope documents, and negotiation strategy to protect your profit margins."
     },
     {
@@ -66,19 +63,18 @@ export default function WaitlistPage() {
 
   return (
     <div className="min-h-screen bg-[#080D1A] text-white font-body selection:bg-blue-600 selection:text-white">
-      {/* Navigation */}
+      {/* Navigation Bar */}
       <WaitlistNavbar />
 
       {/* Main Hero Section */}
-      <section className="relative pt-8 pb-16 px-4 sm:px-6 overflow-hidden">
-        {/* Background Gradients & Effects */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] sm:w-[900px] h-[500px] bg-gradient-to-tr from-blue-600/20 via-cyan-500/10 to-indigo-600/20 rounded-full blur-[140px] pointer-events-none z-0"></div>
-        <div className="absolute top-10 left-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <section className="relative pt-12 pb-16 px-4 sm:px-6 overflow-hidden">
+        {/* Background Ambient Glow */}
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] sm:w-[800px] h-[450px] bg-gradient-to-tr from-blue-600/20 via-cyan-500/10 to-indigo-600/20 rounded-full blur-[130px] pointer-events-none z-0"></div>
 
-        <div className="max-w-6xl mx-auto text-center relative z-10">
+        <div className="max-w-5xl mx-auto text-center relative z-10">
           
-          {/* Badge: Coming Soon */}
-          <div className="inline-flex items-center gap-2.5 bg-blue-500/10 border border-blue-500/30 rounded-full px-4 py-1.5 mb-6 backdrop-blur-sm shadow-inner">
+          {/* Status Badge */}
+          <div className="inline-flex items-center gap-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-4 py-1.5 mb-8 backdrop-blur-sm shadow-inner">
             <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
@@ -88,84 +84,72 @@ export default function WaitlistPage() {
             </span>
           </div>
 
-          {/* Main Headline */}
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold text-white mb-6 tracking-tight font-display leading-[1.15] max-w-4xl mx-auto">
+          {/* Hero Headline */}
+          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold text-white mb-6 tracking-tight font-display leading-[1.12]">
             The AI Workspace for <br className="hidden sm:inline" />
-            <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-indigo-300 bg-clip-text text-transparent drop-shadow-sm">
+            <span className="bg-gradient-to-r from-blue-400 via-blue-500 to-cyan-400 bg-clip-text text-transparent">
               Smarter Business Growth
             </span>
           </h1>
 
-          {/* Subtitle */}
-          <p className="text-base sm:text-xl text-slate-300 mb-10 max-w-2xl mx-auto leading-relaxed font-body font-normal">
+          {/* Hero Subtitle */}
+          <p className="text-base sm:text-xl text-slate-300 mb-10 max-w-3xl mx-auto leading-relaxed font-body font-normal">
             Pricis brings your projects, proposals, clients, invoices and negotiations together — with AI that works for you.
           </p>
 
-          {/* Waitlist Join Card Container */}
-          <div className="mb-12">
+          {/* Waitlist Form Component */}
+          <div className="mb-10">
             <WaitlistForm onSuccess={handleWaitlistSuccess} />
           </div>
 
-          {/* Live Waitlist Subscriber counter */}
-          <div className="inline-flex items-center justify-center gap-3 bg-slate-900/80 border border-slate-800 rounded-full px-5 py-2 text-xs sm:text-sm text-slate-300 font-body shadow-lg">
+          {/* Live Waitlist Subscriber Pill */}
+          <div className="inline-flex items-center justify-center gap-3 bg-slate-900/90 border border-slate-800 rounded-full px-5 py-2.5 text-xs sm:text-sm text-slate-300 font-body shadow-lg">
             <div className="flex -space-x-2">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="w-7 h-7 rounded-full border-2 border-slate-900 bg-slate-700 overflow-hidden">
-                  <img src={`https://i.pravatar.cc/100?img=${i + 15}`} alt="User Avatar" className="w-full h-full object-cover" />
+                <div key={i} className="w-6 h-6 sm:w-7 sm:h-7 rounded-full border-2 border-slate-900 bg-slate-700 overflow-hidden">
+                  <img src={`https://i.pravatar.cc/100?img=${i + 22}`} alt="User Avatar" className="w-full h-full object-cover" />
                 </div>
               ))}
             </div>
             <span>
-              Join <strong className="text-white font-bold">{waitlistCount.toLocaleString()}</strong> forward-thinking teams on the waitlist
+              Join <strong className="text-white font-bold">{waitlistCount.toLocaleString()}</strong> forward-thinking teams on the wait-list
             </span>
           </div>
         </div>
       </section>
 
-      {/* Countdown Timer Section */}
-      <section className="py-4">
-        <CountdownTimer targetDate="2026-09-15T12:00:00Z" />
-      </section>
-
-      {/* Social Proof / Trusted By Logos */}
-      <section className="py-12 border-y border-white/10 bg-[#0D1526]/80">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <p className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-8 font-body">
-            Trusted by forward-thinking teams
-          </p>
-
-          <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-14 opacity-75 grayscale hover:grayscale-0 transition-all duration-300 text-slate-300 font-display font-bold text-lg sm:text-xl">
-            <div className="flex items-center gap-2"><Sparkles size={18} className="text-blue-400" /> Acme Corp</div>
-            <div className="flex items-center gap-2"><Star size={18} className="text-cyan-400" /> TechNova</div>
-            <div className="flex items-center gap-2"><Zap size={18} className="text-amber-400" /> KudaTech</div>
-            <div className="flex items-center gap-2"><ShieldCheck size={18} className="text-emerald-400" /> Greenlife NG</div>
-            <div className="flex items-center gap-2"><Users size={18} className="text-purple-400" /> StoreHub</div>
+      {/* DEDICATED COUNTDOWN TIMER SECTION */}
+      <section id="countdown" className="py-12 border-y border-white/10 bg-[#0D1526]/50">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="text-center mb-4">
+            <span className="text-xs uppercase tracking-widest text-blue-400 font-bold font-body flex items-center justify-center gap-1.5">
+              <Sparkles size={14} className="text-cyan-400" /> Launch Schedule
+            </span>
           </div>
+          <CountdownTimer targetDate="2026-09-15T12:00:00Z" />
         </div>
       </section>
 
-      {/* Interactive App Mockup Preview */}
-      <section className="py-16 px-4">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-white font-display mb-3">
+      {/* DASHBOARD PREVIEW MODAL SECTION */}
+      <section className="py-20 px-4 max-w-6xl mx-auto">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl sm:text-5xl font-extrabold text-white font-display mb-4 tracking-tight">
             Designed for Speed, Precision, and Control
           </h2>
-          <p className="text-slate-400 max-w-xl mx-auto text-sm sm:text-base font-body">
-            Here is an early sneak peek of your future workspace inside Pricis.
+          <p className="text-slate-400 max-w-xl mx-auto text-base font-body">
+            Get a preview of your future workspace inside Pricis.
           </p>
         </div>
         <WaitlistDashboardPreview />
       </section>
 
-      {/* Why Join the Wait-list Section */}
+      {/* WHY JOIN THE WAIT-LIST SECTION */}
       <section id="why-join" className="py-20 px-4 max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-5xl font-extrabold text-white font-display mb-4 tracking-tight">
             Why join the wait-list?
           </h2>
-          <p className="text-slate-400 max-w-xl mx-auto text-base sm:text-lg font-body">
-            Be part of the exclusive cohort shaping the future of AI workspace tools.
-          </p>
+          <div className="w-16 h-1 bg-blue-600 rounded-full mx-auto mb-4"></div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -176,7 +160,7 @@ export default function WaitlistPage() {
             </div>
             <h3 className="text-xl font-bold text-white font-display mb-2">Early Access</h3>
             <p className="text-slate-400 text-sm leading-relaxed font-body">
-              Get early access to Pricis before the official public launch.
+              Get early access to Pricis before the official launch.
             </p>
           </div>
 
@@ -187,7 +171,7 @@ export default function WaitlistPage() {
             </div>
             <h3 className="text-xl font-bold text-white font-display mb-2">Exclusive Offers</h3>
             <p className="text-slate-400 text-sm leading-relaxed font-body">
-              Enjoy special launch pricing and exclusive lifetime bonuses.
+              Enjoy special launch pricing and exclusive bonuses.
             </p>
           </div>
 
@@ -198,7 +182,7 @@ export default function WaitlistPage() {
             </div>
             <h3 className="text-xl font-bold text-white font-display mb-2">Shape the Product</h3>
             <p className="text-slate-400 text-sm leading-relaxed font-body">
-              Your feedback directly influences feature priorities before release.
+              Your feedback helps us build what you truly need.
             </p>
           </div>
 
@@ -215,48 +199,8 @@ export default function WaitlistPage() {
         </div>
       </section>
 
-      {/* Features Showcase Section */}
-      <section id="features" className="py-20 px-4 bg-[#0D1526]/50 border-y border-white/5">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <span className="text-xs uppercase tracking-widest text-blue-400 font-bold font-body">
-              Built For Modern Teams & Professionals
-            </span>
-            <h2 className="text-3xl sm:text-5xl font-extrabold text-white font-display mt-2">
-              Everything you need in one place
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-[#080D1A] border border-white/10 p-6 rounded-2xl">
-              <div className="w-10 h-10 rounded-xl bg-blue-600/20 text-blue-400 flex items-center justify-center mb-4 font-bold">01</div>
-              <h3 className="text-lg font-bold text-white font-display mb-2">AI Scope & Quote Generator</h3>
-              <p className="text-xs text-slate-400 font-body leading-relaxed">
-                Generate accurate client proposals with scope boundaries, milestone breakdowns, and market pricing in seconds.
-              </p>
-            </div>
-
-            <div className="bg-[#080D1A] border border-white/10 p-6 rounded-2xl">
-              <div className="w-10 h-10 rounded-xl bg-cyan-600/20 text-cyan-400 flex items-center justify-center mb-4 font-bold">02</div>
-              <h3 className="text-lg font-bold text-white font-display mb-2">Negotiation AI Assistant</h3>
-              <p className="text-xs text-slate-400 font-body leading-relaxed">
-                Real-time negotiation playbooks to handle price objections, counter offers, and close deals with confidence.
-              </p>
-            </div>
-
-            <div className="bg-[#080D1A] border border-white/10 p-6 rounded-2xl">
-              <div className="w-10 h-10 rounded-xl bg-purple-600/20 text-purple-400 flex items-center justify-center mb-4 font-bold">03</div>
-              <h3 className="text-lg font-bold text-white font-display mb-2">Invoice & Client Management</h3>
-              <p className="text-xs text-slate-400 font-body leading-relaxed">
-                Track proposal opens, send branded invoices, and keep your client pipeline organized without extra effort.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section id="faq" className="py-20 px-4 max-w-4xl mx-auto">
+      {/* FAQ SECTION */}
+      <section id="faq" className="py-20 px-4 max-w-4xl mx-auto border-t border-white/10">
         <div className="text-center mb-12">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white font-display mb-3">
             Frequently Asked Questions
@@ -293,11 +237,9 @@ export default function WaitlistPage() {
         </div>
       </section>
 
-      {/* Bottom CTA Banner */}
+      {/* BOTTOM CTA BANNER */}
       <section className="py-16 px-4 max-w-5xl mx-auto my-12">
-        <div className="relative rounded-3xl bg-gradient-to-r from-blue-900/60 via-blue-700/40 to-cyan-900/60 border border-blue-500/30 p-8 sm:p-12 overflow-hidden shadow-2xl text-center">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
-
+        <div className="relative rounded-3xl bg-gradient-to-r from-blue-900/40 via-blue-800/30 to-slate-900/60 border border-blue-500/20 p-8 sm:p-12 overflow-hidden shadow-2xl text-center">
           <h2 className="text-2xl sm:text-4xl font-extrabold text-white font-display mb-4">
             Don&apos;t miss out on the future of work
           </h2>
