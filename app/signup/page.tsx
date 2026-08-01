@@ -71,7 +71,7 @@ export default function SignupPage() {
         }
       });
       if (error) {
-        setError(error.message);
+        setError((error as any).message);
       }
     } catch {
       setError("Failed to redirect to Google signup.");
