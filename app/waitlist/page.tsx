@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { 
   Zap, Tag, Gift, Lock, ChevronDown, ChevronUp, 
-  Sparkles, CheckCircle2, ArrowRight, Clock, MessageSquare, Target, ShieldCheck, Star
+  Sparkles, MessageSquare, Target, Star
 } from "lucide-react";
 import WaitlistNavbar from "@/components/WaitlistNavbar";
 import CountdownTimer from "@/components/CountdownTimer";
@@ -13,18 +13,12 @@ import Footer from "@/components/Footer";
 import { fetchWaitlistCount } from "@/app/actions/db";
 
 export default function WaitlistPage() {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
   const [waitlistCount, setWaitlistCount] = useState<number>(1482);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   useEffect(() => {
-    if (theme === "light") {
-      document.body.style.backgroundColor = "#FFFFFF";
-      document.documentElement.style.backgroundColor = "#FFFFFF";
-    } else {
-      document.body.style.backgroundColor = "#080D1A";
-      document.documentElement.style.backgroundColor = "#080D1A";
-    }
+    document.body.style.backgroundColor = "#FFFFFF";
+    document.documentElement.style.backgroundColor = "#FFFFFF";
 
     const loadCount = async () => {
       try {
@@ -42,17 +36,11 @@ export default function WaitlistPage() {
       document.body.style.backgroundColor = "";
       document.documentElement.style.backgroundColor = "";
     };
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(prev => (prev === "light" ? "dark" : "light"));
-  };
+  }, []);
 
   const handleWaitlistSuccess = (email: string, totalCount?: number) => {
     if (totalCount) setWaitlistCount(totalCount);
   };
-
-  const isLight = theme === "light";
 
   const faqs = [
     {
@@ -74,24 +62,18 @@ export default function WaitlistPage() {
   ];
 
   return (
-    <div className={`min-h-screen transition-colors duration-200 font-body ${
-      isLight ? "bg-white text-slate-900 selection:bg-blue-100 selection:text-blue-900" : "bg-[#080D1A] text-white selection:bg-blue-600 selection:text-white"
-    }`}>
+    <div className="min-h-screen bg-white text-slate-900 font-body selection:bg-blue-100 selection:text-blue-900 transition-colors duration-200">
       {/* Navbar */}
-      <WaitlistNavbar theme={theme} onToggleTheme={toggleTheme} />
+      <WaitlistNavbar />
 
-      {/* HERO SECTION (Asymmetric Split Layout with Dot Pattern Background) */}
-      <section className={`relative pt-12 pb-20 px-4 sm:px-8 overflow-hidden transition-colors ${
-        isLight ? "bg-[#F8FAFC] bg-dot-pattern-light" : "bg-[#080D1A] bg-dot-pattern-dark"
-      }`}>
-        {/* Subtle Ambient Glows */}
-        <div className={`absolute top-1/4 left-1/4 w-[500px] h-[350px] rounded-full blur-[140px] pointer-events-none ${
-          isLight ? "bg-blue-400/10" : "bg-blue-600/15"
-        }`}></div>
+      {/* HERO SECTION (Asymmetric Split Layout with Light Dot Pattern) */}
+      <section className="relative pt-12 pb-20 px-4 sm:px-8 overflow-hidden bg-[#F8FAFC] bg-dot-pattern-light">
+        {/* Subtle Ambient Light Glow */}
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[350px] rounded-full blur-[140px] pointer-events-none bg-blue-400/10"></div>
 
         <div className="max-w-7xl mx-auto grid lg:grid-cols-12 gap-12 items-center relative z-10">
           
-          {/* Left Column (Hero Copy & Waitlist Card Form) */}
+          {/* Left Column (Hero Headline, Copy & Waitlist Form) */}
           <div className="lg:col-span-7 text-left">
             {/* Mint Green Pill Badge */}
             <div className="inline-flex items-center gap-2 bg-[#EBFBF5] border border-[#12B38F]/30 rounded-full px-4 py-1.5 mb-6 shadow-sm">
@@ -101,67 +83,57 @@ export default function WaitlistPage() {
               </span>
             </div>
 
-            {/* Main Headline */}
-            <h1 className={`text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-6 tracking-tight font-display leading-[1.12] ${
-              isLight ? "text-[#0F172A]" : "text-white"
-            }`}>
-              The AI Workspace for <br className="hidden sm:inline" />
+            {/* Main Headline (Updated per requested copy) */}
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-6 tracking-tight font-display leading-[1.12] text-[#0F172A]">
+              The Operating System <br className="hidden sm:inline" />
               <span className="text-[#2563EB]">
-                Smarter Business Growth
+                For Client Businesses
               </span>
             </h1>
 
             {/* Subtitle */}
-            <p className={`text-base sm:text-lg mb-8 leading-relaxed font-body max-w-xl ${
-              isLight ? "text-[#64748B]" : "text-slate-300"
-            }`}>
+            <p className="text-base sm:text-lg mb-8 leading-relaxed font-body max-w-xl text-[#64748B]">
               Pricis brings your projects, proposals, clients, invoices and negotiations together — with AI that works for you.
             </p>
 
             {/* Waitlist Form Card */}
             <div className="mb-8">
-              <WaitlistForm onSuccess={handleWaitlistSuccess} theme={theme} />
+              <WaitlistForm onSuccess={handleWaitlistSuccess} />
             </div>
 
             {/* Live Subscriber Pill */}
-            <div className={`inline-flex items-center gap-3 border rounded-full px-4 py-2 text-xs sm:text-sm font-body shadow-sm ${
-              isLight ? "bg-white border-slate-200 text-slate-700" : "bg-slate-900 border-slate-800 text-slate-300"
-            }`}>
+            <div className="inline-flex items-center gap-3 border rounded-full px-4 py-2 text-xs sm:text-sm font-body shadow-sm bg-white border-slate-200 text-slate-700">
               <div className="flex -space-x-2">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="w-6 h-6 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 overflow-hidden">
+                  <div key={i} className="w-6 h-6 rounded-full border-2 border-white bg-slate-200 overflow-hidden">
                     <img src={`https://i.pravatar.cc/100?img=${i + 40}`} alt="User Avatar" className="w-full h-full object-cover" />
                   </div>
                 ))}
               </div>
               <span>
-                Join <strong className={isLight ? "text-slate-900 font-bold" : "text-white font-bold"}>{waitlistCount.toLocaleString()}</strong> professionals on the wait-list
+                Join <strong className="text-slate-900 font-bold">{waitlistCount.toLocaleString()}</strong> professionals on the wait-list
               </span>
             </div>
           </div>
 
-          {/* Right Column (Floating Interactive Cards over Dot Pattern) */}
+          {/* Right Column (Floating Interactive Cards over Light Dot Pattern) */}
           <div className="lg:col-span-5 space-y-5">
             {/* Card 1: WhatsApp AI Negotiation Copilot Teaser */}
-            <div className={`p-6 rounded-3xl border shadow-xl transition-all hover:-translate-y-1 ${
-              isLight ? "bg-white border-slate-200/90" : "bg-[#0D1526] border-white/10"
-            }`}>
+            <div className="p-6 rounded-3xl border shadow-xl transition-all hover:-translate-y-1 bg-white border-slate-200/90">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2.5">
                   <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
                     <MessageSquare size={18} />
                   </div>
                   <div>
-                    <h4 className={`text-sm font-bold font-display ${isLight ? "text-slate-900" : "text-white"}`}>AI Negotiation Copilot</h4>
+                    <h4 className="text-sm font-bold font-display text-slate-900">AI Negotiation Copilot</h4>
                     <span className="text-[11px] text-emerald-600 font-semibold font-body">Live Strategy Assistant</span>
                   </div>
                 </div>
                 <span className="bg-emerald-50 text-emerald-600 text-[10px] font-extrabold px-2 py-0.5 rounded-full font-body">ACTIVE</span>
               </div>
 
-              <div className={`p-3.5 rounded-2xl text-xs font-body mb-3 border ${
-                isLight ? "bg-slate-50 border-slate-200 text-slate-700" : "bg-[#080D1A] border-slate-800 text-slate-300"
-              }`}>
+              <div className="p-3.5 rounded-2xl text-xs font-body mb-3 border bg-slate-50 border-slate-200 text-slate-700">
                 <p className="font-semibold mb-1 text-blue-600">Client Pushback:</p>
                 <p className="italic">&quot;Can we do 20% discount on this website scope?&quot;</p>
               </div>
@@ -173,16 +145,14 @@ export default function WaitlistPage() {
             </div>
 
             {/* Card 2: Scope & Pricing Intelligence Card */}
-            <div className={`p-6 rounded-3xl border shadow-xl transition-all hover:-translate-y-1 ${
-              isLight ? "bg-white border-slate-200/90" : "bg-[#0D1526] border-white/10"
-            }`}>
+            <div className="p-6 rounded-3xl border shadow-xl transition-all hover:-translate-y-1 bg-white border-slate-200/90">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2.5">
                   <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
                     <Target size={18} />
                   </div>
                   <div>
-                    <h4 className={`text-sm font-bold font-display ${isLight ? "text-slate-900" : "text-white"}`}>Scope Generator</h4>
+                    <h4 className="text-sm font-bold font-display text-slate-900">Scope Generator</h4>
                     <span className="text-[11px] text-slate-500 font-body">Automated Proposal Engine</span>
                   </div>
                 </div>
@@ -190,12 +160,12 @@ export default function WaitlistPage() {
               </div>
 
               <div className="space-y-2 text-xs font-body">
-                <div className="flex justify-between items-center py-1.5 border-b border-slate-100 dark:border-white/5">
-                  <span className={isLight ? "text-slate-600" : "text-slate-400"}>Market Rate Accuracy</span>
+                <div className="flex justify-between items-center py-1.5 border-b border-slate-100">
+                  <span className="text-slate-600">Market Rate Accuracy</span>
                   <span className="font-bold text-emerald-600">98.4% Calibrated</span>
                 </div>
                 <div className="flex justify-between items-center py-1.5">
-                  <span className={isLight ? "text-slate-600" : "text-slate-400"}>Client Proposal PDF</span>
+                  <span className="text-slate-600">Client Proposal PDF</span>
                   <span className="font-semibold text-blue-600">Instant Export →</span>
                 </div>
               </div>
@@ -218,51 +188,37 @@ export default function WaitlistPage() {
         </div>
       </section>
 
-      {/* DEDICATED LAUNCH COUNTDOWN TIMER SECTION (Padded & Framed) */}
-      <section id="countdown" className={`py-16 px-4 sm:px-8 border-y transition-colors ${
-        isLight ? "bg-white border-slate-200/80" : "bg-[#0D1526]/80 border-white/10"
-      }`}>
+      {/* DEDICATED LAUNCH COUNTDOWN TIMER SECTION */}
+      <section id="countdown" className="py-16 px-4 sm:px-8 border-y bg-white border-slate-200/80">
         <div className="max-w-5xl mx-auto">
-          <CountdownTimer targetDate="2026-09-15T12:00:00Z" theme={theme} />
+          <CountdownTimer targetDate="2026-09-15T12:00:00Z" />
         </div>
       </section>
 
       {/* DASHBOARD PREVIEW MODAL SECTION */}
-      <section className={`py-20 px-4 max-w-6xl mx-auto transition-colors ${
-        isLight ? "bg-[#F8FAFC]" : "bg-[#080D1A]"
-      }`}>
+      <section className="py-20 px-4 max-w-6xl mx-auto bg-[#F8FAFC]">
         <div className="text-center mb-10">
-          <h2 className={`text-3xl sm:text-4xl font-extrabold font-display mb-3 ${
-            isLight ? "text-slate-900" : "text-white"
-          }`}>
+          <h2 className="text-3xl sm:text-4xl font-extrabold font-display mb-3 text-slate-900">
             Designed for Speed, Precision, and Control
           </h2>
-          <p className={`max-w-xl mx-auto text-sm sm:text-base font-body ${
-            isLight ? "text-slate-500" : "text-slate-400"
-          }`}>
+          <p className="max-w-xl mx-auto text-sm sm:text-base font-body text-slate-500">
             Here is a sneak peek of your future workspace inside Pricis.
           </p>
         </div>
-        <WaitlistDashboardPreview theme={theme} />
+        <WaitlistDashboardPreview />
       </section>
 
       {/* ASYMMETRIC WHY JOIN SECTION */}
-      <section id="why-join" className={`py-24 px-4 sm:px-8 max-w-7xl mx-auto transition-colors ${
-        isLight ? "bg-white" : "bg-[#080D1A]"
-      }`}>
+      <section id="why-join" className="py-24 px-4 sm:px-8 max-w-7xl mx-auto bg-white">
         <div className="grid lg:grid-cols-12 gap-12 items-start">
           
           {/* Left Column Title & Mission */}
           <div className="lg:col-span-4 lg:sticky lg:top-28 text-left space-y-4">
             <span className="text-xs uppercase tracking-widest font-bold text-blue-600 font-body">WHY JOIN NOW</span>
-            <h2 className={`text-3xl sm:text-5xl font-extrabold font-display tracking-tight leading-tight ${
-              isLight ? "text-slate-900" : "text-white"
-            }`}>
+            <h2 className="text-3xl sm:text-5xl font-extrabold font-display tracking-tight leading-tight text-slate-900">
               Why join the wait-list?
             </h2>
-            <p className={`text-base font-body leading-relaxed ${
-              isLight ? "text-slate-600" : "text-slate-400"
-            }`}>
+            <p className="text-base font-body leading-relaxed text-slate-600">
               Be part of the exclusive launch cohort shaping the future of AI workspace tools for service providers.
             </p>
             <div className="pt-2">
@@ -273,53 +229,45 @@ export default function WaitlistPage() {
           {/* Right Column Grid (4 Feature Cards) */}
           <div className="lg:col-span-8 grid sm:grid-cols-2 gap-6 text-left">
             {/* Card 1: Early Access */}
-            <div className={`border rounded-3xl p-7 transition-all duration-300 hover:-translate-y-1 shadow-sm group ${
-              isLight ? "bg-white border-slate-200/90 hover:shadow-md" : "bg-[#0D1526] border-blue-500/20 hover:border-blue-500/50"
-            }`}>
+            <div className="border rounded-3xl p-7 transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-md bg-white border-slate-200/90 group">
               <div className="w-14 h-14 rounded-2xl bg-blue-50 text-[#2563EB] flex items-center justify-center mb-6 group-hover:bg-[#2563EB] group-hover:text-white transition-colors">
                 <Zap size={28} />
               </div>
-              <h3 className={`text-xl font-bold font-display mb-2 ${isLight ? "text-slate-900" : "text-white"}`}>Early Access</h3>
-              <p className={`text-sm leading-relaxed font-body ${isLight ? "text-slate-500" : "text-slate-400"}`}>
+              <h3 className="text-xl font-bold font-display mb-2 text-slate-900">Early Access</h3>
+              <p className="text-sm leading-relaxed font-body text-slate-500">
                 Get early access to Pricis before the official launch.
               </p>
             </div>
 
             {/* Card 2: Exclusive Offers */}
-            <div className={`border rounded-3xl p-7 transition-all duration-300 hover:-translate-y-1 shadow-sm group ${
-              isLight ? "bg-white border-slate-200/90 hover:shadow-md" : "bg-[#0D1526] border-blue-500/20 hover:border-blue-500/50"
-            }`}>
+            <div className="border rounded-3xl p-7 transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-md bg-white border-slate-200/90 group">
               <div className="w-14 h-14 rounded-2xl bg-cyan-50 text-cyan-600 flex items-center justify-center mb-6 group-hover:bg-cyan-600 group-hover:text-white transition-colors">
                 <Tag size={28} />
               </div>
-              <h3 className={`text-xl font-bold font-display mb-2 ${isLight ? "text-slate-900" : "text-white"}`}>Exclusive Offers</h3>
-              <p className={`text-sm leading-relaxed font-body ${isLight ? "text-slate-500" : "text-slate-400"}`}>
+              <h3 className="text-xl font-bold font-display mb-2 text-slate-900">Exclusive Offers</h3>
+              <p className="text-sm leading-relaxed font-body text-slate-500">
                 Enjoy special launch pricing and exclusive bonuses.
               </p>
             </div>
 
             {/* Card 3: Shape the Product */}
-            <div className={`border rounded-3xl p-7 transition-all duration-300 hover:-translate-y-1 shadow-sm group ${
-              isLight ? "bg-white border-slate-200/90 hover:shadow-md" : "bg-[#0D1526] border-blue-500/20 hover:border-blue-500/50"
-            }`}>
+            <div className="border rounded-3xl p-7 transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-md bg-white border-slate-200/90 group">
               <div className="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                 <Gift size={28} />
               </div>
-              <h3 className={`text-xl font-bold font-display mb-2 ${isLight ? "text-slate-900" : "text-white"}`}>Shape the Product</h3>
-              <p className={`text-sm leading-relaxed font-body ${isLight ? "text-slate-500" : "text-slate-400"}`}>
+              <h3 className="text-xl font-bold font-display mb-2 text-slate-900">Shape the Product</h3>
+              <p className="text-sm leading-relaxed font-body text-slate-500">
                 Your feedback helps us build what you truly need.
               </p>
             </div>
 
             {/* Card 4: Stay Ahead */}
-            <div className={`border rounded-3xl p-7 transition-all duration-300 hover:-translate-y-1 shadow-sm group ${
-              isLight ? "bg-white border-slate-200/90 hover:shadow-md" : "bg-[#0D1526] border-blue-500/20 hover:border-blue-500/50"
-            }`}>
+            <div className="border rounded-3xl p-7 transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-md bg-white border-slate-200/90 group">
               <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-6 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
                 <Lock size={28} />
               </div>
-              <h3 className={`text-xl font-bold font-display mb-2 ${isLight ? "text-slate-900" : "text-white"}`}>Stay Ahead</h3>
-              <p className={`text-sm leading-relaxed font-body ${isLight ? "text-slate-500" : "text-slate-400"}`}>
+              <h3 className="text-xl font-bold font-display mb-2 text-slate-900">Stay Ahead</h3>
+              <p className="text-sm leading-relaxed font-body text-slate-500">
                 Be the first to experience the future of AI-powered work.
               </p>
             </div>
@@ -328,19 +276,13 @@ export default function WaitlistPage() {
       </section>
 
       {/* SPLIT FAQ SECTION */}
-      <section id="faq" className={`py-20 px-4 sm:px-8 max-w-7xl mx-auto transition-colors border-t ${
-        isLight ? "bg-[#F8FAFC] border-slate-200" : "bg-[#080D1A] border-white/10"
-      }`}>
+      <section id="faq" className="py-20 px-4 sm:px-8 max-w-7xl mx-auto border-t bg-[#F8FAFC] border-slate-200">
         <div className="grid lg:grid-cols-12 gap-12 items-start">
           <div className="lg:col-span-4 text-left">
-            <h2 className={`text-3xl sm:text-4xl font-extrabold font-display mb-4 ${
-              isLight ? "text-slate-900" : "text-white"
-            }`}>
+            <h2 className="text-3xl sm:text-4xl font-extrabold font-display mb-4 text-slate-900">
               Frequently Asked Questions
             </h2>
-            <p className={`text-sm font-body leading-relaxed mb-6 ${
-              isLight ? "text-slate-500" : "text-slate-400"
-            }`}>
+            <p className="text-sm font-body leading-relaxed mb-6 text-slate-500">
               Got questions about early access, features, or launch timelines? We&apos;ve got answers.
             </p>
           </div>
@@ -349,27 +291,21 @@ export default function WaitlistPage() {
             {faqs.map((faq, idx) => (
               <div 
                 key={idx} 
-                className={`border rounded-2xl overflow-hidden transition-colors ${
-                  isLight ? "bg-white border-slate-200" : "bg-[#0D1526] border-white/10"
-                }`}
+                className="border rounded-2xl overflow-hidden transition-colors bg-white border-slate-200"
               >
                 <button
                   onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
                   className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none"
                 >
-                  <span className={`font-semibold text-base font-display ${
-                    isLight ? "text-slate-900" : "text-white"
-                  }`}>{faq.q}</span>
+                  <span className="font-semibold text-base font-display text-slate-900">{faq.q}</span>
                   {openFaq === idx ? (
                     <ChevronUp size={20} className="text-[#2563EB] flex-shrink-0" />
                   ) : (
-                    <ChevronDown size={20} className={isLight ? "text-slate-400 flex-shrink-0" : "text-slate-500 flex-shrink-0"} />
+                    <ChevronDown size={20} className="text-slate-400 flex-shrink-0" />
                   )}
                 </button>
                 {openFaq === idx && (
-                  <div className={`px-6 pb-5 text-sm font-body leading-relaxed border-t pt-3 ${
-                    isLight ? "border-slate-100 text-slate-600" : "border-white/5 text-slate-300"
-                  }`}>
+                  <div className="px-6 pb-5 text-sm font-body leading-relaxed border-t pt-3 border-slate-100 text-slate-600">
                     {faq.a}
                   </div>
                 )}
@@ -381,21 +317,15 @@ export default function WaitlistPage() {
 
       {/* BOTTOM CTA BANNER */}
       <section className="py-16 px-4 max-w-5xl mx-auto my-12">
-        <div className={`relative rounded-3xl border p-8 sm:p-12 text-center transition-colors shadow-xl ${
-          isLight ? "bg-white border-slate-200/90 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.06)]" : "bg-gradient-to-r from-blue-900/40 via-blue-800/30 to-slate-900/60 border-blue-500/20"
-        }`}>
-          <h2 className={`text-2xl sm:text-4xl font-extrabold font-display mb-4 ${
-            isLight ? "text-slate-900" : "text-white"
-          }`}>
+        <div className="relative rounded-3xl border p-8 sm:p-12 text-center transition-colors shadow-lg bg-white border-slate-200/90 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.06)]">
+          <h2 className="text-2xl sm:text-4xl font-extrabold font-display mb-4 text-slate-900">
             Don&apos;t miss out on the future of work
           </h2>
-          <p className={`max-w-xl mx-auto text-sm sm:text-base font-body mb-8 ${
-            isLight ? "text-slate-600" : "text-slate-300"
-          }`}>
+          <p className="max-w-xl mx-auto text-sm sm:text-base font-body mb-8 text-slate-600">
             Join the wait-list today and be part of something amazing.
           </p>
 
-          <WaitlistForm onSuccess={handleWaitlistSuccess} compact={true} theme={theme} />
+          <WaitlistForm onSuccess={handleWaitlistSuccess} compact={true} />
         </div>
       </section>
 
