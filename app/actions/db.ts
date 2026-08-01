@@ -117,7 +117,6 @@ export async function saveQuote(
   );
 }
 
-
 // 10. Fetch Conversations
 export async function fetchConversations(userId: string) {
   return await query("SELECT * FROM negotiations WHERE user_id = $1 ORDER BY created_at DESC", [userId]);
@@ -279,7 +278,8 @@ export async function fetchTemplates(userId: string) {
 export async function deleteTemplate(templateId: string, userId: string) {
   return await query("DELETE FROM templates WHERE id = $1 AND user_id = $2", [templateId, userId]);
 }
-// 13. Check Profile Exists
+
+// 23. Check Profile Exists
 export async function checkProfileExists(email: string) {
   try {
     const user = await queryOne<any>("SELECT * FROM profiles WHERE email = $1", [email]);
