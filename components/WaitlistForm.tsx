@@ -41,8 +41,16 @@ export default function WaitlistForm({ onSuccess, compact = false }: WaitlistFor
     setStatus({ type: "idle", message: "" });
 
     try {
+      const brevoRes = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const brevoData = await brevoRes.json();
+
       const res = await joinWaitlist(email, role);
-      if (res.success) {
+
+      if (brevoRes.ok || res.success) {
         setStatus({
           type: "success",
           message: res.message || "Welcome to the Pricis wait-list!",
@@ -51,11 +59,11 @@ export default function WaitlistForm({ onSuccess, compact = false }: WaitlistFor
         });
         if (onSuccess) onSuccess(email, res.count);
       } else {
-        setStatus({ type: "error", message: "Something went wrong. Please try again." });
+        setStatus({ type: "error", message: brevoData.error || "Something went wrong. Please try again." });
       }
     } catch (err) {
       console.error(err);
-      setStatus({ type: "success", message: "You're on the wait-list! We'll notify you soon." });
+      setStatus({ type: "error", message: "Something went wrong. Please try again." });
     } finally {
       setLoading(false);
     }
