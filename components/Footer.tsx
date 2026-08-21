@@ -16,11 +16,15 @@ export default function Footer() {
     <footer className="border-t border-slate-200/80 bg-white py-12 px-4 sm:px-8 font-body">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
         
-        {/* Left Column: Logo */}
-        <div className="text-left">
+        {/* Left Column: Logo & Tagline */}
+        <div className="text-left space-y-2">
           <Link href="/" className="inline-block">
             <Logo variant="dark" />
           </Link>
+          <p className="text-xs text-slate-600 font-medium leading-relaxed font-body">
+            Price with <span className="text-[#2563EB] font-bold">confidence</span>.<br />
+            Negotiate with <span className="text-emerald-500 font-bold">clarity</span>.
+          </p>
         </div>
 
         {/* Right Column: Footer Links */}
