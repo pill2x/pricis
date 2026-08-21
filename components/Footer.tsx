@@ -16,14 +16,11 @@ export default function Footer() {
     <footer className="border-t border-slate-200/80 bg-white py-12 px-4 sm:px-8 font-body">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
         
-        {/* Left Column: Logo & Tagline */}
-        <div className="space-y-2 text-left">
+        {/* Left Column: Logo */}
+        <div className="text-left">
           <Link href="/" className="inline-block">
             <Logo variant="dark" />
           </Link>
-          <p className="text-xs text-slate-500 font-medium">
-            Client operations, precisely.
-          </p>
         </div>
 
         {/* Right Column: Footer Links */}
@@ -62,7 +59,6 @@ export default function Footer() {
 
       <div className="max-w-7xl mx-auto pt-8 mt-8 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-400">
         <p>© {new Date().getFullYear()} Pricis Inc. All rights reserved.</p>
-        <p>Built for ambitious service businesses.</p>
       </div>
     </footer>
   );
