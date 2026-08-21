@@ -62,7 +62,7 @@ export default function Footer() {
       </div>
 
       <div className="max-w-7xl mx-auto pt-8 mt-8 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-400">
-        <p>© {new Date().getFullYear()} Pricis Inc. All rights reserved.</p>
+        <p>© 2025 Pricis. All rights reserved.</p>
       </div>
     </footer>
   );
