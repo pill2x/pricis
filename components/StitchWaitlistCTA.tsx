@@ -53,17 +53,20 @@ export default function StitchWaitlistCTA({ onSuccess }: StitchWaitlistCTAProps)
   };
 
   return (
-    <section id="waitlist-form" className="py-20 px-4 sm:px-8 border-t border-slate-200/80 bg-white">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-[#FBFBFD] border border-slate-200/90 rounded-3xl p-8 sm:p-14 text-center space-y-6 shadow-sm">
+    <section id="waitlist-form" className="py-16 sm:py-24 px-4 sm:px-8 border-t border-slate-200/80 bg-white relative overflow-hidden">
+      {/* Background Subtle Dot Pattern */}
+      <div className="absolute inset-0 bg-dot-pattern-light opacity-50 pointer-events-none"></div>
+
+      <div className="max-w-5xl mx-auto relative z-10">
+        <div className="bg-[#FBFBFD] border border-slate-200/90 rounded-3xl p-6 sm:p-12 md:p-14 text-center space-y-5 sm:space-y-6 shadow-sm">
           
-          {/* Section Headline */}
-          <h2 className="text-3xl sm:text-4xl font-extrabold font-display text-[#0F172A] tracking-tight">
+          {/* Desktop Single Line Headline */}
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[2rem] font-extrabold font-display text-[#0F172A] tracking-tight md:whitespace-nowrap leading-snug">
             Build your client operations around one system.
           </h2>
 
-          {/* Subtitle */}
-          <p className="max-w-xl mx-auto text-sm sm:text-base text-slate-600 font-body leading-relaxed">
+          {/* Desktop Single Line Subtitle */}
+          <p className="text-xs sm:text-sm text-slate-600 font-body leading-relaxed max-w-3xl mx-auto md:whitespace-nowrap">
             Join the waitlist to get early access to Pricis and start streamlining your client engagements.
           </p>
 
@@ -74,7 +77,7 @@ export default function StitchWaitlistCTA({ onSuccess }: StitchWaitlistCTAProps)
                 <div className="w-12 h-12 bg-blue-50 text-[#2563EB] rounded-full flex items-center justify-center mx-auto border border-blue-100">
                   <CheckCircle2 size={28} />
                 </div>
-                <h3 className="text-xl font-bold font-display text-[#0F172A]">
+                <h3 className="text-lg sm:text-xl font-bold font-display text-[#0F172A]">
                   {status.alreadySubscribed ? "You're Already On The List!" : "Your Spot Is Secured! 🎉"}
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-600 font-body leading-relaxed">
@@ -96,7 +99,7 @@ export default function StitchWaitlistCTA({ onSuccess }: StitchWaitlistCTAProps)
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email address"
-                    className="w-full px-4 py-3 bg-transparent font-body text-xs sm:text-sm focus:outline-none text-[#0F172A] placeholder-slate-400"
+                    className="w-full px-4 py-2.5 sm:py-3 bg-transparent font-body text-xs sm:text-sm focus:outline-none text-[#0F172A] placeholder-slate-400"
                   />
 
                   <button
@@ -111,7 +114,7 @@ export default function StitchWaitlistCTA({ onSuccess }: StitchWaitlistCTAProps)
                       </>
                     ) : (
                       <>
-                        <span>Join Waitlist</span>
+                        <span>JOIN WAITLIST</span>
                         <ArrowRight size={14} />
                       </>
                     )}

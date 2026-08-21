@@ -23,42 +23,42 @@ export default function StitchHero() {
   };
 
   return (
-    <section id="product" className="pt-16 pb-20 px-4 sm:px-8 text-center bg-[#FBFBFD]">
-      <div className="max-w-6xl mx-auto space-y-6">
+    <section id="product" className="pt-12 sm:pt-16 pb-16 sm:pb-20 px-4 sm:px-8 text-center bg-[#FBFBFD] bg-dot-pattern-light relative overflow-hidden">
+      <div className="max-w-6xl mx-auto space-y-5 sm:space-y-6 relative z-10">
         
         {/* Eyebrow */}
-        <p className="text-xs sm:text-sm font-bold uppercase tracking-[0.2em] text-slate-500 font-body">
+        <p className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.2em] text-slate-500 font-body">
           Client Operations, Precisely.
         </p>
 
         {/* Main Headline */}
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight font-display text-[#0F172A] leading-[1.12]">
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight font-display text-[#0F172A] leading-[1.15]">
           Run every client engagement from quote to payment.
         </h1>
 
         {/* Supporting Paragraph */}
-        <p className="max-w-2xl mx-auto text-base sm:text-lg text-slate-600 font-body leading-relaxed">
+        <p className="max-w-2xl mx-auto text-sm sm:text-base lg:text-lg text-slate-600 font-body leading-relaxed">
           Pricis brings pricing, proposals, negotiation, client management, delivery, and payments into one workspace — so service businesses can spend less time managing operations and more time doing the work.
         </p>
 
         {/* Action Buttons */}
-        <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
           <button
             onClick={scrollToWaitlist}
-            className="w-full sm:w-auto bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-xs uppercase tracking-wider px-8 py-3.5 rounded-lg shadow-sm transition-all active:scale-95 font-body"
+            className="w-full sm:w-auto bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-xs uppercase tracking-wider px-7 py-3.5 rounded-lg shadow-sm transition-all active:scale-95 font-body"
           >
             Join the waitlist
           </button>
           <button
             onClick={scrollToHowItWorks}
-            className="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs uppercase tracking-wider px-8 py-3.5 rounded-lg border border-slate-300 shadow-sm transition-all font-body"
+            className="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs uppercase tracking-wider px-7 py-3.5 rounded-lg border border-slate-300 shadow-sm transition-all font-body"
           >
             See how it works
           </button>
         </div>
 
-        {/* Product UI Visualization Window (Updated Proposals List Dashboard Modal matching Image 2) */}
-        <div className="pt-10 max-w-6xl mx-auto">
+        {/* Product UI Visualization Window (Proposals List Dashboard Modal) */}
+        <div className="pt-8 sm:pt-10 max-w-6xl mx-auto">
           <div className="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.08)] text-left font-body">
             
             <div className="grid lg:grid-cols-12 min-h-[560px]">
@@ -121,46 +121,46 @@ export default function StitchHero() {
               </div>
 
               {/* Main Content Area: Proposals Management View */}
-              <div className="lg:col-span-9 p-6 sm:p-8 bg-[#FBFBFD] flex flex-col justify-between">
+              <div className="lg:col-span-9 p-4 sm:p-8 bg-[#FBFBFD] flex flex-col justify-between">
                 <div>
                   {/* Header Bar */}
-                  <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+                  <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
                     <div>
-                      <h1 className="text-2xl sm:text-3xl font-extrabold font-display text-slate-900">Proposals</h1>
+                      <h1 className="text-xl sm:text-3xl font-extrabold font-display text-slate-900">Proposals</h1>
                       <p className="text-xs sm:text-sm text-slate-500 font-body">
                         Manage and track all your live proposal links in real time.
                       </p>
                     </div>
 
-                    <button className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-bold px-4 py-2.5 rounded-full flex items-center gap-1.5 transition-colors shadow-2xs font-body">
-                      <Plus size={16} /> New Proposal
+                    <button className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-bold px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-full flex items-center gap-1.5 transition-colors shadow-2xs font-body">
+                      <Plus size={15} /> New Proposal
                     </button>
                   </div>
 
                   {/* 4 Metric Summary Cards */}
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                    <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-2xs">
-                      <span className="text-2xl font-extrabold font-display text-slate-900 block mb-1">24</span>
-                      <span className="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Total Proposals</span>
-                      <span className="text-[10px] font-semibold text-emerald-600 block mt-1">↑ 20% vs last month</span>
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+                    <div className="bg-white border border-slate-200/90 rounded-2xl p-3.5 sm:p-4 shadow-2xs">
+                      <span className="text-xl sm:text-2xl font-extrabold font-display text-slate-900 block mb-1">24</span>
+                      <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Total Proposals</span>
+                      <span className="text-[9px] sm:text-[10px] font-semibold text-emerald-600 block mt-1">↑ 20% vs last month</span>
                     </div>
 
-                    <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-2xs">
-                      <span className="text-2xl font-extrabold font-display text-emerald-600 block mb-1">62.5%</span>
-                      <span className="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Open Rate</span>
-                      <span className="text-[10px] font-semibold text-emerald-600 block mt-1">↑ 8.5% vs last month</span>
+                    <div className="bg-white border border-slate-200/90 rounded-2xl p-3.5 sm:p-4 shadow-2xs">
+                      <span className="text-xl sm:text-2xl font-extrabold font-display text-emerald-600 block mb-1">62.5%</span>
+                      <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Open Rate</span>
+                      <span className="text-[9px] sm:text-[10px] font-semibold text-emerald-600 block mt-1">↑ 8.5% vs last month</span>
                     </div>
 
-                    <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-2xs">
-                      <span className="text-2xl font-extrabold font-display text-purple-600 block mb-1">5.3 days</span>
-                      <span className="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Avg. Time to Signature</span>
-                      <span className="text-[10px] font-semibold text-purple-600 block mt-1">↓ 1.2 days vs last month</span>
+                    <div className="bg-white border border-slate-200/90 rounded-2xl p-3.5 sm:p-4 shadow-2xs">
+                      <span className="text-xl sm:text-2xl font-extrabold font-display text-purple-600 block mb-1">5.3 days</span>
+                      <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Avg. Time to Signature</span>
+                      <span className="text-[9px] sm:text-[10px] font-semibold text-purple-600 block mt-1">↓ 1.2 days vs last month</span>
                     </div>
 
-                    <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-2xs">
-                      <span className="text-2xl font-extrabold font-display text-slate-900 block mb-1">₦8,450,000</span>
-                      <span className="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Total Value in Proposals</span>
-                      <span className="text-[10px] font-semibold text-emerald-600 block mt-1">↑ 28% vs last month</span>
+                    <div className="bg-white border border-slate-200/90 rounded-2xl p-3.5 sm:p-4 shadow-2xs">
+                      <span className="text-xl sm:text-2xl font-extrabold font-display text-slate-900 block mb-1">₦8,450,000</span>
+                      <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 block uppercase tracking-wider">Total Value in Proposals</span>
+                      <span className="text-[9px] sm:text-[10px] font-semibold text-emerald-600 block mt-1">↑ 28% vs last month</span>
                     </div>
                   </div>
 
@@ -176,7 +176,7 @@ export default function StitchHero() {
                       />
                     </div>
 
-                    <button className="bg-white border border-slate-200 text-slate-700 text-xs font-semibold px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-2xs hover:bg-slate-50">
+                    <button className="bg-white border border-slate-200 text-slate-700 text-xs font-semibold px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-2xs hover:bg-slate-50">
                       <Filter size={14} className="text-slate-400" /> Filter
                     </button>
                   </div>
@@ -197,68 +197,68 @@ export default function StitchHero() {
                         </thead>
                         <tbody className="divide-y divide-slate-100 text-xs font-body">
                           <tr className="hover:bg-slate-50/60 transition-colors">
-                            <td className="py-3.5 px-4 font-bold text-slate-900">Website Redesign Project</td>
-                            <td className="py-3.5 px-4 text-slate-600">Acme Corp</td>
-                            <td className="py-3.5 px-4 font-bold text-slate-900">₦1,200,000</td>
-                            <td className="py-3.5 px-4">
+                            <td className="py-3 px-4 font-bold text-slate-900">Website Redesign Project</td>
+                            <td className="py-3 px-4 text-slate-600">Acme Corp</td>
+                            <td className="py-3 px-4 font-bold text-slate-900">₦1,200,000</td>
+                            <td className="py-3 px-4">
                               <span className="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2.5 py-1 rounded-full border border-emerald-100">
                                 Opened
                               </span>
                             </td>
-                            <td className="py-3.5 px-4 text-slate-400">May 15, 2024</td>
-                            <td className="py-3.5 px-4 text-right text-slate-400"><ChevronRight size={14} className="ml-auto" /></td>
+                            <td className="py-3 px-4 text-slate-400">May 15, 2024</td>
+                            <td className="py-3 px-4 text-right text-slate-400"><ChevronRight size={14} className="ml-auto" /></td>
                           </tr>
 
                           <tr className="hover:bg-slate-50/60 transition-colors">
-                            <td className="py-3.5 px-4 font-bold text-slate-900">Mobile App Design</td>
-                            <td className="py-3.5 px-4 text-slate-600">TechNova Ltd.</td>
-                            <td className="py-3.5 px-4 font-bold text-slate-900">₦850,000</td>
-                            <td className="py-3.5 px-4">
+                            <td className="py-3 px-4 font-bold text-slate-900">Mobile App Design</td>
+                            <td className="py-3 px-4 text-slate-600">TechNova Ltd.</td>
+                            <td className="py-3 px-4 font-bold text-slate-900">₦850,000</td>
+                            <td className="py-3 px-4">
                               <span className="bg-purple-50 text-purple-700 text-[10px] font-bold px-2.5 py-1 rounded-full border border-purple-100">
                                 Reviewing
                               </span>
                             </td>
-                            <td className="py-3.5 px-4 text-slate-400">May 10, 2024</td>
-                            <td className="py-3.5 px-4 text-right text-slate-400"><ChevronRight size={14} className="ml-auto" /></td>
+                            <td className="py-3 px-4 text-slate-400">May 10, 2024</td>
+                            <td className="py-3 px-4 text-right text-slate-400"><ChevronRight size={14} className="ml-auto" /></td>
                           </tr>
 
                           <tr className="hover:bg-slate-50/60 transition-colors">
-                            <td className="py-3.5 px-4 font-bold text-slate-900">Brand Identity Design</td>
-                            <td className="py-3.5 px-4 text-slate-600">Greenlife NG</td>
-                            <td className="py-3.5 px-4 font-bold text-slate-900">₦450,000</td>
-                            <td className="py-3.5 px-4">
+                            <td className="py-3 px-4 font-bold text-slate-900">Brand Identity Design</td>
+                            <td className="py-3 px-4 text-slate-600">Greenlife NG</td>
+                            <td className="py-3 px-4 font-bold text-slate-900">₦450,000</td>
+                            <td className="py-3 px-4">
                               <span className="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2.5 py-1 rounded-full border border-emerald-100">
                                 Signed
                               </span>
                             </td>
-                            <td className="py-3.5 px-4 text-slate-400">May 8, 2024</td>
-                            <td className="py-3.5 px-4 text-right text-slate-400"><ChevronRight size={14} className="ml-auto" /></td>
+                            <td className="py-3 px-4 text-slate-400">May 8, 2024</td>
+                            <td className="py-3 px-4 text-right text-slate-400"><ChevronRight size={14} className="ml-auto" /></td>
                           </tr>
 
                           <tr className="hover:bg-slate-50/60 transition-colors">
-                            <td className="py-3.5 px-4 font-bold text-slate-900">UI/UX Design System</td>
-                            <td className="py-3.5 px-4 text-slate-600">StartupX</td>
-                            <td className="py-3.5 px-4 font-bold text-slate-900">₦300,000</td>
-                            <td className="py-3.5 px-4">
+                            <td className="py-3 px-4 font-bold text-slate-900">UI/UX Design System</td>
+                            <td className="py-3 px-4 text-slate-600">StartupX</td>
+                            <td className="py-3 px-4 font-bold text-slate-900">₦300,000</td>
+                            <td className="py-3 px-4">
                               <span className="bg-blue-50 text-blue-700 text-[10px] font-bold px-2.5 py-1 rounded-full border border-blue-100">
                                 Sent
                               </span>
                             </td>
-                            <td className="py-3.5 px-4 text-slate-400">May 3, 2024</td>
-                            <td className="py-3.5 px-4 text-right text-slate-400"><ChevronRight size={14} className="ml-auto" /></td>
+                            <td className="py-3 px-4 text-slate-400">May 3, 2024</td>
+                            <td className="py-3 px-4 text-right text-slate-400"><ChevronRight size={14} className="ml-auto" /></td>
                           </tr>
 
                           <tr className="hover:bg-slate-50/60 transition-colors">
-                            <td className="py-3.5 px-4 font-bold text-slate-900">E-commerce Website</td>
-                            <td className="py-3.5 px-4 text-slate-600">StoreHub</td>
-                            <td className="py-3.5 px-4 font-bold text-slate-900">₦500,000</td>
-                            <td className="py-3.5 px-4">
+                            <td className="py-3 px-4 font-bold text-slate-900">E-commerce Website</td>
+                            <td className="py-3 px-4 text-slate-600">StoreHub</td>
+                            <td className="py-3 px-4 font-bold text-slate-900">₦500,000</td>
+                            <td className="py-3 px-4">
                               <span className="bg-slate-100 text-slate-600 text-[10px] font-bold px-2.5 py-1 rounded-full border border-slate-200">
                                 Expired
                               </span>
                             </td>
-                            <td className="py-3.5 px-4 text-slate-400">Apr 28, 2024</td>
-                            <td className="py-3.5 px-4 text-right text-slate-400"><ChevronRight size={14} className="ml-auto" /></td>
+                            <td className="py-3 px-4 text-slate-400">Apr 28, 2024</td>
+                            <td className="py-3 px-4 text-right text-slate-400"><ChevronRight size={14} className="ml-auto" /></td>
                           </tr>
                         </tbody>
                       </table>
