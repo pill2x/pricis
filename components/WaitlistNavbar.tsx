@@ -3,21 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import Logo from "@/components/Logo";
-import { Menu, X, ArrowRight } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 export default function WaitlistNavbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const scrollToWaitlist = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setMobileMenuOpen(false);
-    const element = document.getElementById("hero-waitlist-form");
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "center" });
-      const input = element.querySelector("input");
-      if (input) input.focus();
-    }
-  };
 
   const scrollToSection = (e: React.MouseEvent, id: string) => {
     e.preventDefault();
@@ -28,106 +17,103 @@ export default function WaitlistNavbar() {
     }
   };
 
+  const scrollToWaitlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setMobileMenuOpen(false);
+    const element = document.getElementById("waitlist-form");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "center" });
+      const input = element.querySelector("input");
+      if (input) input.focus();
+    }
+  };
+
   return (
-    <header className="sticky top-0 z-50 transition-colors duration-200 border-b bg-white/90 backdrop-blur-md border-slate-200/80 text-slate-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
-        {/* Logo */}
-        <Link href="/waitlist" className="flex items-center gap-2 group">
+    <header className="sticky top-0 z-50 bg-[#FBFBFD]/90 backdrop-blur-md border-b border-slate-200/80 transition-colors">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 h-16 sm:h-20 flex items-center justify-between">
+        
+        {/* Pricis Official Logo */}
+        <Link href="/" className="flex items-center gap-2 group">
           <Logo variant="dark" />
         </Link>
 
-        {/* Desktop Links */}
-        <nav className="hidden md:flex items-center gap-8 font-body">
+        {/* Desktop Navigation Links */}
+        <nav className="hidden md:flex items-center gap-9 font-body">
           <a
-            href="#why-join"
-            onClick={(e) => scrollToSection(e, "why-join")}
-            className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+            href="#product"
+            onClick={(e) => scrollToSection(e, "product")}
+            className="text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors uppercase tracking-wider"
           >
-            Why Join
+            Product
           </a>
           <a
-            href="#features"
-            onClick={(e) => scrollToSection(e, "features")}
-            className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+            href="#how-it-works"
+            onClick={(e) => scrollToSection(e, "how-it-works")}
+            className="text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors uppercase tracking-wider"
           >
-            Features
+            How It Works
           </a>
           <a
-            href="#countdown"
-            onClick={(e) => scrollToSection(e, "countdown")}
-            className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+            href="#built-for"
+            onClick={(e) => scrollToSection(e, "built-for")}
+            className="text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors uppercase tracking-wider"
           >
-            Launch Timer
-          </a>
-          <a
-            href="#faq"
-            onClick={(e) => scrollToSection(e, "faq")}
-            className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
-          >
-            FAQ
+            For Teams
           </a>
         </nav>
 
-        {/* Action Button: Join Waitlist Pill */}
-        <div className="hidden md:flex items-center gap-4">
+        {/* Desktop Primary CTA Button */}
+        <div className="hidden md:flex items-center">
           <button
             onClick={scrollToWaitlist}
-            className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold px-6 py-2.5 rounded-full text-sm transition-all shadow-[0_4px_16px_rgba(37,99,235,0.3)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.45)] active:scale-95 font-body flex items-center gap-2"
+            className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-xs uppercase tracking-wider px-5 py-2.5 rounded-full transition-all shadow-sm active:scale-95 font-body"
           >
-            <span>Join Waitlist</span>
+            Join the waitlist
           </button>
         </div>
 
-        {/* Mobile Controls */}
-        <div className="md:hidden flex items-center gap-2">
+        {/* Mobile Menu Button */}
+        <div className="md:hidden flex items-center">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="p-2 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors"
             aria-label="Toggle Menu"
           >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Drawer */}
+      {/* Mobile Menu Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-b px-6 py-6 space-y-4 animate-fade-in bg-white border-slate-200 text-slate-900">
+        <div className="md:hidden border-b border-slate-200 px-6 py-6 space-y-4 bg-white animate-fade-in">
           <a
-            href="#why-join"
-            onClick={(e) => scrollToSection(e, "why-join")}
-            className="block text-base font-medium py-1 font-body"
+            href="#product"
+            onClick={(e) => scrollToSection(e, "product")}
+            className="block text-xs font-bold uppercase tracking-wider text-slate-700 py-2 font-body"
           >
-            Why Join
+            Product
           </a>
           <a
-            href="#features"
-            onClick={(e) => scrollToSection(e, "features")}
-            className="block text-base font-medium py-1 font-body"
+            href="#how-it-works"
+            onClick={(e) => scrollToSection(e, "how-it-works")}
+            className="block text-xs font-bold uppercase tracking-wider text-slate-700 py-2 font-body"
           >
-            Features
+            How It Works
           </a>
           <a
-            href="#countdown"
-            onClick={(e) => scrollToSection(e, "countdown")}
-            className="block text-base font-medium py-1 font-body"
+            href="#built-for"
+            onClick={(e) => scrollToSection(e, "built-for")}
+            className="block text-xs font-bold uppercase tracking-wider text-slate-700 py-2 font-body"
           >
-            Launch Timer
+            For Teams
           </a>
-          <a
-            href="#faq"
-            onClick={(e) => scrollToSection(e, "faq")}
-            className="block text-base font-medium py-1 font-body"
-          >
-            FAQ
-          </a>
-          <div className="pt-4 border-t border-slate-200">
+          <div className="pt-4 border-t border-slate-100">
             <button
               onClick={scrollToWaitlist}
-              className="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold py-3 rounded-full text-center flex items-center justify-center gap-2 font-body shadow-md shadow-blue-500/20"
+              className="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-xs uppercase tracking-wider py-3 rounded-full text-center font-body shadow-sm"
             >
-              <span>Join Waitlist</span>
-              <ArrowRight size={18} />
+              Join the waitlist
             </button>
           </div>
         </div>
